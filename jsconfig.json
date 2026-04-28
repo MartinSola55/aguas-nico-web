@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		"baseUrl": "src",
+		"paths": {
+			"@app": [
+				"app/index.js"
+			],
+			"@app/*": [
+				"app/*"
+			],
+			"@components": [
+				"components/index.js"
+			],
+			"@components/*": [
+				"components/*"
+			],
+			"@constants": [
+				"constants/index.js"
+			],
+			"@constants/*": [
+				"constants/*"
+			],
+			"@layout/*": [
+				"layout/*"
+			],
+			"@screens/*": [
+				"screens/*"
+			]
+		}
+	}
+}
