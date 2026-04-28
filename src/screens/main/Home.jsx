@@ -1,48 +1,53 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Banknote, ClipboardList, Package, ReceiptText, Truck } from 'lucide-react';
-import { API, DateHelper, Formatters, Helpers } from '@app';
+import { API, DateHelper, Formatters, Helpers, LocalStorage } from '@app';
 import { App } from '@app';
 import { Button, Card, DataTable, Input, Modal, PageHeader, Select, StatCard } from '@components';
 import { toast } from 'react-toastify';
 
 const Home = () => {
 	const navigate = useNavigate();
-	const [dashboard, setDashboard] = useState(null);
 	const [dealers, setDealers] = useState([]);
 	const [date, setDate] = useState(DateHelper.toInputDate());
 	const [routes, setRoutes] = useState([]);
 	const [expenses, setExpenses] = useState([]);
+	const [soldProducts, setSoldProducts] = useState([]);
 	const [balance, setBalance] = useState(null);
 	const [expenseModal, setExpenseModal] = useState(false);
 	const [expenseForm, setExpenseForm] = useState({ userId: '', description: '', amount: '' });
 	const [loading, setLoading] = useState(true);
 
 	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
+	const selectedDateLabel = Formatters.formatDate(date);
+	const totalSold = Helpers.numberOrZero(balance?.cartPaymentMethods) + Helpers.numberOrZero(balance?.transfers) + Helpers.numberOrZero(balance?.dispenserPrice);
 
-	const loadDashboard = () => {
-		setLoading(true);
-		API.endpoints.home.getDashboard()
-			.then((rs) => {
-				setDashboard(rs.data);
-				setDealers(rs.data.dealers || []);
-			})
-			.finally(() => setLoading(false));
+	const normalizeExpense = (expense) => ({
+		...expense,
+		dealerName: expense.dealerName || expense.dealer || '-',
+	});
+
+	const filterRoutesForRole = (items = []) => {
+		if (App.isAdmin()) return items;
+		const userId = LocalStorage.getUserId();
+		return items.filter((route) => route.userId === userId);
 	};
 
-	const loadDaily = (selectedDate = date) => {
+	const loadDashboard = (selectedDate = date) => {
+		setLoading(true);
 		const rq = { date: DateHelper.toApiDate(selectedDate) };
 		Promise.all([
-			API.endpoints.routes.searchByDate(rq).then((rs) => setRoutes(rs.data.routes || [])),
-			API.endpoints.expenses.searchByDate(rq).then((rs) => setExpenses(rs.data.items || [])),
+			API.endpoints.routes.searchByDate(rq).then((rs) => setRoutes(filterRoutesForRole(rs.data.routes || []))),
+			API.endpoints.routes.searchSoldProducts(rq).then((rs) => setSoldProducts(rs.data.items || [])),
+			API.endpoints.expenses.searchByDate(rq).then((rs) => setExpenses((rs.data.items || []).map(normalizeExpense))),
 			API.endpoints.stats.getBalanceByDate(rq).then((rs) => setBalance(rs.data)),
-		]).catch(() => null);
+			App.isAdmin() ? API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || [])) : Promise.resolve(),
+		]).catch(() => null).finally(() => setLoading(false));
 	};
 
 	useEffect(() => {
-		loadDashboard();
-		if (App.isAdmin()) loadDaily();
-	}, []);
+		loadDashboard(date);
+	}, [date]);
 
 	const createExpense = () => {
 		API.endpoints.expenses.create({
@@ -53,29 +58,34 @@ const Home = () => {
 			toast.success(rs.message);
 			setExpenseModal(false);
 			setExpenseForm({ userId: '', description: '', amount: '' });
-			loadDashboard();
-			loadDaily();
+			loadDashboard(date);
 		});
 	};
 
 	const adminTotals = (
 		<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-			<StatCard label="Vendido hoy" value={Formatters.formatCurrency(dashboard?.totalSold || 0)} icon={<ReceiptText size={18} />} />
-			<StatCard label="Transferencias" value={Formatters.formatCurrency((dashboard?.transfers || []).reduce((s, x) => s + Number(x.amount || 0), 0))} icon={<Banknote size={18} />} tone="info" />
-			<StatCard label="Dispenser" value={Formatters.formatCurrency(dashboard?.dispensers || 0)} icon={<Truck size={18} />} tone="warning" />
-			<StatCard label="Gastos" value={Formatters.formatCurrency((dashboard?.expenses || []).reduce((s, x) => s + Number(x.amount || 0), 0))} icon={<ClipboardList size={18} />} tone="danger" />
+			<StatCard label="Vendido" value={Formatters.formatCurrency(totalSold)} icon={<ReceiptText size={18} />} />
+			<StatCard label="Transferencias" value={Formatters.formatCurrency(balance?.transfers || 0)} icon={<Banknote size={18} />} tone="info" />
+			<StatCard label="Dispenser" value={Formatters.formatCurrency(balance?.dispenserPrice || 0)} icon={<Truck size={18} />} tone="warning" />
+			<StatCard label="Gastos" value={Formatters.formatCurrency(balance?.expenses || 0)} icon={<ClipboardList size={18} />} tone="danger" />
 		</div>
 	);
 
-	if (loading && !dashboard) {
+	if (loading && !balance) {
 		return <PageHeader title="Inicio" breadcrumbs={['Inicio']} />;
 	}
+
+	const dateAction = (
+		<div className="w-44">
+			<Input type="date" value={date} onChange={setDate} />
+		</div>
+	);
 
 	if (App.isDealer()) {
 		return (
 			<>
-				<PageHeader title="Inicio" breadcrumbs={['Inicio']} />
-				<Card title="Repartos del dia">
+				<PageHeader title="Inicio" breadcrumbs={['Inicio']} actions={dateAction} />
+				<Card title={`Repartos del ${selectedDateLabel}`}>
 					<DataTable
 						columns={[
 							{ name: 'dealerName', text: 'Nombre' },
@@ -83,8 +93,9 @@ const Home = () => {
 							{ name: 'isClosed', text: 'Estado', render: (_, row) => row.isClosed ? 'Cerrada' : row.pendingCarts === 0 ? 'Completado' : 'Pendiente' },
 							{ name: 'createdAt', text: 'Fecha', render: Formatters.formatDate },
 						]}
-						rows={dashboard?.dealerRoutes || []}
-						empty="No hay repartos para hoy"
+						rows={routes}
+						loading={loading}
+						empty="No hay repartos para la fecha seleccionada"
 						infinite
 						onRowClick={(row) => navigate(`/planillas/${row.id}`)}
 					/>
@@ -98,11 +109,11 @@ const Home = () => {
 			<PageHeader
 				title="Inicio"
 				breadcrumbs={['Inicio']}
-				actions={<Button onClick={() => setExpenseModal(true)}>Agregar gasto</Button>}
+				actions={<div className="flex flex-wrap items-end gap-2">{dateAction}<Button onClick={() => setExpenseModal(true)}>Agregar gasto</Button></div>}
 			/>
 			{adminTotals}
 			<div className="mt-4 grid gap-4 xl:grid-cols-2">
-				<Card title="Productos vendidos hoy">
+				<Card title={`Productos vendidos el ${selectedDateLabel}`}>
 					<DataTable
 						columns={[
 							{ name: 'name', text: 'Producto' },
@@ -111,32 +122,26 @@ const Home = () => {
 							{ name: 'returned', text: 'Devueltos' },
 							{ name: 'total', text: 'Total', render: Formatters.formatCurrency },
 						]}
-						rows={dashboard?.soldProducts || []}
+						rows={soldProducts}
+						loading={loading}
 						infinite
 					/>
 				</Card>
-				<Card title="Gastos de hoy">
+				<Card title={`Gastos del ${selectedDateLabel}`}>
 					<DataTable
 						columns={[
 							{ name: 'dealerName', text: 'Repartidor' },
 							{ name: 'description', text: 'Descripcion' },
 							{ name: 'amount', text: 'Monto', render: Formatters.formatCurrency },
 						]}
-						rows={dashboard?.expenses || []}
+						rows={expenses}
+						loading={loading}
 						infinite
 					/>
 				</Card>
 			</div>
 			<div className="mt-4 grid gap-4 xl:grid-cols-[2fr_1fr]">
-				<Card
-					title="Repartos por fecha"
-					actions={
-						<div className="flex items-end gap-2">
-							<Input type="date" value={date} onChange={setDate} />
-							<Button variant="secondary" onClick={() => loadDaily(date)}>Buscar</Button>
-						</div>
-					}
-				>
+				<Card title={`Repartos del ${selectedDateLabel}`}>
 					<DataTable
 						columns={[
 							{ name: 'dealerName', text: 'Nombre' },
@@ -144,11 +149,12 @@ const Home = () => {
 							{ name: 'createdAt', text: 'Fecha', render: Formatters.formatDate },
 						]}
 						rows={routes}
+						loading={loading}
 						infinite
 						onRowClick={(row) => navigate(`/planillas/${row.id}`)}
 					/>
 				</Card>
-				<Card title="Balance por fecha">
+				<Card title={`Balance del ${selectedDateLabel}`}>
 					<div className="space-y-2 text-sm">
 						<div className="flex justify-between"><span>Efectivo</span><strong>{Formatters.formatCurrency(balance?.cartPaymentMethods || 0)}</strong></div>
 						<div className="flex justify-between"><span>Transferencias</span><strong>{Formatters.formatCurrency(balance?.transfers || 0)}</strong></div>

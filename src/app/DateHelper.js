@@ -1,20 +1,37 @@
-export const toApiDate = (value) => {
+const getDateParts = (value) => {
 	if (!value) return null;
+
+	if (typeof value === 'string') {
+		const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+		if (dateOnlyMatch) {
+			return {
+				year: dateOnlyMatch[1],
+				month: dateOnlyMatch[2],
+				day: dateOnlyMatch[3],
+			};
+		}
+	}
+
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) return null;
-	const year = date.getFullYear();
-	const month = `${date.getMonth() + 1}`.padStart(2, '0');
-	const day = `${date.getDate()}`.padStart(2, '0');
-	return `${year}-${month}-${day}T00:00:00Z`;
+
+	return {
+		year: `${date.getFullYear()}`,
+		month: `${date.getMonth() + 1}`.padStart(2, '0'),
+		day: `${date.getDate()}`.padStart(2, '0'),
+	};
+};
+
+export const toApiDate = (value) => {
+	const parts = getDateParts(value);
+	if (!parts) return null;
+	return `${parts.year}-${parts.month}-${parts.day}`;
 };
 
 export const toInputDate = (value = new Date()) => {
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return '';
-	const year = date.getFullYear();
-	const month = `${date.getMonth() + 1}`.padStart(2, '0');
-	const day = `${date.getDate()}`.padStart(2, '0');
-	return `${year}-${month}-${day}`;
+	const parts = getDateParts(value);
+	if (!parts) return '';
+	return `${parts.year}-${parts.month}-${parts.day}`;
 };
 
 export const monthStart = () => {
