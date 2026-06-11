@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": false,
+		"noEmit": true,
+		"paths": {
+			"@app": [
+				"./src/app/index"
+			],
+			"@assets/*": [
+				"./src/assets/*"
+			],
+			"@components": [
+				"./src/components/index"
+			],
+			"@constants": [
+				"./src/constants/index"
+			],
+			"@hooks": [
+				"./src/hooks/index"
+			],
+			"@layout/*": [
+				"./src/layout/*"
+			],
+			"@screens/*": [
+				"./src/screens/*"
+			]
+		}
+	},
+	"include": [
+		"src/**/*.js",
+		"src/**/*.jsx",
+		"vite.config.js",
+		"eslint.config.js"
+	],
+	"exclude": [
+		"dist",
+		"node_modules"
+	]
+}
