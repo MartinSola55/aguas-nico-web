@@ -6,7 +6,6 @@ import {
 	ClipboardList,
 	FileSpreadsheet,
 	Home,
-	Map,
 	Package,
 	Route,
 	Truck,
@@ -39,11 +38,10 @@ const NavBar = () => {
 						<Link
 							key={to}
 							to={to}
-							className={`flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors ${
-								active
+							className={`flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors ${active
 									? 'bg-accent-primary-muted text-accent-primary'
 									: 'text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
-							}`}
+								}`}
 						>
 							<Icon size={18} />
 							{label}

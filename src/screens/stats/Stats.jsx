@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { API, DateHelper, Formatters } from '@app';
-import { Card, DataTable, Input, PageHeader, StatCard } from '@components';
+import { Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
 
 const Stats = () => {
 	const [years, setYears] = useState([]);
@@ -29,9 +29,14 @@ const Stats = () => {
 		<>
 			<PageHeader title="Estadisticas" breadcrumbs={['Inicio', 'Estadisticas']} />
 			<Card title="Filtros">
-				<div className="grid gap-3 md:grid-cols-[160px_160px_180px_auto] md:items-end">
-					<Input label="Anio" type="number" value={year} onChange={setYear} />
-					<Input label="Mes" type="number" min={1} max={12} value={month} onChange={setMonth} />
+				<div className="grid gap-3 md:grid-cols-[200px_200px_220px_auto] md:items-end">
+					<Select label="Año" value={year} onChange={setYear} options={years.map((y) => ({ value: y, label: y }))} />
+					<Select label="Mes" value={month} onChange={setMonth} options={[
+						{ value: 1, label: 'Enero' }, { value: 2, label: 'Febrero' }, { value: 3, label: 'Marzo' },
+						{ value: 4, label: 'Abril' }, { value: 5, label: 'Mayo' }, { value: 6, label: 'Junio' },
+						{ value: 7, label: 'Julio' }, { value: 8, label: 'Agosto' }, { value: 9, label: 'Septiembre' },
+						{ value: 10, label: 'Octubre' }, { value: 11, label: 'Noviembre' }, { value: 12, label: 'Diciembre' },
+					]} />
 					<Input label="Balance al dia" type="date" value={balanceDate} onChange={setBalanceDate} />
 					<button type="button" className="rounded-[var(--radius-md)] bg-accent-primary px-4 py-2 text-sm font-medium text-white" onClick={load}>Actualizar</button>
 				</div>

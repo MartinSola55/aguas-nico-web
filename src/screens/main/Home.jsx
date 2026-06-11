@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Banknote, ClipboardList, Package, ReceiptText, Truck } from 'lucide-react';
+import { Banknote, ClipboardList, ReceiptText, Truck } from 'lucide-react';
 import { API, DateHelper, Formatters, Helpers, LocalStorage } from '@app';
 import { App } from '@app';
 import { Button, Card, DataTable, Input, Modal, PageHeader, Select, StatCard } from '@components';
