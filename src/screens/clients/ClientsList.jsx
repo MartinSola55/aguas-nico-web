@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Plus } from 'lucide-react';
-import { API, Formatters, Helpers } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, Formatters, Helpers, useCatalog } from '@app';
 import { Button, Card, ConfirmButton, DataTable, Input, PageHeader, Select } from '@components';
 import { clientFilterRequest } from './Clients.helpers.js';
 import { toast } from 'react-toastify';

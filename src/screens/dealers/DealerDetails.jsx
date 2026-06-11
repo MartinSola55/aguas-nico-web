@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { API, DateHelper, Formatters } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, DateHelper, Formatters, useCatalog } from '@app';
 import { Button, Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
 
 const DealerDetails = () => {

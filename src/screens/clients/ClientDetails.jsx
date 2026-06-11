@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { API, Formatters, Helpers } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, Formatters, Helpers, useCatalog } from '@app';
 import { Button, Card, CheckBox, ConfirmButton, DataTable, Field, Input, PageHeader, Select } from '@components';
 import { buildClientRequest } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
@@ -109,13 +108,15 @@ const ClientDetails = () => {
 						<DataTable
 							columns={[
 								{ name: 'date', text: 'Fecha', render: Formatters.formatDate },
-								{ name: 'type', text: 'Movimiento', render: (_, row) => {
-									if (row.transferAmount) return `Transferencia - ${Formatters.formatCurrency(row.transferAmount)}`;
-									if (row.abonoName) return `${row.abonoName} - ${Formatters.formatCurrency(row.abonoPrice)}`;
-									if (row.cartState !== 1) return Formatters.stateName(row.cartState);
-									const products = [...(row.products || []), ...(row.abonoProducts || []).map((p) => ({ ...p, typeName: `${p.typeName} (abono)` }))];
-									return products.length ? products.map((p) => `${p.typeName} x ${p.quantity}`).join(', ') : '-';
-								} },
+								{
+									name: 'type', text: 'Movimiento', render: (_, row) => {
+										if (row.transferAmount) return `Transferencia - ${Formatters.formatCurrency(row.transferAmount)}`;
+										if (row.abonoName) return `${row.abonoName} - ${Formatters.formatCurrency(row.abonoPrice)}`;
+										if (row.cartState !== 1) return Formatters.stateName(row.cartState);
+										const products = [...(row.products || []), ...(row.abonoProducts || []).map((p) => ({ ...p, typeName: `${p.typeName} (abono)` }))];
+										return products.length ? products.map((p) => `${p.typeName} x ${p.quantity}`).join(', ') : '-';
+									}
+								},
 								{ name: 'paymentMethods', text: 'Pago', render: (items = []) => items.length ? items.map((m) => `${m.paymentMethodName}: ${Formatters.formatCurrency(m.amount)}`).join(', ') : '-' },
 							]}
 							rows={client.cartsTransfersHistory || []}

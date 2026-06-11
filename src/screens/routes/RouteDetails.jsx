@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Edit, PackageCheck, Play, Plus } from 'lucide-react';
-import { API, App, Formatters, Helpers } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, App, Formatters, Helpers, useCatalog } from '@app';
 import { State } from '@constants';
 import { Badge, Button, Card, ConfirmButton, DataTable, Field, Input, Modal, PageHeader, StatCard } from '@components';
 import CartEditor from './CartEditor.jsx';
@@ -145,7 +144,7 @@ const CartCard = ({ cart, paymentMethods, onChanged }) => {
 const RouteDetails = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { catalog, combos } = useCatalog();
+	const { catalog } = useCatalog();
 	const [route, setRoute] = useState(null);
 	const [dispatched, setDispatched] = useState([]);
 	const [dispatchedOpen, setDispatchedOpen] = useState(false);

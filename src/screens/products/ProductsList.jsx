@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { BarChart3, Plus } from 'lucide-react';
-import { API, Formatters } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, Formatters, useCatalog } from '@app';
 import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader, Select } from '@components';
 import { buildProductRequest, emptyProduct } from './Products.helpers.js';
 import { toast } from 'react-toastify';
@@ -63,14 +62,16 @@ const ProductsList = () => {
 						{ name: 'price', text: 'Precio', render: Formatters.formatCurrency },
 						{ name: 'sortOrder', text: 'Orden' },
 						{ name: 'isActive', text: 'Activo', render: (value) => value ? 'Si' : 'No' },
-						{ name: 'actions', text: 'Acciones', render: (_, row) => (
-							<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-								<Button size="sm" variant="secondary" onClick={() => openForm(row)}>Editar</Button>
-								<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
-								<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} />Stats</Button></Link>
-								{row.isActive && <ConfirmButton size="sm" variant="danger" message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
-							</div>
-						) },
+						{
+							name: 'actions', text: 'Acciones', render: (_, row) => (
+								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+									<Button size="sm" variant="secondary" onClick={() => openForm(row)}>Editar</Button>
+									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
+									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} />Stats</Button></Link>
+									{row.isActive && <ConfirmButton size="sm" variant="danger" message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
+								</div>
+							)
+						},
 					]}
 					rows={products}
 					pagination

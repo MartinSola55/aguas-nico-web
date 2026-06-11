@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { API, Formatters } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, Formatters, useCatalog } from '@app';
 import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader } from '@components';
 import { buildAbonoRequest, emptyAbono } from './Abonos.helpers.js';
 import { toast } from 'react-toastify';
@@ -72,13 +71,15 @@ const AbonosList = () => {
 						{ name: 'name', text: 'Nombre' },
 						{ name: 'price', text: 'Precio', render: Formatters.formatCurrency },
 						{ name: 'products', text: 'Productos', render: (items = []) => items.map((item) => `${item.typeName} x ${item.quantity}`).join(', ') || '-' },
-						{ name: 'actions', text: 'Acciones', render: (_, row) => (
-							<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-								<Button size="sm" variant="secondary" onClick={() => openEdit(row)}>Editar</Button>
-								<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
-								<ConfirmButton size="sm" variant="danger" message="Eliminar abono?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
-							</div>
-						) },
+						{
+							name: 'actions', text: 'Acciones', render: (_, row) => (
+								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+									<Button size="sm" variant="secondary" onClick={() => openEdit(row)}>Editar</Button>
+									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
+									<ConfirmButton size="sm" variant="danger" message="Eliminar abono?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
+								</div>
+							)
+						},
 					]}
 					rows={abonos}
 					pagination

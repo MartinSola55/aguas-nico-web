@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { API, Helpers } from '@app';
-import { useCatalog } from '@app/useCatalog';
+import { API, Helpers, useCatalog } from '@app';
 import { Button, Card, CheckBox, DataTable, Input, PageHeader, Select } from '@components';
 import { buildClientRequest, emptyClient } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
