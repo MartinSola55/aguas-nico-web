@@ -1,24 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
 import { Plus } from 'lucide-react';
 import { API, App, Formatters, Helpers, useCatalog } from '@app';
 import { Button, Card, ConfirmButton, DataTable, Modal, PageHeader, Select } from '@components';
 import { routeRequest } from './Routes.helpers.js';
-import { toast } from 'react-toastify';
 
 const RoutesList = () => {
 	const navigate = useNavigate();
 	const { combos } = useCatalog();
 	const [routes, setRoutes] = useState([]);
 	const [dealers, setDealers] = useState([]);
-	const [day, setDay] = useState('');
+	const [day, setDay] = useState(() => {
+		const today = new Date().getDay();
+		return today >= 1 && today <= 5 ? today : '';
+	});
+	const [userId, setUserId] = useState('');
 	const [modal, setModal] = useState(false);
 	const [form, setForm] = useState({ userId: '', dayOfWeek: '' });
 
 	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
 
 	const load = () => {
-		API.endpoints.routes.getAll({ day: day || 0 }).then((rs) => setRoutes(rs.data.routes || []));
+		API.endpoints.routes.getAll({ day: day || 0, userId: userId || '' }).then((rs) => setRoutes(rs.data.routes || []));
 	};
 
 	useEffect(() => {
@@ -59,9 +63,12 @@ const RoutesList = () => {
 			/>
 			<Card title="Planillas">
 				{App.isAdmin() && (
-					<div className="mb-4 flex max-w-sm items-end gap-2">
+					<div className="mb-4 grid gap-3 md:grid-cols-3">
+						<Select label="Repartidor" clearable items={dealerItems} value={userId} onChange={(value) => setUserId(value || '')} />
 						<Select label="Dia" clearable items={combos.days} value={day} onChange={(value) => setDay(value || '')} />
-						<Button variant="secondary" onClick={load}>Buscar</Button>
+						<div className="flex items-end gap-2">
+							<Button variant="secondary" onClick={load}>Buscar</Button>
+						</div>
 					</div>
 				)}
 				<DataTable
