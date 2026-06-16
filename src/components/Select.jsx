@@ -4,7 +4,7 @@ import { getSelectStyles } from './Select.constants';
 const Select = ({
 	label,
 	value,
-	options = [],
+	items = [],
 	placeholder = 'Seleccione una opción',
 	size = 'md',
 	isMulti = false,
@@ -14,8 +14,8 @@ const Select = ({
 	onChange,
 }) => {
 	const selectedValue = isMulti
-		? options.filter((option) => Array.isArray(value) && value.includes(option.value))
-		: options.find((option) => option.value === value) || null;
+		? items.filter((item) => Array.isArray(value) && value.includes(item.value))
+		: items.find((item) => item.value === value) || null;
 
 	const handleChange = (option) => {
 		if (isMulti) {
@@ -35,7 +35,7 @@ const Select = ({
 			<ReactSelect
 				classNamePrefix="react-select"
 				value={selectedValue}
-				options={options}
+				options={items}
 				placeholder={placeholder}
 				isMulti={isMulti}
 				isClearable={isClearable}
