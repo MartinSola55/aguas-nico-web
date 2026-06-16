@@ -8,8 +8,8 @@ const Select = ({
 	placeholder = 'Seleccione una opción',
 	size = 'md',
 	isMulti = false,
-	isClearable = false,
-	isDisabled = false,
+	clearable = false,
+	disabled = false,
 	required = false,
 	onChange,
 }) => {
@@ -38,8 +38,8 @@ const Select = ({
 				options={items}
 				placeholder={placeholder}
 				isMulti={isMulti}
-				isClearable={isClearable}
-				isDisabled={isDisabled}
+				isClearable={clearable}
+				isDisabled={disabled}
 				noOptionsMessage={() => 'Sin resultados'}
 				styles={getSelectStyles(size)}
 				onChange={handleChange}

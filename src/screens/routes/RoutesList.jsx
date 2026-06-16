@@ -64,8 +64,8 @@ const RoutesList = () => {
 			<Card title="Planillas">
 				{App.isAdmin() && (
 					<div className="mb-4 grid gap-3 md:grid-cols-3">
-						<Select label="Repartidor" clearable items={dealerItems} value={userId} onChange={(value) => setUserId(value || '')} />
 						<Select label="Dia" clearable items={combos.days} value={day} onChange={(value) => setDay(value || '')} />
+						<Select label="Repartidor" clearable items={dealerItems} value={userId} onChange={(value) => setUserId(value || '')} />
 						<div className="flex items-end gap-2">
 							<Button variant="secondary" onClick={load}>Buscar</Button>
 						</div>
