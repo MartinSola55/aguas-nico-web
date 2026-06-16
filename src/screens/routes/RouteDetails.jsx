@@ -85,7 +85,7 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 			className="mb-3"
 			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.debt)}`}
-			actions={<Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
+			actions={!route.isStatic && <Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
 			<div className="grid gap-3 md:grid-cols-4">
 				<Field label="Bajada" value={`#${cart.id}`} />
