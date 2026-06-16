@@ -14,7 +14,7 @@ const stateVariant = (state) => {
 	return 'warning';
 };
 
-const CartCard = ({ cart, paymentMethods, onChanged }) => {
+const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	const [expanded, setExpanded] = useState(false);
 	const [clientData, setClientData] = useState(null);
 	const [confirmedData, setConfirmedData] = useState(null);
@@ -83,7 +83,7 @@ const CartCard = ({ cart, paymentMethods, onChanged }) => {
 	return (
 		<Card
 			className="mb-3"
-			title={<span>{cart.clientName} {!cart.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
+			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.debt)}`}
 			actions={<Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
@@ -262,7 +262,7 @@ const RouteDetails = () => {
 			</div>}
 			<Card className="mt-4" title={`Repartos para ${Formatters.dayName(route.dayOfWeek)}`}>
 				{(route.carts || []).sort((a, b) => a.priority - b.priority).map((cart) => (
-					<CartCard key={cart.id} cart={cart} paymentMethods={paymentMethods} onChanged={load} />
+					<CartCard key={cart.id} route={route} cart={cart} paymentMethods={paymentMethods} onChanged={load} />
 				))}
 			</Card>
 			<Modal open={dispatchedOpen} title="Productos cargados" onClose={() => setDispatchedOpen(false)} footer={<><Button variant="secondary" onClick={() => setDispatchedOpen(false)}>Cerrar</Button><Button onClick={saveDispatched}>Guardar</Button></>}>
