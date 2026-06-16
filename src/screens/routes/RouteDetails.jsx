@@ -84,7 +84,7 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 		<Card
 			className="mb-3"
 			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
-			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.debt)}`}
+			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.clientDebt)}`}
 			actions={!route.isStatic && <Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
 			<div className="grid gap-3 md:grid-cols-4">
@@ -225,7 +225,7 @@ const RouteDetails = () => {
 					<>
 						{!route.isStatic && <Button variant="secondary" onClick={openDispatched}>Productos cargados</Button>}
 						{!route.isStatic && <Button variant="secondary" onClick={() => setDispenserOpen(true)}>Precio dispenser</Button>}
-						<ConfirmButton variant="secondary" message="Renovar abonos de esta planilla?" onConfirm={renewByRoute}>Renovar abonos</ConfirmButton>
+						{route.isStatic && <ConfirmButton variant="secondary" message="Renovar abonos de esta planilla?" onConfirm={renewByRoute}>Renovar abonos</ConfirmButton>}
 						{!route.isStatic && !route.isClosed && <ConfirmButton variant="warning" message="Cerrar planilla?" onConfirm={closeRoute}>Cerrar</ConfirmButton>}
 						<ConfirmButton variant="danger" message="Eliminar planilla?" onConfirm={deleteRoute}>Eliminar</ConfirmButton>
 					</>

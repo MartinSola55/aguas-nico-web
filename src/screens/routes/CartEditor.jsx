@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Helpers, Formatters } from '@app';
 import { Button, Card, DataTable, Input, Select } from '@components';
 
-const normalizeProducts = (items = []) =>
+const EMPTY_ARRAY = [];
+
+const normalizeProducts = (items = EMPTY_ARRAY) =>
 	items.map((item) => ({
 		type: Number(item.type),
 		name: item.name || item.typeName,
@@ -13,10 +15,10 @@ const normalizeProducts = (items = []) =>
 
 const CartEditor = ({
 	title = 'Bajada',
-	products = [],
-	abonoProducts = [],
-	returnedProducts = [],
-	paymentMethods = [],
+	products = EMPTY_ARRAY,
+	abonoProducts = EMPTY_ARRAY,
+	returnedProducts = EMPTY_ARRAY,
+	paymentMethods = EMPTY_ARRAY,
 	showReturned = false,
 	allowReturnedOnly = false,
 	defaultPaymentMethodId = 1,
