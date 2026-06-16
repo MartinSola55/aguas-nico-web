@@ -83,7 +83,7 @@ const CartCard = ({ cart, paymentMethods, onChanged }) => {
 	return (
 		<Card
 			className="mb-3"
-			title={<span>{cart.clientName} <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge></span>}
+			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.debt)}`}
 			actions={<Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
@@ -223,10 +223,10 @@ const RouteDetails = () => {
 			{App.isAdmin() && (
 				<Card className="mb-4" title="Administracion" actions={
 					<>
-						<Button variant="secondary" onClick={openDispatched}>Productos cargados</Button>
-						<Button variant="secondary" onClick={() => setDispenserOpen(true)}>Precio dispenser</Button>
+						{!route.isStatic && <Button variant="secondary" onClick={openDispatched}>Productos cargados</Button>}
+						{!route.isStatic && <Button variant="secondary" onClick={() => setDispenserOpen(true)}>Precio dispenser</Button>}
 						<ConfirmButton variant="secondary" message="Renovar abonos de esta planilla?" onConfirm={renewByRoute}>Renovar abonos</ConfirmButton>
-						{!route.isClosed && <ConfirmButton variant="warning" message="Cerrar planilla?" onConfirm={closeRoute}>Cerrar</ConfirmButton>}
+						{!route.isStatic && !route.isClosed && <ConfirmButton variant="warning" message="Cerrar planilla?" onConfirm={closeRoute}>Cerrar</ConfirmButton>}
 						<ConfirmButton variant="danger" message="Eliminar planilla?" onConfirm={deleteRoute}>Eliminar</ConfirmButton>
 					</>
 				}>
@@ -237,7 +237,7 @@ const RouteDetails = () => {
 					</div>
 				</Card>
 			)}
-			<div className="grid gap-4 xl:grid-cols-[1.2fr_.8fr]">
+			{!route.isStatic && <div className="grid gap-4 xl:grid-cols-[1.2fr_.8fr]">
 				<Card title="Productos vendidos">
 					<DataTable
 						columns={[
@@ -259,7 +259,7 @@ const RouteDetails = () => {
 						<div className="flex justify-between"><span>Gastos</span><strong>{Formatters.formatCurrency(route.totalExpenses || 0)}</strong></div>
 					</div>
 				</Card>
-			</div>
+			</div>}
 			<Card className="mt-4" title={`Repartos para ${Formatters.dayName(route.dayOfWeek)}`}>
 				{(route.carts || []).sort((a, b) => a.priority - b.priority).map((cart) => (
 					<CartCard key={cart.id} cart={cart} paymentMethods={paymentMethods} onChanged={load} />
