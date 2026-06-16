@@ -83,7 +83,7 @@ const CartCard = ({ cart, paymentMethods, onChanged }) => {
 	return (
 		<Card
 			className="mb-3"
-			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
+			title={<span>{cart.clientName} {!cart.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.debt)}`}
 			actions={<Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
