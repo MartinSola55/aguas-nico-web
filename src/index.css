@@ -39,6 +39,7 @@
 	--z-dropdown: 100;
 	--z-sticky: 200;
 	--z-modal: 400;
+	--z-popover: 500;
 	--z-toast: 600;
 }
 
@@ -97,3 +98,4 @@
 }
 
 .react-select__menu { z-index: var(--z-dropdown); }
+.react-select__menu-portal { z-index: var(--z-popover); }

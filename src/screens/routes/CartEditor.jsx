@@ -42,6 +42,11 @@ const CartEditor = ({
 	}, [products, abonoProducts, returnedProducts, paymentMethods, defaultPaymentMethodId]);
 
 	const total = useMemo(() => regularRows.reduce((sum, row) => sum + Helpers.numberOrZero(row.quantity) * Helpers.numberOrZero(row.price), 0), [regularRows]);
+	const showRegularTable = regularRows.length > 0;
+	const showAbonosTable = abonoRows.length > 0;
+	const showReturnedTable = showReturned && returnedRows.length > 0;
+	const visibleTablesCount = [showRegularTable, showAbonosTable, showReturnedTable].filter(Boolean).length;
+	const gridColsClass = { 1: 'xl:grid-cols-1', 2: 'xl:grid-cols-2', 3: 'xl:grid-cols-3' }[visibleTablesCount] || 'xl:grid-cols-1';
 
 	const updateQuantity = (setter) => (type, value) => {
 		setter((rows) => rows.map((row) => row.type === type ? { ...row, quantity: value } : row));
@@ -100,20 +105,20 @@ const CartEditor = ({
 			title={title}
 			actions={<div className="text-sm font-semibold text-text-primary">Total: {Formatters.formatCurrency(total)}</div>}
 		>
-			<div className="grid gap-4 xl:grid-cols-3">
-				{regularRows.length > 0 && (
+			<div className={`grid gap-4 ${gridColsClass}`}>
+				{showRegularTable > 0 && (
 					<div className="xl:col-span-1">
 						<h3 className="mb-2 text-sm font-semibold">Bajada</h3>
 						<DataTable columns={productColumns(updateQuantity(setRegularRows), true)} rows={regularRows} empty="Sin productos" />
 					</div>
 				)}
-				{abonoRows.length > 0 && (
+				{showAbonosTable && (
 					<div className="xl:col-span-1">
 						<h3 className="mb-2 text-sm font-semibold">Abonos</h3>
 						<DataTable columns={productColumns(updateQuantity(setAbonoRows), false, true)} rows={abonoRows} empty="Sin abonos disponibles" />
 					</div>
 				)}
-				{showReturned && returnedRows.length > 0 && (
+				{showReturnedTable && (
 					<div className="xl:col-span-1">
 						<h3 className="mb-2 text-sm font-semibold">Devoluciones</h3>
 						<DataTable columns={productColumns(updateQuantity(setReturnedRows))} rows={returnedRows} empty="Sin productos para devolver" />

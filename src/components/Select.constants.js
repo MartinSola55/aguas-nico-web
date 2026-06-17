@@ -65,6 +65,10 @@ const getSelectStyles = (size = 'md') => {
 			overflow: 'hidden',
 			zIndex: 'var(--z-dropdown)',
 		}),
+		menuPortal: (base) => ({
+			...base,
+			zIndex: 'var(--z-popover)',
+		}),
 		menuList: (base) => ({
 			...base,
 			padding: 4,

@@ -42,6 +42,8 @@ const Select = ({
 				isDisabled={disabled}
 				noOptionsMessage={() => 'Sin resultados'}
 				styles={getSelectStyles(size)}
+				menuPortalTarget={document.body}
+				menuPosition="fixed"
 				onChange={handleChange}
 			/>
 		</label>

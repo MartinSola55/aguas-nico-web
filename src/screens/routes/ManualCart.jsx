@@ -47,7 +47,7 @@ const ManualCart = () => {
 	return (
 		<>
 			<PageHeader title="Agregar fuera de reparto" breadcrumbs={['Inicio', 'Planillas', 'Fuera de reparto']} />
-			<div className="grid gap-4 xl:grid-cols-[420px_1fr]">
+			<div className="grid gap-4 xl:grid-cols-[3fr_5fr]">
 				<Card title={`Planilla ${route ? Formatters.dayName(route.dayOfWeek) : ''}`}>
 					<div className="mb-3 flex items-end gap-2">
 						<Input label="Cliente" value={search} onChange={setSearch} />
@@ -58,10 +58,12 @@ const ManualCart = () => {
 							{ name: 'id', text: 'Código' },
 							{ name: 'name', text: 'Cliente' },
 							{ name: 'address', text: 'Direccion' },
-							{ name: 'route', text: 'Reparto / Día', render: (_, row) => {
-								const parts = [row.dealerName, row.deliveryDay ? Formatters.dayName(row.deliveryDay) : ''].filter(Boolean);
-								return parts.length ? parts.join(' - ') : '-';
-							} },
+							{
+								name: 'route', text: 'Reparto / Día', render: (_, row) => {
+									const parts = [row.dealerName, row.deliveryDay ? Formatters.dayName(row.deliveryDay) : ''].filter(Boolean);
+									return parts.length ? parts.join(' - ') : '-';
+								}
+							},
 							{ name: 'actions', text: '', render: (_, row) => <Button size="sm" onClick={() => selectClient(row)}>Seleccionar</Button> },
 						]}
 						rows={clients}
