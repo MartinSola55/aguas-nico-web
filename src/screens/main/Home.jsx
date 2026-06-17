@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Banknote, ClipboardList, ReceiptText, Truck } from 'lucide-react';
+import { Banknote, ClipboardList, FileSpreadsheet, ReceiptText, Truck } from 'lucide-react';
 import { API, DateHelper, Formatters, Helpers, LocalStorage } from '@app';
 import { App } from '@app';
 import { Button, Card, DataTable, Input, Modal, PageHeader, Select, StatCard } from '@components';
@@ -48,6 +48,8 @@ const Home = () => {
 	useEffect(() => {
 		loadDashboard(date);
 	}, [date]);
+
+	const downloadCaja = () => API.endpoints.caja.downloadDailyClose({ date: DateHelper.toApiDate(date) });
 
 	const createExpense = () => {
 		API.endpoints.expenses.create({
@@ -109,7 +111,7 @@ const Home = () => {
 			<PageHeader
 				title="Inicio"
 				breadcrumbs={['Inicio']}
-				actions={<div className="flex flex-wrap items-end gap-2">{dateAction}<Button onClick={() => setExpenseModal(true)}>Agregar gasto</Button></div>}
+				actions={<div className="flex flex-wrap items-end gap-2">{dateAction}<Button variant="secondary" onClick={downloadCaja}><FileSpreadsheet size={16} />Cierre de caja</Button><Button onClick={() => setExpenseModal(true)}>Agregar gasto</Button></div>}
 			/>
 			{adminTotals}
 			<div className="mt-4 grid gap-4 xl:grid-cols-2">

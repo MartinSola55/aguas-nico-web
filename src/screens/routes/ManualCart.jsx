@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { API, Formatters } from '@app';
 import { Button, Card, DataTable, Input, PageHeader } from '@components';
 import CartEditor from './CartEditor.jsx';
@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 
 const ManualCart = () => {
 	const { id } = useParams();
-	const navigate = useNavigate();
 	const [route, setRoute] = useState(null);
 	const [paymentMethods, setPaymentMethods] = useState([]);
 	const [search, setSearch] = useState('');
@@ -39,7 +38,9 @@ const ManualCart = () => {
 	const confirm = (payload) => {
 		API.endpoints.carts.confirmManual(manualCartRequest({ routeId: id, clientId: selected.id }, payload)).then((rs) => {
 			toast.success(rs.message);
-			navigate(`/planillas/${id}`);
+			setSelected(null);
+			setClientData(null);
+			if (search) searchClients();
 		});
 	};
 
@@ -54,8 +55,13 @@ const ManualCart = () => {
 					</div>
 					<DataTable
 						columns={[
+							{ name: 'id', text: 'Código' },
 							{ name: 'name', text: 'Cliente' },
 							{ name: 'address', text: 'Direccion' },
+							{ name: 'route', text: 'Reparto / Día', render: (_, row) => {
+								const parts = [row.dealerName, row.deliveryDay ? Formatters.dayName(row.deliveryDay) : ''].filter(Boolean);
+								return parts.length ? parts.join(' - ') : '-';
+							} },
 							{ name: 'actions', text: '', render: (_, row) => <Button size="sm" onClick={() => selectClient(row)}>Seleccionar</Button> },
 						]}
 						rows={clients}

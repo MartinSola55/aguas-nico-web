@@ -1,17 +1,26 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Edit, PackageCheck, Play, Plus } from 'lucide-react';
+import { Edit, PackageCheck, Play, Plus, Search } from 'lucide-react';
 import { API, App, Formatters, Helpers, useCatalog } from '@app';
 import { State } from '@constants';
 import { Badge, Button, Card, ConfirmButton, DataTable, Field, Input, Modal, PageHeader, StatCard } from '@components';
 import CartEditor from './CartEditor.jsx';
 import { confirmCartRequest } from './Routes.helpers.js';
+import TransferFormModal from '../transfers/TransferFormModal.jsx';
 import { toast } from 'react-toastify';
 
 const stateVariant = (state) => {
 	if (state === State.Confirmed) return 'success';
 	if (state === State.Pending) return 'neutral';
 	return 'warning';
+};
+
+const cartPreview = (data) => {
+	if (!data) return 'Cargando…';
+	const items = [...(data.products || []), ...(data.abonoProducts || [])]
+		.filter((item) => Number(item.quantity) > 0)
+		.map((item) => `${item.quantity}x ${item.typeName}`);
+	return items.length ? items.join(', ') : 'Sin productos';
 };
 
 const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
@@ -21,17 +30,16 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	const [returnRows, setReturnRows] = useState([]);
 	const [returnModal, setReturnModal] = useState(false);
 
-	const loadDetails = () => {
-		if (cart.state === State.Pending) {
-			API.endpoints.clients.getProductsAndAbono({ id: cart.clientId }).then((rs) => setClientData(rs.data));
-		}
+	useEffect(() => {
 		if (cart.state === State.Confirmed) {
 			API.endpoints.carts.getForEdit({ id: cart.id }).then((rs) => setConfirmedData(rs.data));
 		}
-	};
+	}, [cart.id, cart.state]);
 
 	useEffect(() => {
-		if (expanded) loadDetails();
+		if (expanded && cart.state === State.Pending) {
+			API.endpoints.clients.getProductsAndAbono({ id: cart.clientId }).then((rs) => setClientData(rs.data));
+		}
 	}, [expanded]);
 
 	const confirm = (payload) => {
@@ -87,12 +95,17 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.clientDebt)}`}
 			actions={!route.isStatic && <Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
-			<div className="grid gap-3 md:grid-cols-4">
+			<div className="grid gap-3 md:grid-cols-3">
 				<Field label="Bajada" value={`#${cart.id}`} />
-				<Field label="Prioridad" value={cart.priority} />
 				<Field label="Cobrado" value={Formatters.formatCurrency(cart.collected || 0)} />
 				<Field label="Estado" value={Formatters.stateName(cart.state)} />
 			</div>
+			{cart.state === State.Confirmed && (
+				<div className="mt-3">
+					<div className="text-xs font-medium uppercase tracking-wide text-text-muted">Bajada</div>
+					<div className="mt-1 text-sm text-text-primary">{cartPreview(confirmedData)}</div>
+				</div>
+			)}
 			{expanded && cart.state === State.Pending && clientData && (
 				<div className="mt-4">
 					<CartEditor
@@ -150,6 +163,8 @@ const RouteDetails = () => {
 	const [dispatchedOpen, setDispatchedOpen] = useState(false);
 	const [dispenserOpen, setDispenserOpen] = useState(false);
 	const [dispenserPrice, setDispenserPrice] = useState('');
+	const [cartSearch, setCartSearch] = useState('');
+	const [transferOpen, setTransferOpen] = useState(false);
 
 	const paymentMethods = useMemo(() => catalog?.paymentMethods || [], [catalog]);
 
@@ -201,6 +216,11 @@ const RouteDetails = () => {
 		});
 	};
 
+	const term = cartSearch.trim().toLowerCase();
+	const visibleCarts = (route.carts || [])
+		.filter((cart) => !term || cart.clientName?.toLowerCase().includes(term) || String(cart.clientId).includes(term))
+		.sort((a, b) => a.priority - b.priority);
+
 	return (
 		<>
 			<PageHeader
@@ -211,6 +231,7 @@ const RouteDetails = () => {
 						{route.isStatic && App.isAdmin() && <Button onClick={startRoute}><Play size={16} />Comenzar</Button>}
 						{App.isAdmin() && <Link to={`/planillas/${route.id}/editar`}><Button variant="secondary"><Edit size={16} />Editar clientes</Button></Link>}
 						{!route.isStatic && <Link to={`/planillas/${route.id}/manual`}><Button variant="secondary"><Plus size={16} />Fuera de reparto</Button></Link>}
+						{!route.isStatic && <Button onClick={() => setTransferOpen(true)}>Nueva transferencia</Button>}
 					</>
 				}
 			/>
@@ -260,10 +281,29 @@ const RouteDetails = () => {
 					</div>
 				</Card>
 			</div>}
-			<Card className="mt-4" title={`Repartos para ${Formatters.dayName(route.dayOfWeek)}`}>
-				{(route.carts || []).sort((a, b) => a.priority - b.priority).map((cart) => (
-					<CartCard key={cart.id} route={route} cart={cart} paymentMethods={paymentMethods} onChanged={load} />
-				))}
+			<Card
+				className="mt-4"
+				title={`Repartos para ${Formatters.dayName(route.dayOfWeek)}`}
+				actions={
+					<div className="relative">
+						<Search size={16} className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
+						<input
+							type="text"
+							value={cartSearch}
+							onChange={(e) => setCartSearch(e.target.value)}
+							placeholder="Buscar por nombre o código"
+							className="w-64 rounded-[var(--radius-md)] border border-border-default bg-bg-elevated py-2 pl-8 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
+						/>
+					</div>
+				}
+			>
+				{visibleCarts.length === 0 ? (
+					<p className="m-0 py-2 text-sm text-text-muted">No se encontraron clientes.</p>
+				) : (
+					visibleCarts.map((cart) => (
+						<CartCard key={cart.id} route={route} cart={cart} paymentMethods={paymentMethods} onChanged={load} />
+					))
+				)}
 			</Card>
 			<Modal open={dispatchedOpen} title="Productos cargados" onClose={() => setDispatchedOpen(false)} footer={<><Button variant="secondary" onClick={() => setDispatchedOpen(false)}>Cerrar</Button><Button onClick={saveDispatched}>Guardar</Button></>}>
 				<DataTable
@@ -277,6 +317,7 @@ const RouteDetails = () => {
 			<Modal open={dispenserOpen} title="Precio dispenser" onClose={() => setDispenserOpen(false)} footer={<><Button variant="secondary" onClick={() => setDispenserOpen(false)}>Cerrar</Button><Button onClick={saveDispenser}>Guardar</Button></>}>
 				<Input label="Precio" type="number" min={0} value={dispenserPrice} onChange={setDispenserPrice} />
 			</Modal>
+			<TransferFormModal open={transferOpen} onClose={() => setTransferOpen(false)} onSaved={load} />
 		</>
 	);
 };

@@ -15,6 +15,7 @@ const Invoices = () => {
 	const [csvRows, setCsvRows] = useState([]);
 
 	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
+	const dealerOptions = useMemo(() => [{ value: '', label: 'Todos los repartos' }, ...dealerItems], [dealerItems]);
 	const dayItems = useMemo(() => [{ value: '', label: 'Todos los dias' }, ...(combos.days || [])], [combos.days]);
 
 	useEffect(() => {
@@ -43,7 +44,7 @@ const Invoices = () => {
 					<Input label="Desde" type="date" value={filters.startDate} onChange={(value) => setFilters((f) => ({ ...f, startDate: value }))} />
 					<Input label="Hasta" type="date" value={filters.endDate} onChange={(value) => setFilters((f) => ({ ...f, endDate: value }))} />
 					<Select label="Dia" items={dayItems} value={filters.invoiceDay} onChange={(value) => setFilters((f) => ({ ...f, invoiceDay: value || '' }))} />
-					<Select label="Repartidor" items={dealerItems} value={filters.invoiceDealer} onChange={(value) => setFilters((f) => ({ ...f, invoiceDealer: value }))} />
+					<Select label="Repartidor" items={dealerOptions} value={filters.invoiceDealer} onChange={(value) => setFilters((f) => ({ ...f, invoiceDealer: value || '' }))} />
 					<Button variant="secondary" onClick={search}>Buscar</Button>
 				</div>
 			</Card>

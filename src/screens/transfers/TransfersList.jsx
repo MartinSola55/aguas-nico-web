@@ -1,20 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { API, DateHelper, Formatters, Helpers } from '@app';
-import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader, Select } from '@components';
-import { buildTransferRequest, emptyTransfer, transferFiltersRequest } from './Transfers.helpers.js';
+import { Button, Card, ConfirmButton, DataTable, Input, PageHeader, Select } from '@components';
+import { emptyTransfer, transferFiltersRequest } from './Transfers.helpers.js';
+import TransferFormModal from './TransferFormModal.jsx';
 import { toast } from 'react-toastify';
 
 const TransfersList = () => {
 	const [transfers, setTransfers] = useState([]);
 	const [dealers, setDealers] = useState([]);
-	const [clientSearch, setClientSearch] = useState('');
-	const [clientOptions, setClientOptions] = useState([]);
 	const [filters, setFilters] = useState({ dateFrom: DateHelper.monthStart(), dateTo: DateHelper.monthEnd(), userId: '' });
-	const [form, setForm] = useState(emptyTransfer);
+	const [editing, setEditing] = useState(emptyTransfer);
 	const [modal, setModal] = useState(false);
 
 	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
-	const clientItems = useMemo(() => clientOptions.map((c) => ({ value: c.id, label: `${c.name} - ${c.address}`, raw: c })), [clientOptions]);
 
 	const load = () => API.endpoints.transfers.getAll(transferFiltersRequest(filters)).then((rs) => setTransfers(rs.data.items || []));
 
@@ -23,28 +21,9 @@ const TransfersList = () => {
 		load();
 	}, []);
 
-	const searchClients = () => {
-		API.endpoints.clients.getAll({ activeOnly: true, search: clientSearch }).then((rs) => setClientOptions(rs.data.items || []));
-	};
-
 	const open = (transfer = emptyTransfer) => {
-		setForm({
-			...emptyTransfer,
-			...transfer,
-			date: transfer.date ? DateHelper.toInputDate(transfer.date) : DateHelper.toInputDate(),
-			clientId: transfer.clientId || null,
-		});
-		if (transfer.clientId) setClientOptions([{ id: transfer.clientId, name: transfer.clientName, address: '' }]);
+		setEditing(transfer);
 		setModal(true);
-	};
-
-	const save = () => {
-		const action = form.id ? API.endpoints.transfers.update : API.endpoints.transfers.create;
-		action(buildTransferRequest(form)).then((rs) => {
-			toast.success(rs.message);
-			setModal(false);
-			load();
-		});
 	};
 
 	const remove = (id) => API.endpoints.transfers.delete({ id }).then((rs) => { toast.success(rs.message); load(); });
@@ -76,18 +55,7 @@ const TransfersList = () => {
 					pagination
 				/>
 			</Card>
-			<Modal open={modal} title={form.id ? 'Editar transferencia' : 'Nueva transferencia'} onClose={() => setModal(false)} footer={<><Button variant="secondary" onClick={() => setModal(false)}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}>
-				<div className="grid gap-3">
-					<div className="flex items-end gap-2">
-						<Input label="Buscar cliente" value={clientSearch} onChange={setClientSearch} />
-						<Button variant="secondary" onClick={searchClients}>Buscar</Button>
-					</div>
-					<Select label="Cliente" items={clientItems} value={form.clientId} onChange={(value) => setForm((f) => ({ ...f, clientId: value }))} />
-					<Select label="Repartidor opcional" clearable items={dealerItems} value={form.userId} onChange={(value) => setForm((f) => ({ ...f, userId: value || '' }))} />
-					<Input label="Monto" type="number" min={0} value={form.amount} onChange={(value) => setForm((f) => ({ ...f, amount: value }))} />
-					<Input label="Fecha" type="date" value={form.date} onChange={(value) => setForm((f) => ({ ...f, date: value, updateDate: true }))} />
-				</div>
-			</Modal>
+			<TransferFormModal open={modal} transfer={editing} onClose={() => setModal(false)} onSaved={load} />
 		</>
 	);
 };

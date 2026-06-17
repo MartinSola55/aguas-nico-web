@@ -172,6 +172,16 @@ export const endpoints = {
 		getAnnualProfits: (rq) => get('Stats/GetAnnualProfits', rq),
 		getMonthlyProfits: (rq) => get('Stats/GetMonthlyProfits', rq),
 		getProductsSold: (rq) => get('Stats/GetProductsSold', rq),
+		getProductsSoldByDealer: (rq) => get('Stats/GetProductsSoldByDealer', rq),
 		getBalanceByDate: (rq) => get('Stats/GetBalanceByDate', rq),
+	},
+	terceros: {
+		getByDate: (rq) => get('Tercero/GetByDate', rq),
+		create: (rq) => post('Tercero/Create', rq),
+		update: (rq) => post('Tercero/Update', rq),
+		delete: (rq) => post('Tercero/Delete', rq),
+	},
+	caja: {
+		downloadDailyClose: (rq) => download('Caja/DownloadDailyClose', rq, `caja_diaria_${rq.date}.xlsx`),
 	},
 };

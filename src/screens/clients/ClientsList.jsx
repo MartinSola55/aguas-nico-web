@@ -55,6 +55,7 @@ const ClientsList = () => {
 				<DataTable
 					loading={loading}
 					columns={[
+						{ name: 'id', text: 'Código', render: (value) => `#${value}` },
 						{ name: 'name', text: 'Nombre' },
 						{ name: 'address', text: 'Direccion' },
 						{ name: 'phone', text: 'Telefono' },

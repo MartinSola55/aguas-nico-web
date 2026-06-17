@@ -28,6 +28,7 @@ const ExpensesList = lazy(() => import('../screens/expenses/ExpensesList.jsx'));
 const TransfersList = lazy(() => import('../screens/transfers/TransfersList.jsx'));
 const Invoices = lazy(() => import('../screens/invoices/Invoices.jsx'));
 const Stats = lazy(() => import('../screens/stats/Stats.jsx'));
+const TercerosList = lazy(() => import('../screens/terceros/TercerosList.jsx'));
 
 const PrivateRoute = () => (App.isLoggedIn() ? <Outlet /> : <Navigate to="/login" replace />);
 const AdminRoute = () => (App.isAdmin() ? <Outlet /> : <Navigate to="/notAllowed" replace />);
@@ -60,6 +61,7 @@ export const AppRoutes = () => (
 						<Route path="/transferencias" element={<Shell><TransfersList /></Shell>} />
 						<Route path="/facturas" element={<Shell><Invoices /></Shell>} />
 						<Route path="/estadisticas" element={<Shell><Stats /></Shell>} />
+						<Route path="/terceros" element={<Shell><TercerosList /></Shell>} />
 					</Route>
 				</Route>
 				<Route path="/login" element={<Login />} />

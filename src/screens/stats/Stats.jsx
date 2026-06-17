@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
-import { API, DateHelper, Formatters } from '@app';
-import { Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
+import { API, DateHelper, Formatters, Helpers } from '@app';
+import { Button, Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
 
 const Stats = () => {
 	const [years, setYears] = useState([]);
@@ -12,6 +12,11 @@ const Stats = () => {
 	const [products, setProducts] = useState([]);
 	const [balanceDate, setBalanceDate] = useState(DateHelper.toInputDate());
 	const [balance, setBalance] = useState(null);
+	const [dealers, setDealers] = useState([]);
+	const [dealerFilters, setDealerFilters] = useState({ startDate: DateHelper.monthStart(), endDate: DateHelper.monthEnd(), dealerId: '' });
+	const [dealerProducts, setDealerProducts] = useState([]);
+
+	const dealerOptions = useMemo(() => [{ value: '', label: 'Todos los repartos' }, ...Helpers.dealerComboItems(dealers)], [dealers]);
 
 	const load = () => {
 		API.endpoints.stats.getAnnualProfits({ year }).then((rs) => setAnnual(rs.data.items || []));
@@ -20,9 +25,19 @@ const Stats = () => {
 		API.endpoints.stats.getBalanceByDate({ date: DateHelper.toApiDate(balanceDate) }).then((rs) => setBalance(rs.data));
 	};
 
+	const loadDealerProducts = () => {
+		API.endpoints.stats.getProductsSoldByDealer({
+			startDate: DateHelper.toApiDate(dealerFilters.startDate),
+			endDate: DateHelper.toApiDate(dealerFilters.endDate),
+			dealerId: dealerFilters.dealerId || '',
+		}).then((rs) => setDealerProducts(rs.data.items || []));
+	};
+
 	useEffect(() => {
 		API.endpoints.stats.getYears().then((rs) => setYears(rs.data.years || []));
+		API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || []));
 		load();
+		loadDealerProducts();
 	}, []);
 
 	return (
@@ -30,8 +45,8 @@ const Stats = () => {
 			<PageHeader title="Estadisticas" breadcrumbs={['Inicio', 'Estadisticas']} />
 			<Card title="Filtros">
 				<div className="grid gap-3 md:grid-cols-[200px_200px_220px_auto] md:items-end">
-					<Select label="Año" value={year} onChange={setYear} options={years.map((y) => ({ value: y, label: y }))} />
-					<Select label="Mes" value={month} onChange={setMonth} options={[
+					<Select label="Año" value={year} onChange={setYear} items={years.map((y) => ({ value: y, label: y }))} />
+					<Select label="Mes" value={month} onChange={setMonth} items={[
 						{ value: 1, label: 'Enero' }, { value: 2, label: 'Febrero' }, { value: 3, label: 'Marzo' },
 						{ value: 4, label: 'Abril' }, { value: 5, label: 'Mayo' }, { value: 6, label: 'Junio' },
 						{ value: 7, label: 'Julio' }, { value: 8, label: 'Agosto' }, { value: 9, label: 'Septiembre' },
@@ -67,6 +82,27 @@ const Stats = () => {
 			</div>
 			<Card className="mt-4" title="Productos vendidos">
 				<DataTable columns={[{ name: 'type', text: 'Producto' }, { name: 'quantity', text: 'Cantidad' }]} rows={products} infinite />
+			</Card>
+			<Card className="mt-4" title="Productos vendidos por repartidor">
+				<div className="mb-4 grid gap-3 md:grid-cols-[200px_200px_220px_auto] md:items-end">
+					<Input label="Desde" type="date" value={dealerFilters.startDate} onChange={(value) => setDealerFilters((f) => ({ ...f, startDate: value }))} />
+					<Input label="Hasta" type="date" value={dealerFilters.endDate} onChange={(value) => setDealerFilters((f) => ({ ...f, endDate: value }))} />
+					<Select label="Repartidor" items={dealerOptions} value={dealerFilters.dealerId} onChange={(value) => setDealerFilters((f) => ({ ...f, dealerId: value || '' }))} />
+					<Button variant="secondary" onClick={loadDealerProducts}>Buscar</Button>
+				</div>
+				<DataTable
+					columns={[
+						{ name: 'dealerName', text: 'Repartidor' },
+						{ name: 'quantity', text: 'Total' },
+						{ name: 'products', text: 'Detalle', render: (products = []) => (
+							<div className="flex flex-col gap-0.5">
+								{products.map((p) => <span key={p.type}>{p.type}: <strong>{p.quantity}</strong></span>)}
+							</div>
+						) },
+					]}
+					rows={dealerProducts}
+					infinite
+				/>
 			</Card>
 		</>
 	);
