@@ -21,6 +21,7 @@ const Home = () => {
 	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
 	const selectedDateLabel = Formatters.formatDate(date);
 	const totalSold = Helpers.numberOrZero(balance?.cartPaymentMethods) + Helpers.numberOrZero(balance?.transfers) + Helpers.numberOrZero(balance?.dispenserPrice);
+	const totalCollected = useMemo(() => routes.reduce((acc, route) => acc + Helpers.numberOrZero(route.collected), 0), [routes]);
 
 	const normalizeExpense = (expense) => ({
 		...expense,
@@ -143,11 +144,23 @@ const Home = () => {
 				</Card>
 			</div>
 			<div className="mt-4 grid gap-4 xl:grid-cols-[2fr_1fr]">
-				<Card title={`Repartos del ${selectedDateLabel}`}>
+				<Card title={`Repartos del ${selectedDateLabel}`} actions={<span className="text-sm text-text-muted">Recaudación total (con transferencias): <strong>{Formatters.formatCurrency(totalCollected)}</strong></span>}>
 					<DataTable
 						columns={[
 							{ name: 'dealerName', text: 'Nombre' },
 							{ name: 'completedCarts', text: 'Envios completados', render: (_, row) => `${row.completedCarts}/${row.totalCarts}` },
+							{
+								name: 'soldProducts',
+								text: 'Productos vendidos',
+								render: (_, row) => (
+									<ul className="m-0 list-none p-0">
+										{(row.soldProducts || []).map((product) => (
+											<li key={product.name}>{product.name} ({product.sold})</li>
+										))}
+									</ul>
+								),
+							},
+							{ name: 'collected', text: 'Recaudado', render: (value) => Formatters.formatCurrency(value) },
 							{ name: 'createdAt', text: 'Fecha', render: Formatters.formatDate },
 						]}
 						rows={routes}
