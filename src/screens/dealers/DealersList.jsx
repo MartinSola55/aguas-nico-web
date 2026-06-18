@@ -18,8 +18,8 @@ const DealersList = () => {
 				<DataTable
 					columns={[
 						{ name: 'name', text: 'Nombre' },
-						{ name: 'email', text: 'Email' },
 						{ name: 'truckNumber', text: 'Camion', render: (value) => value || '-' },
+						{ name: 'email', text: 'Email' },
 					]}
 					rows={dealers}
 					pagination
