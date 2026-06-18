@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { API, Helpers, useCatalog } from '@app';
+import { API, App, Helpers, useCatalog } from '@app';
 import { Button, Card, CheckBox, DataTable, Input, PageHeader, Select } from '@components';
 import { buildClientRequest, emptyClient } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
@@ -49,7 +49,7 @@ const ClientForm = () => {
 		e.preventDefault();
 		API.endpoints.clients.create(buildClientRequest(client)).then((rs) => {
 			toast.success(rs.message);
-			navigate(`/clientes/${rs.data.id}`);
+			navigate(App.isAdmin() ? `/clientes/${rs.data.id}` : '/');
 		});
 	};
 
@@ -63,8 +63,8 @@ const ClientForm = () => {
 						<Input label="Direccion" required value={client.address} onChange={(value) => update('address', value)} />
 						<Input label="Telefono" required value={client.phone} onChange={(value) => update('phone', value)} />
 						<Input label="Email" type="email" value={client.email} onChange={(value) => update('email', value)} />
-						<Select label="Repartidor" clearable items={dealerItems} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />
-						<Select label="Dia de reparto" clearable items={combos.days} value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />
+						{App.isAdmin() && <Select label="Repartidor" clearable items={dealerItems} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />}
+						{App.isAdmin() && <Select label="Dia de reparto" clearable items={combos.days} value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />}
 						<Input label="Deuda inicial" type="number" value={client.debt} onChange={(value) => update('debt', value)} />
 						<div className="flex flex-col justify-end gap-2">
 							<CheckBox label="Factura" checked={client.hasInvoice} onChange={(value) => update('hasInvoice', value)} />

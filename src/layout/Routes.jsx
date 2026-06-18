@@ -11,6 +11,7 @@ const NotFound = lazy(() => import('../screens/public/NotFound.jsx'));
 const NotAllowed = lazy(() => import('../screens/public/NotAllowed.jsx'));
 const Home = lazy(() => import('../screens/main/Home.jsx'));
 const ClientsList = lazy(() => import('../screens/clients/ClientsList.jsx'));
+const ClientsUnassigned = lazy(() => import('../screens/clients/ClientsUnassigned.jsx'));
 const ClientForm = lazy(() => import('../screens/clients/ClientForm.jsx'));
 const ClientDetails = lazy(() => import('../screens/clients/ClientDetails.jsx'));
 const ProductsList = lazy(() => import('../screens/products/ProductsList.jsx'));
@@ -45,9 +46,10 @@ export const AppRoutes = () => (
 					<Route path="/planillas/:id" element={<Shell><RouteDetails /></Shell>} />
 					<Route path="/planillas/:id/manual" element={<Shell><ManualCart /></Shell>} />
 					<Route path="/bajadas/:id/editar" element={<Shell><CartEdit /></Shell>} />
-					<Route element={<AdminRoute />}>
+					<Route path="/clientes/nuevo" element={<Shell><ClientForm /></Shell>} />
+						<Route element={<AdminRoute />}>
 						<Route path="/clientes" element={<Shell><ClientsList /></Shell>} />
-						<Route path="/clientes/nuevo" element={<Shell><ClientForm /></Shell>} />
+						<Route path="/clientes/sin-asignar" element={<Shell><ClientsUnassigned /></Shell>} />
 						<Route path="/clientes/:id" element={<Shell><ClientDetails /></Shell>} />
 						<Route path="/productos" element={<Shell><ProductsList /></Shell>} />
 						<Route path="/productos/:id/estadisticas" element={<Shell><ProductStats /></Shell>} />

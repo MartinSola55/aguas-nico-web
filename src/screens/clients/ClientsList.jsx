@@ -40,7 +40,7 @@ const ClientsList = () => {
 			<PageHeader
 				title="Clientes"
 				breadcrumbs={['Inicio', 'Clientes']}
-				actions={<Link to="/clientes/nuevo"><Button><Plus size={16} />Nuevo cliente</Button></Link>}
+				actions={<div className="flex gap-2"><Link to="/clientes/sin-asignar"><Button variant="secondary">Sin asignar</Button></Link><Link to="/clientes/nuevo"><Button><Plus size={16} />Nuevo cliente</Button></Link></div>}
 			/>
 			<Card title="Listado">
 				<div className="mb-4 grid gap-3 md:grid-cols-4">
@@ -59,6 +59,7 @@ const ClientsList = () => {
 						{ name: 'name', text: 'Nombre' },
 						{ name: 'address', text: 'Direccion' },
 						{ name: 'phone', text: 'Telefono' },
+						{ name: 'email', text: 'Email', render: (value) => value || '-' },
 						{ name: 'dealerName', text: 'Repartidor' },
 						{ name: 'deliveryDay', text: 'Dia', render: Formatters.dayName },
 						{ name: 'debt', text: 'Deuda', render: Formatters.formatCurrency },
