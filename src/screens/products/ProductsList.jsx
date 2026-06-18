@@ -100,7 +100,7 @@ const ProductsList = () => {
 					columns={[
 						{ name: 'name', text: 'Cliente' },
 						{ name: 'address', text: 'Direccion' },
-						{ name: 'dealerName', text: 'Repartidor' },
+						{ name: 'dealerName', text: 'Reparto', render: (_, row) => `${row.dealerName || 'Sin repartidor'} - ${row.deliveryDay ? Formatters.dayName(row.deliveryDay) : 'Sin dia de reparto'}` },
 						{ name: 'debt', text: 'Deuda', render: Formatters.formatCurrency },
 					]}
 					rows={clientsModal.clients}

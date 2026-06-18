@@ -30,10 +30,10 @@ export const buildClientRequest = (client) => ({
 	dealerId: client.dealerId || null,
 	hasInvoice: !!client.hasInvoice,
 	onlyAbonos: !!client.onlyAbonos,
-	invoiceType: client.hasInvoice ? Number(client.invoiceType || 0) : 0,
-	taxCondition: client.hasInvoice ? Number(client.taxCondition || 0) : 0,
+	invoiceType: client.hasInvoice && client.invoiceType ? Number(client.invoiceType) : null,
+	taxCondition: client.hasInvoice && client.taxCondition ? Number(client.taxCondition) : null,
 	cuit: client.hasInvoice ? client.cuit || '' : '',
-	deliveryDay: Number(client.deliveryDay || 0),
+	deliveryDay: client.deliveryDay ? Number(client.deliveryDay) : null,
 	products: (client.products || []).filter((item) => item.assigned || Helpers.numberOrZero(item.stock) >= 0).map((item) => ({
 		productId: Number(item.productId || item.id),
 		stock: Helpers.numberOrZero(item.stock),

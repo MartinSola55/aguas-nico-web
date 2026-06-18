@@ -17,6 +17,7 @@ import { App } from '@app';
 const items = [
 	{ to: '/', label: 'Inicio', icon: Home },
 	{ to: '/clientes', label: 'Clientes', icon: Users, admin: true },
+	{ to: '/clientes/nuevo', label: 'Agregar cliente', icon: Users, dealer: true },
 	{ to: '/productos', label: 'Productos', icon: Package, admin: true },
 	{ to: '/abonos', label: 'Abonos', icon: Boxes, admin: true },
 	{ to: '/planillas', label: 'Planillas', icon: ClipboardList },
@@ -30,7 +31,11 @@ const items = [
 
 const NavBar = () => {
 	const { pathname } = useLocation();
-	const navItems = items.filter((item) => !item.admin || App.isAdmin());
+	const navItems = items.filter((item) => {
+		if (item.admin) return App.isAdmin();
+		if (item.dealer) return App.isDealer();
+		return true;
+	});
 	return (
 		<aside className="sticky top-16 hidden h-[calc(100vh-64px)] w-60 shrink-0 overflow-y-auto border-r border-border-subtle bg-bg-secondary p-3 md:block">
 			<nav className="flex flex-col gap-1">

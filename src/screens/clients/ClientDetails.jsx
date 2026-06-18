@@ -44,8 +44,8 @@ const ClientDetails = () => {
 	const saveInvoice = () => {
 		API.endpoints.clients.updateInvoiceData({
 			id: client.id,
-			invoiceType: Number(client.invoiceType || 0),
-			taxCondition: Number(client.taxCondition || 0),
+			invoiceType: client.invoiceType ? Number(client.invoiceType) : null,
+			taxCondition: client.taxCondition ? Number(client.taxCondition) : null,
 			cuit: client.cuit || '',
 		}).then((rs) => {
 			toast.success(rs.message);
@@ -186,6 +186,8 @@ const ClientDetails = () => {
 									<Field label="Repartidor" value={client.dealerName || '-'} />
 									<Field label="Dia" value={Formatters.dayName(client.deliveryDay)} />
 									<Field label="Deuda" value={Formatters.debtLabel(client.debt)} />
+									<Field label="Factura" value={client.hasInvoice ? 'Si' : 'No'} />
+									<Field label="Solo abonos" value={client.onlyAbonos ? 'Si' : 'No'} />
 									<Field label="Alta" value={Formatters.formatDateTime(client.createdAt)} />
 									<Field label="Observaciones" value={client.observations || '-'} />
 									<Field label="Notas" value={client.notes || '-'} />

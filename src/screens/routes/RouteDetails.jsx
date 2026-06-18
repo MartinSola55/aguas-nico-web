@@ -239,7 +239,7 @@ const RouteDetails = () => {
 				<StatCard label="Total repartos" value={route.totalCarts} icon={<PackageCheck size={18} />} />
 				<StatCard label="Visitados" value={route.completedCarts} tone="success" />
 				<StatCard label="Pendientes" value={route.pendingCarts} tone="warning" />
-				<StatCard label="Recaudado" value={Formatters.formatCurrency(route.totalSold || 0)} tone="info" />
+				{App.isAdmin() && <StatCard label="Recaudado" value={Formatters.formatCurrency(route.totalSold || 0)} tone="info" />}
 			</div>
 			{App.isAdmin() && (
 				<Card className="mb-4" title="Administracion" actions={
@@ -258,7 +258,7 @@ const RouteDetails = () => {
 					</div>
 				</Card>
 			)}
-			{!route.isStatic && <div className="grid gap-4 xl:grid-cols-[1.2fr_.8fr]">
+			{!route.isStatic && App.isAdmin() && <div className="grid gap-4 xl:grid-cols-[1.2fr_.8fr]">
 				<Card title="Productos vendidos">
 					<DataTable
 						columns={[
