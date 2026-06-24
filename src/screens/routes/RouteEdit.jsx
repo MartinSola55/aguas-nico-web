@@ -1,9 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import { CSS } from '@dnd-kit/utilities';
 import { API, Formatters } from '@app';
-import { Button, Card, DataTable, Input, PageHeader } from '@components';
+import { Button, Card, DataTable, EmptyState, Input, PageHeader } from '@components';
 import { toast } from 'react-toastify';
+
+const SortableClientRow = ({ client, onRemove }) => {
+	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: client.id });
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+		opacity: isDragging ? 0.5 : 1,
+	};
+
+	return (
+		<tr
+			ref={setNodeRef}
+			style={style}
+			{...attributes}
+			{...listeners}
+			className={`select-none touch-none cursor-grab hover:bg-bg-tertiary/60 active:cursor-grabbing ${isDragging ? 'relative z-10' : ''}`}
+		>
+			<td className="border border-border-subtle px-3 py-2 align-top">{client.name}</td>
+			<td className="border border-border-subtle px-3 py-2 align-top">{client.address}</td>
+			<td className="border border-border-subtle px-3 py-2 text-center align-top">
+				<Button size="sm" variant="danger" onClick={() => onRemove(client.id)}><X size={14} /></Button>
+			</td>
+		</tr>
+	);
+};
 
 const RouteEdit = () => {
 	const { id } = useParams();
@@ -12,6 +41,10 @@ const RouteEdit = () => {
 	const [clients, setClients] = useState([]);
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState([]);
+	const sensors = useSensors(
+		useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+	);
 
 	useEffect(() => {
 		API.endpoints.routes.getOne({ id }).then((rs) => {
@@ -39,13 +72,12 @@ const RouteEdit = () => {
 
 	const remove = (clientId) => setClients((current) => current.filter((item) => item.id !== clientId));
 
-	const move = (index, dir) => {
+	const handleDragEnd = ({ active, over }) => {
+		if (!over || active.id === over.id) return;
 		setClients((current) => {
-			const next = [...current];
-			const target = index + dir;
-			if (target < 0 || target >= next.length) return current;
-			[next[index], next[target]] = [next[target], next[index]];
-			return next;
+			const oldIndex = current.findIndex((item) => item.id === active.id);
+			const newIndex = current.findIndex((item) => item.id === over.id);
+			return arrayMove(current, oldIndex, newIndex);
 		});
 	};
 
@@ -61,20 +93,33 @@ const RouteEdit = () => {
 			<PageHeader title="Editar clientes de planilla" breadcrumbs={['Inicio', 'Planillas', 'Editar']} actions={<Button onClick={save}>Guardar planilla</Button>} />
 			<div className="grid gap-4 xl:grid-cols-2">
 				<Card title={`Clientes en planilla ${route ? Formatters.dayName(route.dayOfWeek) : ''}`}>
-					<DataTable
-						columns={[
-							{ name: 'name', text: 'Cliente' },
-							{ name: 'address', text: 'Direccion' },
-							{ name: 'actions', text: 'Orden', render: (_, row, index) => (
-								<div className="flex gap-1">
-									<Button size="sm" variant="ghost" onClick={() => move(index, -1)}><ArrowUp size={14} /></Button>
-									<Button size="sm" variant="ghost" onClick={() => move(index, 1)}><ArrowDown size={14} /></Button>
-									<Button size="sm" variant="danger" onClick={() => remove(row.id)}><X size={14} /></Button>
-								</div>
-							) },
-						]}
-						rows={clients}
-					/>
+					<div className="overflow-x-auto">
+						<table className="w-full border-collapse text-sm">
+							<thead>
+								<tr className="bg-bg-tertiary">
+									<th className="border border-border-subtle px-3 py-2 text-left font-semibold text-text-primary">Cliente</th>
+									<th className="border border-border-subtle px-3 py-2 text-left font-semibold text-text-primary">Direccion</th>
+									<th className="border border-border-subtle px-3 py-2 text-left font-semibold text-text-primary"></th>
+								</tr>
+							</thead>
+							<DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
+								<SortableContext items={clients.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+									<tbody>
+										{clients.map((client) => (
+											<SortableClientRow key={client.id} client={client} onRemove={remove} />
+										))}
+										{clients.length === 0 && (
+											<tr>
+												<td colSpan={3} className="border border-border-subtle px-3 py-8">
+													<EmptyState text="No hay datos para mostrar" />
+												</td>
+											</tr>
+										)}
+									</tbody>
+								</SortableContext>
+							</DndContext>
+						</table>
+					</div>
 				</Card>
 				<Card title="Agregar clientes">
 					<div className="mb-3 flex items-end gap-2">
