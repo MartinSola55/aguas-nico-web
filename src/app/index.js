@@ -6,5 +6,6 @@ import * as Helpers from './Helpers.js';
 import * as LocalStorage from './LocalStorage.js';
 import * as Theme from './Theme.js';
 import { useCatalog } from './useCatalog.js';
+import { useIsDarkMode, useResolvedTheme } from './useTheme.js';
 
-export { API, App, DateHelper, Formatters, Helpers, LocalStorage, Theme, useCatalog };
+export { API, App, DateHelper, Formatters, Helpers, LocalStorage, Theme, useCatalog, useIsDarkMode, useResolvedTheme };

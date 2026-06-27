@@ -51,7 +51,7 @@ const DataTable = ({
 	const rangeEnd = isPaginated ? Math.min(pageEnd, rows.length) : displayRows.length;
 
 	return (
-		<div className="min-w-0">
+		<div className="min-w-0 overflow-hidden rounded-[var(--radius-lg)] border border-border-subtle bg-bg-secondary shadow-sm">
 			<div
 				ref={scrollRef}
 				onScroll={handleScroll}
@@ -60,9 +60,12 @@ const DataTable = ({
 			>
 				<table className="w-full border-collapse text-sm">
 					<thead>
-						<tr className="bg-bg-tertiary">
+						<tr>
 							{columns.map((column) => (
-								<th key={column.name || column.text} className={`border border-border-subtle px-3 py-2 text-left font-semibold text-text-primary ${column.className || ''}`}>
+								<th
+									key={column.name || column.text}
+									className={`sticky top-0 z-10 bg-bg-tertiary px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-text-secondary shadow-[inset_0_-1px_0_0_var(--color-border-default)] ${column.className || ''}`}
+								>
 									{column.text}
 								</th>
 							))}
@@ -71,7 +74,7 @@ const DataTable = ({
 					<tbody>
 						{loading && (
 							<tr>
-								<td colSpan={columns.length} className="border border-border-subtle px-3 py-6 text-center">
+								<td colSpan={columns.length} className="px-4 py-6 text-center">
 									<Loader />
 								</td>
 							</tr>
@@ -81,11 +84,11 @@ const DataTable = ({
 							return (
 								<tr
 									key={row.id ?? absoluteIndex}
-									className={`${onRowClick ? 'cursor-pointer hover:bg-accent-primary-muted' : 'hover:bg-bg-tertiary/60'} ${row.isActive === false ? 'text-text-muted' : ''}`}
+									className={`border-b border-border-subtle transition-colors last:border-0 even:bg-[color-mix(in_srgb,var(--color-bg-tertiary),transparent_65%)] ${onRowClick ? 'cursor-pointer hover:bg-accent-primary-muted' : 'hover:bg-bg-tertiary/60'} ${row.isActive === false ? 'text-text-muted' : ''}`}
 									onClick={() => onRowClick?.(row)}
 								>
 									{columns.map((column) => (
-										<td key={column.name || column.text} className={`border border-border-subtle px-3 py-2 align-top ${column.bodyClassName || ''}`}>
+										<td key={column.name || column.text} className={`px-4 py-2.5 align-top ${column.bodyClassName || ''}`}>
 											{column.render ? column.render(row[column.name], row, absoluteIndex) : row[column.name]}
 										</td>
 									))}
@@ -94,7 +97,7 @@ const DataTable = ({
 						})}
 						{!loading && rows.length === 0 && (
 							<tr>
-								<td colSpan={columns.length} className="border border-border-subtle px-3 py-8">
+								<td colSpan={columns.length} className="px-4 py-8">
 									<EmptyState text={empty} />
 								</td>
 							</tr>
@@ -103,7 +106,7 @@ const DataTable = ({
 				</table>
 			</div>
 			{!loading && isPaginated && (
-				<div className="flex flex-col gap-3 border-x border-b border-border-subtle px-3 py-2 text-sm text-text-secondary sm:flex-row sm:items-center sm:justify-between">
+				<div className="flex flex-col gap-3 border-t border-border-subtle bg-bg-secondary px-4 py-2.5 text-sm text-text-secondary sm:flex-row sm:items-center sm:justify-between">
 					<span>Mostrando {rangeStart}-{rangeEnd} de {rows.length}</span>
 					<div className="flex items-center gap-2">
 						<Button size="sm" variant="secondary" disabled={page === 1} onClick={() => setPage((current) => Math.max(current - 1, 1))}>
@@ -117,7 +120,7 @@ const DataTable = ({
 				</div>
 			)}
 			{!loading && isInfinite && (
-				<div className="border-x border-b border-border-subtle px-3 py-2 text-sm text-text-secondary">
+				<div className="border-t border-border-subtle bg-bg-secondary px-4 py-2.5 text-sm text-text-secondary">
 					Mostrando {rangeEnd} de {rows.length}
 				</div>
 			)}

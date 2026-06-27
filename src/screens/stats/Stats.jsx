@@ -1,7 +1,46 @@
 import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
-import { API, DateHelper, Formatters, Helpers } from '@app';
+import { API, DateHelper, Formatters, Helpers, useIsDarkMode } from '@app';
 import { Button, Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
+
+const chartPalette = (isDark) => ({
+	accent: isDark ? '#2dd4bf' : '#0f766e',
+	axis: isDark ? '#b3c0d4' : '#4b5563',
+	grid: isDark ? '#3a4658' : '#e7edf4',
+});
+
+// Shared ApexCharts options: theme-aware axes/grid/tooltip (so the popup stays
+// readable in dark mode) and no overflowing data labels (values live in the
+// tooltip and y-axis instead).
+const baseChartOptions = (isDark, categories) => {
+	const c = chartPalette(isDark);
+	return {
+		chart: {
+			toolbar: { show: false },
+			zoom: { enabled: false },
+			background: 'transparent',
+			fontFamily: 'Inter, "Segoe UI", Arial, sans-serif',
+		},
+		theme: { mode: isDark ? 'dark' : 'light' },
+		colors: [c.accent],
+		dataLabels: { enabled: false },
+		grid: { borderColor: c.grid, strokeDashArray: 4 },
+		xaxis: {
+			categories,
+			labels: { style: { colors: c.axis } },
+			axisBorder: { color: c.grid },
+			axisTicks: { color: c.grid },
+		},
+		yaxis: {
+			labels: { style: { colors: c.axis }, formatter: (value) => Formatters.formatCurrency(value) },
+		},
+		tooltip: {
+			theme: isDark ? 'dark' : 'light',
+			y: { formatter: (value) => Formatters.formatCurrency(value) },
+		},
+		legend: { labels: { colors: c.axis } },
+	};
+};
 
 const Stats = () => {
 	const [years, setYears] = useState([]);
@@ -17,6 +56,18 @@ const Stats = () => {
 	const [dealerProducts, setDealerProducts] = useState([]);
 
 	const dealerOptions = useMemo(() => [{ value: '', label: 'Todos los repartos' }, ...Helpers.dealerComboItems(dealers)], [dealers]);
+
+	const isDark = useIsDarkMode();
+	const annualOptions = useMemo(() => ({
+		...baseChartOptions(isDark, annual.map((item) => item.period)),
+		plotOptions: { bar: { borderRadius: 6, borderRadiusApplication: 'end', columnWidth: '55%' } },
+	}), [isDark, annual]);
+	const monthlyOptions = useMemo(() => ({
+		...baseChartOptions(isDark, (monthly?.daily || []).map((item) => item.period.slice(-2))),
+		stroke: { curve: 'smooth', width: 3 },
+		markers: { size: 0, hover: { size: 5 } },
+		fill: { type: 'gradient', gradient: { shadeIntensity: 0.3, opacityFrom: 0.35, opacityTo: 0.05, stops: [0, 100] } },
+	}), [isDark, monthly]);
 
 	const load = () => {
 		API.endpoints.stats.getAnnualProfits({ year }).then((rs) => setAnnual(rs.data.items || []));
@@ -67,7 +118,7 @@ const Stats = () => {
 					<Chart
 						type="bar"
 						height={300}
-						options={{ chart: { toolbar: { show: false } }, xaxis: { categories: annual.map((item) => item.period) } }}
+						options={annualOptions}
 						series={[{ name: 'Vendido', data: annual.map((item) => item.sold) }]}
 					/>
 				</Card>
@@ -75,7 +126,7 @@ const Stats = () => {
 					<Chart
 						type="line"
 						height={300}
-						options={{ chart: { toolbar: { show: false } }, xaxis: { categories: (monthly?.daily || []).map((item) => item.period.slice(-2)) } }}
+						options={monthlyOptions}
 						series={[{ name: 'Vendido', data: (monthly?.daily || []).map((item) => item.sold) }]}
 					/>
 				</Card>
