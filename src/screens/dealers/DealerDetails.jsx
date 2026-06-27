@@ -74,7 +74,7 @@ const DealerDetails = () => {
 				<div className="mb-3 grid gap-3 md:grid-cols-[200px_200px_auto] md:items-end">
 					<Input label="Desde" type="date" value={from} onChange={setFrom} />
 					<Input label="Hasta" type="date" value={to} onChange={setTo} />
-					<Button variant="secondary" onClick={loadRange}>Buscar</Button>
+					<Button variant="secondary" className="justify-self-start" onClick={loadRange}>Buscar</Button>
 				</div>
 				<div className="grid gap-4 xl:grid-cols-2">
 					<div>

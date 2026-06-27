@@ -32,7 +32,7 @@ const TopBar = ({ onMobileMenuClick = () => { } }) => {
 					className="flex items-center gap-3"
 					onClick={() => navigate('/')}
 				>
-					<span className="grid h-10 w-10 place-items-center rounded-[var(--radius-md)] bg-accent-primary text-lg font-bold text-text-inverse">AN</span>
+					<span className="grid h-10 w-10 place-items-center rounded-[var(--radius-md)] bg-linear-to-br from-[color-mix(in_srgb,var(--color-accent-primary),white_22%)]/85 to-[color-mix(in_srgb,var(--color-accent-primary),black_22%)]/85 text-lg font-bold text-text-inverse shadow-[inset_0_1px_0_0_color-mix(in_srgb,white,transparent_55%),var(--shadow-sm)]">AN</span>
 					<span className="hidden text-base font-semibold text-text-primary sm:inline">Aguas Nico</span>
 				</button>
 			</div>

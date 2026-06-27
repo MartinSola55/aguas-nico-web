@@ -51,7 +51,7 @@ const DataTable = ({
 	const rangeEnd = isPaginated ? Math.min(pageEnd, rows.length) : displayRows.length;
 
 	return (
-		<div>
+		<div className="min-w-0">
 			<div
 				ref={scrollRef}
 				onScroll={handleScroll}

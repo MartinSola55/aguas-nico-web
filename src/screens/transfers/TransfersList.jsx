@@ -36,7 +36,7 @@ const TransfersList = () => {
 					<Input label="Desde" type="date" value={filters.dateFrom} onChange={(value) => setFilters((f) => ({ ...f, dateFrom: value }))} />
 					<Input label="Hasta" type="date" value={filters.dateTo} onChange={(value) => setFilters((f) => ({ ...f, dateTo: value }))} />
 					<Select label="Repartidor" clearable items={dealerItems} value={filters.userId} onChange={(value) => setFilters((f) => ({ ...f, userId: value || '' }))} />
-					<Button variant="secondary" onClick={load}>Buscar</Button>
+					<Button variant="secondary" className="justify-self-start" onClick={load}>Buscar</Button>
 				</div>
 				<DataTable
 					columns={[

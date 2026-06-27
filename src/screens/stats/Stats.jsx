@@ -44,7 +44,7 @@ const Stats = () => {
 		<>
 			<PageHeader title="Estadisticas" breadcrumbs={['Inicio', 'Estadisticas']} />
 			<Card title="Filtros">
-				<div className="grid gap-3 md:grid-cols-[200px_200px_220px_auto] md:items-end">
+				<div className="grid gap-3 md:grid-cols-[200px_200px_220px_200px] md:items-end">
 					<Select label="Año" value={year} onChange={setYear} items={years.map((y) => ({ value: y, label: y }))} />
 					<Select label="Mes" value={month} onChange={setMonth} items={[
 						{ value: 1, label: 'Enero' }, { value: 2, label: 'Febrero' }, { value: 3, label: 'Marzo' },
@@ -53,7 +53,7 @@ const Stats = () => {
 						{ value: 10, label: 'Octubre' }, { value: 11, label: 'Noviembre' }, { value: 12, label: 'Diciembre' },
 					]} />
 					<Input label="Balance al dia" type="date" value={balanceDate} onChange={setBalanceDate} />
-					<button type="button" className="rounded-[var(--radius-md)] bg-accent-primary px-4 py-2 text-sm font-medium text-text-inverse" onClick={load}>Actualizar</button>
+					<Button className="justify-self-start" onClick={load}>Actualizar</Button>
 				</div>
 			</Card>
 			<div className="mt-4 grid gap-3 md:grid-cols-4">
@@ -88,17 +88,19 @@ const Stats = () => {
 					<Input label="Desde" type="date" value={dealerFilters.startDate} onChange={(value) => setDealerFilters((f) => ({ ...f, startDate: value }))} />
 					<Input label="Hasta" type="date" value={dealerFilters.endDate} onChange={(value) => setDealerFilters((f) => ({ ...f, endDate: value }))} />
 					<Select label="Repartidor" items={dealerOptions} value={dealerFilters.dealerId} onChange={(value) => setDealerFilters((f) => ({ ...f, dealerId: value || '' }))} />
-					<Button variant="secondary" onClick={loadDealerProducts}>Buscar</Button>
+					<Button variant="secondary" className="justify-self-start" onClick={loadDealerProducts}>Buscar</Button>
 				</div>
 				<DataTable
 					columns={[
 						{ name: 'dealerName', text: 'Repartidor' },
 						{ name: 'quantity', text: 'Total' },
-						{ name: 'products', text: 'Detalle', render: (products = []) => (
-							<div className="flex flex-col gap-0.5">
-								{products.map((p) => <span key={p.type}>{p.type}: <strong>{p.quantity}</strong></span>)}
-							</div>
-						) },
+						{
+							name: 'products', text: 'Detalle', render: (products = []) => (
+								<div className="flex flex-col gap-0.5">
+									{products.map((p) => <span key={p.type}>{p.type}: <strong>{p.quantity}</strong></span>)}
+								</div>
+							)
+						},
 					]}
 					rows={dealerProducts}
 					infinite
