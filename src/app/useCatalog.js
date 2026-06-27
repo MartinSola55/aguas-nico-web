@@ -1,15 +1,34 @@
 import { useEffect, useMemo, useState } from 'react';
 import { API, Helpers } from '@app';
 
+let catalogCache = null;
+let catalogPromise = null;
+
+const fetchCatalog = () => {
+	if (!catalogPromise) {
+		catalogPromise = API.endpoints.catalog.getAll()
+			.then((rs) => {
+				catalogCache = rs.data;
+				return catalogCache;
+			})
+			.catch((err) => {
+				catalogPromise = null;
+				throw err;
+			});
+	}
+	return catalogPromise;
+};
+
 export const useCatalog = () => {
-	const [catalog, setCatalog] = useState(null);
-	const [loading, setLoading] = useState(true);
+	const [catalog, setCatalog] = useState(catalogCache);
+	const [loading, setLoading] = useState(!catalogCache);
 
 	useEffect(() => {
+		if (catalogCache) return;
 		let mounted = true;
-		API.endpoints.catalog.getAll()
-			.then((rs) => {
-				if (mounted) setCatalog(rs.data);
+		fetchCatalog()
+			.then((data) => {
+				if (mounted) setCatalog(data);
 			})
 			.finally(() => {
 				if (mounted) setLoading(false);

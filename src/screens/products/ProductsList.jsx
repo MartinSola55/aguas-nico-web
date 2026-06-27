@@ -67,7 +67,7 @@ const ProductsList = () => {
 								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
 									<Button size="sm" variant="secondary" onClick={() => openForm(row)}>Editar</Button>
 									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
-									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} />Stats</Button></Link>
+									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} /></Button></Link>
 									{row.isActive && <ConfirmButton size="sm" variant="danger" message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
 								</div>
 							)
