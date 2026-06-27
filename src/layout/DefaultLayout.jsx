@@ -27,7 +27,7 @@ const DefaultLayout = ({ children }) => {
 	const marginLeft = navExpanded ? SIDEBAR_EXPANDED_WIDTH : SIDEBAR_COLLAPSED_WIDTH;
 
 	return (
-		<div className="min-h-screen bg-bg-primary">
+		<div className="flex min-h-screen flex-col bg-bg-primary">
 			<TopBar onMobileMenuClick={handleOpenMobileNav} />
 			<NavBar
 				expanded={navExpanded}
@@ -37,7 +37,7 @@ const DefaultLayout = ({ children }) => {
 				onMobileClose={handleCloseMobileNav}
 			/>
 			<main
-				className="ml-0 flex min-h-[calc(100vh-64px)] flex-col px-4 py-5 [transition:margin-left_400ms_ease-in-out] sm:px-6 lg:px-8 md:ml-[var(--sidebar-width)]"
+				className="ml-0 flex flex-1 flex-col px-4 pt-5 [transition:margin-left_400ms_ease-in-out] sm:px-6 lg:px-8 md:ml-[var(--sidebar-width)]"
 				style={{ '--sidebar-width': `${marginLeft}px` }}
 			>
 				<div className="flex-1">
