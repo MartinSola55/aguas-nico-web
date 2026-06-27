@@ -1,4 +1,4 @@
-import Button from './Button.jsx';
+import { Button } from "@components";
 
 const ConfirmButton = ({ message = 'Confirmar operacion?', onConfirm, children, ...props }) => {
 	const handleClick = (event) => {

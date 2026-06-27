@@ -31,10 +31,10 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	const [returnModal, setReturnModal] = useState(false);
 
 	useEffect(() => {
-		if (cart.state === State.Confirmed) {
+		if (expanded && cart.state === State.Confirmed && !confirmedData) {
 			API.endpoints.carts.getForEdit({ id: cart.id }).then((rs) => setConfirmedData(rs.data));
 		}
-	}, [cart.id, cart.state]);
+	}, [expanded, cart.id, cart.state, confirmedData]);
 
 	useEffect(() => {
 		if (expanded && cart.state === State.Pending) {
@@ -100,7 +100,7 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 				<Field label="Cobrado" value={Formatters.formatCurrency(cart.collected || 0)} />
 				<Field label="Estado" value={Formatters.stateName(cart.state)} />
 			</div>
-			{cart.state === State.Confirmed && (
+			{cart.state === State.Confirmed && confirmedData && (
 				<div className="mt-3">
 					<div className="text-xs font-medium uppercase tracking-wide text-text-muted">Bajada</div>
 					<div className="mt-1 text-sm text-text-primary">{cartPreview(confirmedData)}</div>
@@ -285,14 +285,14 @@ const RouteDetails = () => {
 				className="mt-4"
 				title={`Repartos para ${Formatters.dayName(route.dayOfWeek)}`}
 				actions={
-					<div className="relative">
+					<div className="relative w-full sm:w-auto">
 						<Search size={16} className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
 						<input
 							type="text"
 							value={cartSearch}
 							onChange={(e) => setCartSearch(e.target.value)}
 							placeholder="Buscar por nombre o código"
-							className="w-64 rounded-[var(--radius-md)] border border-border-default bg-bg-elevated py-2 pl-8 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20"
+							className="w-full rounded-[var(--radius-md)] border border-border-default bg-bg-elevated py-2 pl-8 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 sm:w-64"
 						/>
 					</div>
 				}

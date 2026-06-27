@@ -45,7 +45,7 @@ const Invoices = () => {
 					<Input label="Hasta" type="date" value={filters.endDate} onChange={(value) => setFilters((f) => ({ ...f, endDate: value }))} />
 					<Select label="Dia" items={dayItems} value={filters.invoiceDay} onChange={(value) => setFilters((f) => ({ ...f, invoiceDay: value || '' }))} />
 					<Select label="Repartidor" items={dealerOptions} value={filters.invoiceDealer} onChange={(value) => setFilters((f) => ({ ...f, invoiceDealer: value || '' }))} />
-					<Button variant="secondary" onClick={search}>Buscar</Button>
+					<Button variant="secondary" className="justify-self-start" onClick={search}>Buscar</Button>
 				</div>
 			</Card>
 			<Card className="mt-4" title="Facturas">

@@ -37,7 +37,7 @@ const Login = () => {
 		<div className="grid min-h-screen place-items-center bg-bg-primary p-4">
 			<form onSubmit={submit} className="w-full max-w-md rounded-[var(--radius-md)] border border-border-subtle bg-bg-secondary p-6 shadow-md">
 				<div className="mb-6 flex items-center gap-3">
-					<div className="grid h-12 w-12 place-items-center rounded-[var(--radius-md)] bg-accent-primary text-white">
+					<div className="grid h-12 w-12 place-items-center rounded-[var(--radius-md)] bg-linear-to-br from-[color-mix(in_srgb,var(--color-accent-primary),white_22%)]/85 to-[color-mix(in_srgb,var(--color-accent-primary),black_22%)]/85 text-text-inverse shadow-[inset_0_1px_0_0_color-mix(in_srgb,white,transparent_55%),var(--shadow-sm)]">
 						<Droplets size={26} />
 					</div>
 					<div>

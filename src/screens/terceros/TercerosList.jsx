@@ -48,7 +48,7 @@ const TercerosList = () => {
 			<Card title="Distribuidoras (carga manual para el cierre de caja)">
 				<div className="mb-4 grid gap-3 md:grid-cols-[220px_auto] md:items-end">
 					<Input label="Fecha" type="date" value={date} onChange={setDate} />
-					<Button variant="secondary" onClick={load}>Buscar</Button>
+					<Button variant="secondary" className="justify-self-start" onClick={load}>Buscar</Button>
 				</div>
 				<DataTable
 					columns={[

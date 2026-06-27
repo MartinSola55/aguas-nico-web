@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { BarChart3, Plus } from 'lucide-react';
+import { BarChart3, Check, Plus, X } from 'lucide-react';
 import { API, Formatters, useCatalog } from '@app';
-import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader, Select } from '@components';
+import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader, Select, Switch } from '@components';
 import { buildProductRequest, emptyProduct } from './Products.helpers.js';
 import { toast } from 'react-toastify';
 
@@ -13,6 +13,9 @@ const ProductsList = () => {
 	const [clientsModal, setClientsModal] = useState({ open: false, product: null, clients: [] });
 	const [form, setForm] = useState(emptyProduct);
 	const [loading, setLoading] = useState(false);
+	const [activeOnly, setActiveOnly] = useState(true);
+
+	const visibleProducts = activeOnly ? products.filter((p) => p.isActive) : products;
 
 	const load = () => {
 		setLoading(true);
@@ -54,6 +57,9 @@ const ProductsList = () => {
 		<>
 			<PageHeader title="Productos" breadcrumbs={['Inicio', 'Productos']} actions={<Button onClick={() => openForm()}><Plus size={16} />Nuevo producto</Button>} />
 			<Card title="Listado">
+				<div className="mb-3 flex justify-start">
+					<Switch label="Mostrar solo activos" checked={activeOnly} onChange={setActiveOnly} />
+				</div>
 				<DataTable
 					loading={loading}
 					columns={[
@@ -61,19 +67,23 @@ const ProductsList = () => {
 						{ name: 'typeName', text: 'Tipo' },
 						{ name: 'price', text: 'Precio', render: Formatters.formatCurrency },
 						{ name: 'sortOrder', text: 'Orden' },
-						{ name: 'isActive', text: 'Activo', render: (value) => value ? 'Si' : 'No' },
+						{
+							name: 'isActive', text: 'Activo', render: (value) => value
+								? <Check size={18} className="text-status-success" />
+								: <X size={18} className="text-status-danger" />
+						},
 						{
 							name: 'actions', text: 'Acciones', render: (_, row) => (
 								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
 									<Button size="sm" variant="secondary" onClick={() => openForm(row)}>Editar</Button>
 									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
-									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} />Stats</Button></Link>
+									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} /></Button></Link>
 									{row.isActive && <ConfirmButton size="sm" variant="danger" message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
 								</div>
 							)
 						},
 					]}
-					rows={products}
+					rows={visibleProducts}
 					pagination
 				/>
 			</Card>

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+	color-scheme: light;
 	--color-bg-primary: #f6f8fb;
 	--color-bg-secondary: #ffffff;
 	--color-bg-tertiary: #eef3f8;
@@ -41,6 +42,39 @@
 	--z-modal: 400;
 	--z-popover: 500;
 	--z-toast: 600;
+}
+
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--color-bg-primary: #151a23;
+	--color-bg-secondary: #1d2430;
+	--color-bg-tertiary: #283140;
+	--color-bg-elevated: #303a4a;
+	--color-bg-canvas: #10141b;
+	--color-accent-primary: #2dd4bf;
+	--color-accent-primary-hover: #5eead4;
+	--color-accent-primary-muted: rgba(45, 212, 191, 0.16);
+	--color-accent-secondary: #60a5fa;
+	--color-accent-secondary-hover: #93c5fd;
+	--color-accent-warm: #fbbf24;
+	--color-text-primary: #eef4ff;
+	--color-text-secondary: #b3c0d4;
+	--color-text-muted: #8794a8;
+	--color-text-inverse: #0f172a;
+	--color-status-success: #4ade80;
+	--color-status-success-bg: rgba(74, 222, 128, 0.14);
+	--color-status-danger: #f87171;
+	--color-status-danger-bg: rgba(248, 113, 113, 0.14);
+	--color-status-warning: #fbbf24;
+	--color-status-warning-bg: rgba(251, 191, 36, 0.14);
+	--color-status-info: #60a5fa;
+	--color-status-info-bg: rgba(96, 165, 250, 0.14);
+	--color-border-primary: #3a4658;
+	--color-border-subtle: #2a3343;
+	--color-border-accent: rgba(45, 212, 191, 0.40);
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.30);
+	--shadow-md: 0 8px 22px rgba(0, 0, 0, 0.34);
+	--shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.44);
 }
 
 @theme {
