@@ -11,6 +11,27 @@ export const StorageKey = {
 	USER_EMAIL: 'aguas_nico_user_email',
 	TRUCK_NUMBER: 'aguas_nico_truck_number',
 	SESSION_EXPIRATION: 'aguas_nico_session_expiration',
+	THEME: 'aguas_nico_theme',
+	SIDEBAR_EXPANDED: 'aguas_nico_sidebar_expanded',
+};
+
+export const Theme = {
+	Light: 'light',
+	Dark: 'dark',
+	System: 'system',
+	Options: [
+		{ value: 'light', label: 'Claro' },
+		{ value: 'dark', label: 'Oscuro' },
+		{ value: 'system', label: 'Sistema' },
+	],
+};
+
+export const BreakpointCode = {
+	SM: 640,
+	MD: 768,
+	LG: 1024,
+	XL: 1280,
+	XXL: 1536,
 };
 
 export const State = {

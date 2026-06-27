@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Button from './Button.jsx';
-import EmptyState from './EmptyState.jsx';
-import Loader from './Loader.jsx';
-
-const DEFAULT_PAGE_SIZE = 20;
+import { Button, EmptyState, Loader } from '@components';
+import { DEFAULT_PAGE_SIZE } from './DataTable.constants';
 
 const DataTable = ({
 	columns = [],

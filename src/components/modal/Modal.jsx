@@ -1,14 +1,9 @@
 import { X } from 'lucide-react';
-import Button from './Button.jsx';
+import { Button } from '@components';
+import { widths } from './Modal.constants';
 
 const Modal = ({ open, title, children, footer, size = 'md', onClose }) => {
 	if (!open) return null;
-	const widths = {
-		sm: 'max-w-md',
-		md: 'max-w-2xl',
-		lg: 'max-w-4xl',
-		xl: 'max-w-6xl',
-	};
 
 	return (
 		<div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center bg-slate-900/40 p-4">

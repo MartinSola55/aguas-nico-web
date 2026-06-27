@@ -4,6 +4,7 @@ import * as DateHelper from './DateHelper.js';
 import * as Formatters from './Formatters.js';
 import * as Helpers from './Helpers.js';
 import * as LocalStorage from './LocalStorage.js';
+import * as Theme from './Theme.js';
 import { useCatalog } from './useCatalog.js';
 
-export { API, App, DateHelper, Formatters, Helpers, LocalStorage, useCatalog };
+export { API, App, DateHelper, Formatters, Helpers, LocalStorage, Theme, useCatalog };

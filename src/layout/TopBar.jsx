@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router';
-import { LogOut, UserRound } from 'lucide-react';
+import { LogOut, Menu, UserRound } from 'lucide-react';
 import { API, Helpers, LocalStorage } from '@app';
-import { Button } from '@components';
+import { Button, ThemeToggle } from '@components';
 import { toast } from 'react-toastify';
 
-const TopBar = () => {
+const TopBar = ({ onMobileMenuClick = () => { } }) => {
 	const navigate = useNavigate();
 
 	const logout = () => {
@@ -18,15 +18,26 @@ const TopBar = () => {
 
 	return (
 		<header className="sticky top-0 z-[var(--z-sticky)] flex h-16 items-center justify-between border-b border-border-subtle bg-bg-secondary px-4 shadow-sm">
-			<button
-				type="button"
-				className="flex items-center gap-3"
-				onClick={() => navigate('/')}
-			>
-				<span className="grid h-10 w-10 place-items-center rounded-[var(--radius-md)] bg-accent-primary text-lg font-bold text-white">AN</span>
-				<span className="hidden text-base font-semibold text-text-primary sm:inline">Aguas Nico</span>
-			</button>
+			<div className="flex items-center gap-2">
+				<button
+					type="button"
+					onClick={onMobileMenuClick}
+					className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-text-secondary transition-colors hover:bg-bg-tertiary hover:text-text-primary md:hidden"
+					title="Abrir menú"
+				>
+					<Menu size={20} />
+				</button>
+				<button
+					type="button"
+					className="flex items-center gap-3"
+					onClick={() => navigate('/')}
+				>
+					<span className="grid h-10 w-10 place-items-center rounded-[var(--radius-md)] bg-accent-primary text-lg font-bold text-text-inverse">AN</span>
+					<span className="hidden text-base font-semibold text-text-primary sm:inline">Aguas Nico</span>
+				</button>
+			</div>
 			<div className="flex items-center gap-3">
+				<ThemeToggle />
 				<div className="hidden text-right sm:block">
 					<div className="text-sm font-medium text-text-primary">{LocalStorage.getUserName()}</div>
 					<div className="text-xs text-text-muted">{Helpers.getRoleName(LocalStorage.getUserRole())}</div>

@@ -35,6 +35,12 @@ export const getSessionExpiration = () => get(StorageKey.SESSION_EXPIRATION);
 export const setTruckNumber = (value) => set(StorageKey.TRUCK_NUMBER, value);
 export const getTruckNumber = () => get(StorageKey.TRUCK_NUMBER);
 
+export const setTheme = (value) => set(StorageKey.THEME, value);
+export const getTheme = () => get(StorageKey.THEME);
+
+export const setSidebarExpanded = (value) => set(StorageKey.SIDEBAR_EXPANDED, value);
+export const getSidebarExpanded = () => get(StorageKey.SIDEBAR_EXPANDED);
+
 export const clearSessionData = () => {
 	remove(StorageKey.TOKEN);
 	remove(StorageKey.USER_ID);

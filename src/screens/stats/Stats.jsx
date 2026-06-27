@@ -53,7 +53,7 @@ const Stats = () => {
 						{ value: 10, label: 'Octubre' }, { value: 11, label: 'Noviembre' }, { value: 12, label: 'Diciembre' },
 					]} />
 					<Input label="Balance al dia" type="date" value={balanceDate} onChange={setBalanceDate} />
-					<button type="button" className="rounded-[var(--radius-md)] bg-accent-primary px-4 py-2 text-sm font-medium text-white" onClick={load}>Actualizar</button>
+					<button type="button" className="rounded-[var(--radius-md)] bg-accent-primary px-4 py-2 text-sm font-medium text-text-inverse" onClick={load}>Actualizar</button>
 				</div>
 			</Card>
 			<div className="mt-4 grid gap-3 md:grid-cols-4">
