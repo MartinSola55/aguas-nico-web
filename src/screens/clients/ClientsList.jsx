@@ -35,6 +35,22 @@ const ClientsList = () => {
 		});
 	};
 
+	const copyClient = (row) => {
+		const line = [
+			`#${row.id}`,
+			row.name,
+			row.address,
+			row.phone,
+			row.email || '-',
+			row.dealerName,
+			Formatters.dayName(row.deliveryDay),
+			Formatters.formatCurrency(row.debt),
+		].join('\t');
+		navigator.clipboard.writeText(line)
+			.then(() => toast.success('Datos del cliente copiados'))
+			.catch(() => toast.error('No se pudo copiar'));
+	};
+
 	return (
 		<>
 			<PageHeader
@@ -55,7 +71,7 @@ const ClientsList = () => {
 				<DataTable
 					loading={loading}
 					columns={[
-						{ name: 'id', text: 'Código', render: (value) => `#${value}` },
+						{ name: 'id', text: 'Código', render: (value, row) => <Button size="sm" variant="ghost" title="Copiar datos del cliente" onClick={(e) => { e.stopPropagation(); copyClient(row); }}>{`#${value}`}</Button> },
 						{ name: 'name', text: 'Nombre' },
 						{ name: 'address', text: 'Direccion' },
 						{ name: 'phone', text: 'Telefono' },

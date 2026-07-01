@@ -64,6 +64,7 @@ const ManualCart = () => {
 									return parts.length ? parts.join(' - ') : '-';
 								}
 							},
+							{ name: 'debt', text: 'Saldo', render: Formatters.debtLabel },
 							{ name: 'actions', text: '', render: (_, row) => <Button size="sm" onClick={() => selectClient(row)}>Seleccionar</Button> },
 						]}
 						rows={clients}
