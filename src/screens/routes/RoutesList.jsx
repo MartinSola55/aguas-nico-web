@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
-import { Plus } from 'lucide-react';
+import { Plus, Printer } from 'lucide-react';
 import { API, App, Formatters, Helpers, useCatalog } from '@app';
 import { Button, Card, ConfirmButton, DataTable, Modal, PageHeader, Select } from '@components';
 import { routeRequest } from './Routes.helpers.js';
+import { printRouteSheet } from './PrintSheet.js';
 
 const RoutesList = () => {
 	const navigate = useNavigate();
@@ -40,6 +41,14 @@ const RoutesList = () => {
 	};
 
 	const renewAll = () => API.endpoints.abonos.renewAll().then((rs) => toast.success(rs.message));
+
+	const printSheet = (event, route) => {
+		event.stopPropagation();
+		API.endpoints.dealers.getSheets({ dealerId: route.userId }).then((rs) => {
+			const sheets = (rs.data.sheets || []).filter((sheet) => Number(sheet.day) === Number(route.dayOfWeek));
+			printRouteSheet({ dealerName: route.dealerName, day: route.dayOfWeek, sheets });
+		});
+	};
 
 	const openRoute = (route) => {
 		if (App.isDealer()) {
@@ -77,7 +86,7 @@ const RoutesList = () => {
 						{ name: 'truckNumber', text: 'Camion', render: (value) => value || '-' },
 						{ name: 'dayOfWeek', text: 'Dia', render: Formatters.dayName },
 						{ name: 'totalCarts', text: 'Envios a realizar' },
-						{ name: 'createdAt', text: 'Fecha', render: Formatters.formatDate },
+						{ name: 'print', text: 'Planilla', render: (value, route) => <Button size="sm" variant="secondary" onClick={(event) => printSheet(event, route)}><Printer size={16} />Imprimir</Button> },
 					]}
 					rows={routes}
 					pagination
