@@ -24,7 +24,7 @@ const cartPreview = (data) => {
 };
 
 const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
-	const [expanded, setExpanded] = useState(false);
+	const expanded = !route.isStatic;
 	const [clientData, setClientData] = useState(null);
 	const [confirmedData, setConfirmedData] = useState(null);
 	const [returnRows, setReturnRows] = useState([]);
@@ -93,12 +93,11 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 			className="mb-3"
 			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.clientDebt)}`}
-			actions={!route.isStatic && <Button size="sm" variant="secondary" onClick={() => setExpanded((value) => !value)}>{expanded ? 'Ocultar' : 'Ver'}</Button>}
 		>
-			<div className="grid gap-3 md:grid-cols-3">
-				<Field label="Bajada" value={`#${cart.id}`} />
-				<Field label="Cobrado" value={Formatters.formatCurrency(cart.collected || 0)} />
-				<Field label="Estado" value={Formatters.stateName(cart.state)} />
+			<div className="flex flex-wrap gap-x-6 gap-y-1 text-xs">
+				<span className="text-text-muted">Bajada <span className="font-medium text-text-primary">#{cart.id}</span></span>
+				<span className="text-text-muted">Cobrado <span className="font-medium text-text-primary">{Formatters.formatCurrency(cart.collected || 0)}</span></span>
+				<span className="text-text-muted">Estado <span className="font-medium text-text-primary">{Formatters.stateName(cart.state)}</span></span>
 			</div>
 			{cart.state === State.Confirmed && confirmedData && (
 				<div className="mt-3">
@@ -165,6 +164,7 @@ const RouteDetails = () => {
 	const [dispenserPrice, setDispenserPrice] = useState('');
 	const [cartSearch, setCartSearch] = useState('');
 	const [transferOpen, setTransferOpen] = useState(false);
+	const [transfersViewOpen, setTransfersViewOpen] = useState(false);
 
 	const paymentMethods = useMemo(() => catalog?.paymentMethods || [], [catalog]);
 
@@ -276,7 +276,7 @@ const RouteDetails = () => {
 				<Card title="Cobros y gastos">
 					<div className="space-y-2 text-sm">
 						{(route.payments || []).map((payment) => <div key={payment.paymentMethodId} className="flex justify-between"><span>{payment.paymentMethodName}</span><strong>{Formatters.formatCurrency(payment.amount)}</strong></div>)}
-						<div className="flex justify-between"><span>Transferencias</span><strong>{Formatters.formatCurrency((route.transfers || []).reduce((sum, x) => sum + Number(x.amount || 0), 0))}</strong></div>
+						<button type="button" onClick={() => setTransfersViewOpen(true)} className="flex w-full items-center justify-between rounded-[var(--radius-sm)] px-1 py-0.5 text-left text-sm transition-colors hover:bg-bg-tertiary focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"><span className="text-accent-primary underline underline-offset-2">Transferencias</span><strong>{Formatters.formatCurrency((route.transfers || []).reduce((sum, x) => sum + Number(x.amount || 0), 0))}</strong></button>
 						<div className="flex justify-between"><span>Gastos</span><strong>{Formatters.formatCurrency(route.totalExpenses || 0)}</strong></div>
 					</div>
 				</Card>
@@ -316,6 +316,24 @@ const RouteDetails = () => {
 			</Modal>
 			<Modal open={dispenserOpen} title="Precio dispenser" onClose={() => setDispenserOpen(false)} footer={<><Button variant="secondary" onClick={() => setDispenserOpen(false)}>Cerrar</Button><Button onClick={saveDispenser}>Guardar</Button></>}>
 				<Input label="Precio" type="number" min={0} value={dispenserPrice} onChange={setDispenserPrice} />
+			</Modal>
+			<Modal open={transfersViewOpen} title={`Transferencias - ${Formatters.dayName(route.dayOfWeek)}`} onClose={() => setTransfersViewOpen(false)} footer={<Button variant="secondary" onClick={() => setTransfersViewOpen(false)}>Cerrar</Button>}>
+				{(route.transfers || []).length === 0 ? (
+					<p className="m-0 py-2 text-sm text-text-muted">No hay transferencias para esta planilla.</p>
+				) : (
+					<>
+						<DataTable
+							columns={[
+								{ name: 'clientName', text: 'Cliente' },
+								{ name: 'amount', text: 'Monto', render: Formatters.formatCurrency },
+								{ name: 'date', text: 'Fecha', render: Formatters.formatDate },
+							]}
+							rows={route.transfers || []}
+							infinite
+						/>
+						<div className="mt-3 flex justify-between border-t border-border-subtle pt-3 text-sm"><span className="font-medium">Total</span><strong>{Formatters.formatCurrency((route.transfers || []).reduce((sum, x) => sum + Number(x.amount || 0), 0))}</strong></div>
+					</>
+				)}
 			</Modal>
 			<TransferFormModal open={transferOpen} onClose={() => setTransferOpen(false)} onSaved={load} />
 		</>
