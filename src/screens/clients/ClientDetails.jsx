@@ -110,14 +110,14 @@ const ClientDetails = () => {
 								{ name: 'date', text: 'Fecha', render: Formatters.formatDate },
 								{
 									name: 'type', text: 'Movimiento', render: (_, row) => {
-										if (row.transferAmount) return `Transferencia - ${Formatters.formatCurrency(row.transferAmount)}`;
+										if (row.transferAmount) return 'Transferencia';
 										if (row.abonoName) return `${row.abonoName} - ${Formatters.formatCurrency(row.abonoPrice)}`;
 										if (row.cartState !== 1) return Formatters.stateName(row.cartState);
 										const products = [...(row.products || []), ...(row.abonoProducts || []).map((p) => ({ ...p, typeName: `${p.typeName} (abono)` }))];
 										return products.length ? products.map((p) => `${p.typeName} x ${p.quantity}`).join(', ') : '-';
 									}
 								},
-								{ name: 'paymentMethods', text: 'Pago', render: (items = []) => items.length ? items.map((m) => `${m.paymentMethodName}: ${Formatters.formatCurrency(m.amount)}`).join(', ') : '-' },
+								{ name: 'paymentMethods', text: 'Pago', render: (items = [], row) => row.transferAmount ? Formatters.formatCurrency(row.transferAmount) : items.length ? items.map((m) => `${m.paymentMethodName}: ${Formatters.formatCurrency(m.amount)}`).join(', ') : '-' },
 							]}
 							rows={client.cartsTransfersHistory || []}
 							infinite

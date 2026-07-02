@@ -19,6 +19,7 @@ const DealersList = () => {
 					columns={[
 						{ name: 'name', text: 'Nombre' },
 						{ name: 'truckNumber', text: 'Camion', render: (value) => value || '-' },
+						{ name: 'clientsCount', text: 'Clientes' },
 						{ name: 'email', text: 'Email' },
 					]}
 					rows={dealers}

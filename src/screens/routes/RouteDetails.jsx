@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Edit, PackageCheck, Play, Plus, Search } from 'lucide-react';
+import { ChevronRight, Edit, PackageCheck, Play, Plus, Search, UserPlus } from 'lucide-react';
 import { API, App, Formatters, Helpers, useCatalog } from '@app';
 import { State } from '@constants';
 import { Badge, Button, Card, ConfirmButton, DataTable, Field, Input, Modal, PageHeader, StatCard } from '@components';
@@ -91,6 +91,7 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	return (
 		<Card
 			className="mb-3"
+			style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
 			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.clientDebt)}`}
 		>
@@ -229,6 +230,7 @@ const RouteDetails = () => {
 				actions={
 					<>
 						{route.isStatic && App.isAdmin() && <Button onClick={startRoute}><Play size={16} />Comenzar</Button>}
+						{App.isAdmin() && <Link to="/clientes/nuevo" target="_blank"><Button variant="secondary"><UserPlus size={16} />Nuevo cliente</Button></Link>}
 						{App.isAdmin() && <Link to={`/planillas/${route.id}/editar`}><Button variant="secondary"><Edit size={16} />Editar clientes</Button></Link>}
 						{!route.isStatic && <Link to={`/planillas/${route.id}/manual`}><Button variant="secondary"><Plus size={16} />Fuera de reparto</Button></Link>}
 						{!route.isStatic && <Button onClick={() => setTransferOpen(true)}>Nueva transferencia</Button>}
@@ -276,7 +278,30 @@ const RouteDetails = () => {
 				<Card title="Cobros y gastos">
 					<div className="space-y-2 text-sm">
 						{(route.payments || []).map((payment) => <div key={payment.paymentMethodId} className="flex justify-between"><span>{payment.paymentMethodName}</span><strong>{Formatters.formatCurrency(payment.amount)}</strong></div>)}
-						<button type="button" onClick={() => setTransfersViewOpen(true)} className="flex w-full items-center justify-between rounded-[var(--radius-sm)] px-1 py-0.5 text-left text-sm transition-colors hover:bg-bg-tertiary focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"><span className="text-accent-primary underline underline-offset-2">Transferencias</span><strong>{Formatters.formatCurrency((route.transfers || []).reduce((sum, x) => sum + Number(x.amount || 0), 0))}</strong></button>
+						{(() => {
+							const transfers = route.transfers || [];
+							const transfersTotal = transfers.reduce((sum, x) => sum + Number(x.amount || 0), 0);
+							const hasTransfers = transfers.length > 0;
+							return (
+								<button
+									type="button"
+									onClick={() => setTransfersViewOpen(true)}
+									disabled={!hasTransfers}
+									title={hasTransfers ? 'Ver detalle de transferencias' : 'No hay transferencias'}
+									className="group -mx-1 cursor-pointer flex w-full items-center justify-between rounded-[var(--radius-sm)] px-1 py-1 text-left text-sm transition-colors enabled:hover:bg-bg-tertiary disabled:cursor-default disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
+								>
+									<span className="flex items-center gap-1.5">
+										<span className={hasTransfers ? 'text-accent-primary' : ''}>Transferencias</span>
+										{hasTransfers && <Badge variant="neutral">{transfers.length}</Badge>}
+									</span>
+									<span className="flex items-center gap-1">
+										<strong>{Formatters.formatCurrency(transfersTotal)}</strong>
+										{hasTransfers && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
+									</span>
+								</button>
+							);
+						})()}
+						{Number(route.dispenserPrice) > 0 && <div className="flex justify-between"><span>Dispenser</span><strong>{Formatters.formatCurrency(route.dispenserPrice)}</strong></div>}
 						<div className="flex justify-between"><span>Gastos</span><strong>{Formatters.formatCurrency(route.totalExpenses || 0)}</strong></div>
 					</div>
 				</Card>
