@@ -4,6 +4,7 @@
 	color-scheme: light;
 	--color-bg-primary: #f6f8fb;
 	--color-bg-secondary: #ffffff;
+	--color-bg-secondary-alt: #f8f8f8;
 	--color-bg-tertiary: #eef3f8;
 	--color-bg-elevated: #ffffff;
 	--color-bg-canvas: #edf2f7;
@@ -48,6 +49,7 @@
 	color-scheme: dark;
 	--color-bg-primary: #151a23;
 	--color-bg-secondary: #1d2430;
+	--color-bg-secondary-alt: #212a39;
 	--color-bg-tertiary: #283140;
 	--color-bg-elevated: #303a4a;
 	--color-bg-canvas: #10141b;
@@ -114,12 +116,20 @@
 }
 
 @keyframes rotation {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 @layer base {
-	* { box-sizing: border-box; }
+	* {
+		box-sizing: border-box;
+	}
+
 	body {
 		margin: 0;
 		background: var(--color-bg-primary);
@@ -127,9 +137,24 @@
 		font-family: Inter, "Segoe UI", Arial, sans-serif;
 		-webkit-font-smoothing: antialiased;
 	}
-	a { color: var(--color-accent-primary); text-decoration: none; }
-	button, input, textarea, select { font: inherit; }
+
+	a {
+		color: var(--color-accent-primary);
+		text-decoration: none;
+	}
+
+	button,
+	input,
+	textarea,
+	select {
+		font: inherit;
+	}
 }
 
-.react-select__menu { z-index: var(--z-dropdown); }
-.react-select__menu-portal { z-index: var(--z-popover); }
+.react-select__menu {
+	z-index: var(--z-dropdown);
+}
+
+.react-select__menu-portal {
+	z-index: var(--z-popover);
+}
