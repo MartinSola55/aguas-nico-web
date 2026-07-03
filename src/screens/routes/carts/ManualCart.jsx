@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { API, Formatters } from '@app';
 import { Button, Card, DataTable, Input, PageHeader } from '@components';
-import CartEditor from './CartEditor.jsx';
-import { manualCartRequest } from './Routes.helpers.js';
+import { CartEditor } from './CartEditor.jsx';
+import { manualCartRequest } from '../Routes.helpers.js';
 import { toast } from 'react-toastify';
 
-const ManualCart = () => {
+export const ManualCart = () => {
 	const { id } = useParams();
 	const [route, setRoute] = useState(null);
 	const [paymentMethods, setPaymentMethods] = useState([]);
@@ -86,5 +86,3 @@ const ManualCart = () => {
 		</>
 	);
 };
-
-export default ManualCart;

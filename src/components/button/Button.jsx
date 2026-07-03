@@ -1,6 +1,6 @@
 import { sizes, variants } from './Button.constants';
 
-const Button = ({
+export const Button = ({
 	type = 'button',
 	variant = 'primary',
 	size = 'md',
@@ -29,4 +29,3 @@ const Button = ({
 	</button>
 );
 
-export default Button;

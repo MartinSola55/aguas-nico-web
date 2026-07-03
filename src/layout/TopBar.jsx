@@ -4,7 +4,7 @@ import { API, Helpers, LocalStorage } from '@app';
 import { Button, ThemeToggle } from '@components';
 import { toast } from 'react-toastify';
 
-const TopBar = ({ onMobileMenuClick = () => { } }) => {
+export const TopBar = ({ onMobileMenuClick = () => { } }) => {
 	const navigate = useNavigate();
 
 	const logout = () => {
@@ -61,4 +61,3 @@ const TopBar = ({ onMobileMenuClick = () => { } }) => {
 	);
 };
 
-export default TopBar;

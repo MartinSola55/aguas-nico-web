@@ -1,70 +1,12 @@
 import { useRef } from 'react';
-import { Link, useLocation } from 'react-router';
-import {
-	Banknote,
-	BarChart3,
-	Boxes,
-	ClipboardList,
-	FileSpreadsheet,
-	Handshake,
-	Home,
-	Package,
-	PanelLeftClose,
-	PanelLeftOpen,
-	Route,
-	Truck,
-	Users,
-	X,
-} from 'lucide-react';
+import { useLocation } from 'react-router';
+import { PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
 import { App } from '@app';
 import { useClickOutside } from '@hooks';
+import { navItems } from './NavBar.constants.js';
+import { NavItem } from './navItem/NavItem.jsx';
 
-const items = [
-	{ to: '/', label: 'Inicio', icon: Home },
-	{ to: '/clientes', label: 'Clientes', icon: Users, admin: true },
-	{ to: '/clientes/nuevo', label: 'Agregar cliente', icon: Users, dealer: true },
-	{ to: '/productos', label: 'Productos', icon: Package, admin: true },
-	{ to: '/abonos', label: 'Abonos', icon: Boxes, admin: true },
-	{ to: '/planillas', label: 'Planillas', icon: ClipboardList },
-	{ to: '/repartidores', label: 'Repartidores', icon: Truck, admin: true },
-	{ to: '/gastos', label: 'Gastos', icon: Banknote, admin: true },
-	{ to: '/transferencias', label: 'Transferencias', icon: Route, admin: true },
-	{ to: '/facturas', label: 'Facturas', icon: FileSpreadsheet, admin: true },
-	{ to: '/terceros', label: 'Terceros', icon: Handshake, admin: true },
-	{ to: '/estadisticas', label: 'Estadisticas', icon: BarChart3, admin: true },
-];
-
-const NavItem = ({ to, label, icon: Icon, expanded, active, onNavigate }) => (
-	<li className="group relative">
-		<Link
-			to={to}
-			onClick={onNavigate}
-			className={`flex items-center whitespace-nowrap rounded-[var(--radius-md)] border-l-[3px] py-2.5 pl-4 pr-3 text-sm font-medium transition-colors ${active
-				? 'border-accent-primary bg-accent-primary-muted text-accent-primary'
-				: 'border-transparent text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
-				}`}
-		>
-			<Icon size={18} className="shrink-0" />
-			<span
-				className="ml-3"
-				style={{
-					clipPath: expanded ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
-					opacity: expanded ? 1 : 0,
-					transition: 'clip-path 400ms ease-in-out, opacity 400ms ease-in-out',
-				}}
-			>
-				{label}
-			</span>
-		</Link>
-		{!expanded && (
-			<div className="invisible absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-[var(--radius-md)] border border-border-subtle bg-bg-elevated px-2.5 py-1.5 text-xs font-medium text-text-primary opacity-0 shadow-md transition-all duration-[var(--transition-fast)] group-hover:visible group-hover:opacity-100 max-md:hidden">
-				{label}
-			</div>
-		)}
-	</li>
-);
-
-const NavBar = ({
+export const NavBar = ({
 	expanded = false,
 	isMobile = false,
 	mobileOpen = false,
@@ -78,7 +20,7 @@ const NavBar = ({
 
 	useClickOutside(navRef, onMobileClose, isMobile && mobileOpen);
 
-	const navItems = items.filter((item) => {
+	const visibleItems = navItems.filter((item) => {
 		if (item.admin) return App.isAdmin();
 		if (item.dealer) return App.isDealer();
 		return true;
@@ -108,7 +50,7 @@ const NavBar = ({
 				</div>
 				<nav className={`flex-1 overflow-y-auto overflow-x-hidden [transition:padding_400ms_ease-in-out] ${expanded ? 'p-3' : 'p-2 max-md:p-3'}`}>
 					<ul className="m-0 flex list-none flex-col gap-1 p-0">
-						{navItems.map((item) => (
+						{visibleItems.map((item) => (
 							<NavItem
 								key={item.to}
 								{...item}
@@ -142,4 +84,3 @@ const NavBar = ({
 	);
 };
 
-export default NavBar;

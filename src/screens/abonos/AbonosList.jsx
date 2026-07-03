@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { API, Formatters, useCatalog } from '@app';
-import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader } from '@components';
-import { buildAbonoRequest, emptyAbono } from './Abonos.helpers.js';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { API, Formatters } from '@app';
+import { Button, Card, ConfirmButton, DataTable, PageHeader } from '@components';
+import { ClientsSummaryModal } from '@screens/shared';
+import { AbonoFormModal } from './AbonoFormModal.jsx';
+import { buildAbonoRequest } from './Abonos.helpers.js';
 
-const AbonosList = () => {
-	const { combos } = useCatalog();
+export const AbonosList = () => {
 	const [abonos, setAbonos] = useState([]);
-	const [form, setForm] = useState(emptyAbono);
-	const [modal, setModal] = useState(false);
-	const [clientsModal, setClientsModal] = useState({ open: false, abono: null, clients: [] });
+	const formModalRef = useRef(null);
+	const clientsModalRef = useRef(null);
 
 	const load = () => {
 		API.endpoints.abonos.getAll().then((rs) => setAbonos(rs.data.items || []));
@@ -17,21 +17,11 @@ const AbonosList = () => {
 
 	useEffect(load, []);
 
-	const openCreate = () => {
-		setForm({ ...emptyAbono, products: combos.productTypes.map((type) => ({ type: type.value, typeName: type.label, quantity: '' })) });
-		setModal(true);
-	};
-
-	const openEdit = (abono) => {
-		setForm({ ...abono, products: abono.products || [] });
-		setModal(true);
-	};
-
-	const save = () => {
+	const save = (form, onSaved) => {
 		const action = form.id ? API.endpoints.abonos.update : API.endpoints.abonos.create;
 		action(buildAbonoRequest(form)).then((rs) => {
 			toast.success(rs.message);
-			setModal(false);
+			onSaved?.();
 			load();
 		});
 	};
@@ -48,22 +38,19 @@ const AbonosList = () => {
 	};
 
 	const showClients = (abono) => {
-		API.endpoints.abonos.getClients({ abonoId: abono.id }).then((rs) => setClientsModal({ open: true, abono, clients: rs.data.items || [] }));
-	};
-
-	const setProductQuantity = (type, quantity) => {
-		setForm((current) => ({
-			...current,
-			products: current.products.map((item) => Number(item.type) === Number(type) ? { ...item, quantity } : item),
-		}));
+		API.endpoints.abonos.getClients({ abonoId: abono.id }).then((rs) => {
+			clientsModalRef.current?.open({ title: `Clientes con ${abono?.name || ''}`, clients: rs.data.items || [] });
+		});
 	};
 
 	return (
 		<>
+			<AbonoFormModal ref={formModalRef} onSave={save} />
+			<ClientsSummaryModal ref={clientsModalRef} />
 			<PageHeader
 				title="Abonos"
 				breadcrumbs={['Inicio', 'Abonos']}
-				actions={<><ConfirmButton variant="secondary" message="Renovar todos los abonos?" onConfirm={renewAll}>Renovar todos</ConfirmButton><Button onClick={openCreate}>Nuevo abono</Button></>}
+				actions={<><ConfirmButton variant="secondary" message="Renovar todos los abonos?" onConfirm={renewAll}>Renovar todos</ConfirmButton><Button onClick={() => formModalRef.current?.openCreate()}>Nuevo abono</Button></>}
 			/>
 			<Card title="Listado">
 				<DataTable
@@ -74,7 +61,7 @@ const AbonosList = () => {
 						{
 							name: 'actions', text: 'Acciones', render: (_, row) => (
 								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-									<Button size="sm" variant="secondary" onClick={() => openEdit(row)}>Editar</Button>
+									<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.openEdit(row)}>Editar</Button>
 									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
 									<ConfirmButton size="sm" variant="danger" message="Eliminar abono?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
 								</div>
@@ -85,40 +72,6 @@ const AbonosList = () => {
 					pagination
 				/>
 			</Card>
-			<Modal
-				open={modal}
-				title={form.id ? 'Editar abono' : 'Nuevo abono'}
-				onClose={() => setModal(false)}
-				footer={<><Button variant="secondary" onClick={() => setModal(false)}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}
-			>
-				<div className="grid gap-3">
-					<Input label="Nombre" value={form.name} onChange={(value) => setForm((f) => ({ ...f, name: value }))} />
-					<Input label="Precio" type="number" min={0} value={form.price} onChange={(value) => setForm((f) => ({ ...f, price: value }))} />
-					{!form.id && (
-						<DataTable
-							columns={[
-								{ name: 'typeName', text: 'Producto' },
-								{ name: 'quantity', text: 'Cantidad', render: (_, row) => <Input type="number" min={0} max={100} value={row.quantity} onChange={(value) => setProductQuantity(row.type, value)} /> },
-							]}
-							rows={form.products}
-						/>
-					)}
-				</div>
-			</Modal>
-			<Modal open={clientsModal.open} title={`Clientes con ${clientsModal.abono?.name || ''}`} size="lg" onClose={() => setClientsModal({ open: false, abono: null, clients: [] })}>
-				<DataTable
-					columns={[
-						{ name: 'name', text: 'Cliente' },
-						{ name: 'address', text: 'Direccion' },
-						{ name: 'dealerName', text: 'Reparto', render: (_, row) => `${row.dealerName || 'Sin repartidor'} - ${row.deliveryDay ? Formatters.dayName(row.deliveryDay) : 'Sin dia de reparto'}` },
-						{ name: 'debt', text: 'Deuda', render: Formatters.formatCurrency },
-					]}
-					rows={clientsModal.clients}
-					infinite
-				/>
-			</Modal>
 		</>
 	);
 };
-
-export default AbonosList;

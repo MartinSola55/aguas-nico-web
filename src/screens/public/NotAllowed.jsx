@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 
-const NotAllowed = () => (
+export const NotAllowed = () => (
 	<div className="grid min-h-screen place-items-center bg-bg-primary p-6 text-center">
 		<div>
 			<h1 className="text-3xl font-semibold">Sin permisos</h1>
@@ -10,4 +10,3 @@ const NotAllowed = () => (
 	</div>
 );
 
-export default NotAllowed;

@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Banknote, ClipboardList, FileSpreadsheet, ReceiptText, Truck } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { API, DateHelper, Formatters, Helpers, LocalStorage } from '@app';
 import { App } from '@app';
-import { Button, Card, DataTable, Input, Modal, PageHeader, Select, StatCard } from '@components';
-import { toast } from 'react-toastify';
+import { Button, Card, DataTable, Input, PageHeader, StatCard } from '@components';
+import { DashboardExpenseModal } from './modals/DashboardExpenseModal.jsx';
 
-const Home = () => {
+export const Home = () => {
 	const navigate = useNavigate();
 	const [dealers, setDealers] = useState([]);
 	const [date, setDate] = useState(DateHelper.toInputDate());
@@ -14,11 +15,9 @@ const Home = () => {
 	const [expenses, setExpenses] = useState([]);
 	const [soldProducts, setSoldProducts] = useState([]);
 	const [balance, setBalance] = useState(null);
-	const [expenseModal, setExpenseModal] = useState(false);
-	const [expenseForm, setExpenseForm] = useState({ userId: '', description: '', amount: '' });
 	const [loading, setLoading] = useState(true);
-
-	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
+	const expenseModalRef = useRef(null);
+
 	const selectedDateLabel = Formatters.formatDate(date);
 	const totalSold = Helpers.numberOrZero(balance?.cartPaymentMethods) + Helpers.numberOrZero(balance?.transfers) + Helpers.numberOrZero(balance?.dispenserPrice);
 	const totalCollected = useMemo(() => routes.reduce((acc, route) => acc + Helpers.numberOrZero(route.collected), 0), [routes]);
@@ -52,15 +51,14 @@ const Home = () => {
 
 	const downloadCaja = () => API.endpoints.caja.downloadDailyClose({ date: DateHelper.toApiDate(date) });
 
-	const createExpense = () => {
+	const createExpense = (expenseForm, onSaved) => {
 		API.endpoints.expenses.create({
 			userId: expenseForm.userId,
 			description: expenseForm.description,
 			amount: Number(expenseForm.amount),
 		}).then((rs) => {
 			toast.success(rs.message);
-			setExpenseModal(false);
-			setExpenseForm({ userId: '', description: '', amount: '' });
+			onSaved?.();
 			loadDashboard(date);
 		});
 	};
@@ -109,10 +107,11 @@ const Home = () => {
 
 	return (
 		<>
+			<DashboardExpenseModal ref={expenseModalRef} dealers={dealers} onSave={createExpense} />
 			<PageHeader
 				title="Inicio"
 				breadcrumbs={['Inicio']}
-				actions={<div className="flex flex-wrap items-end gap-2">{dateAction}<Button variant="secondary" onClick={downloadCaja}><FileSpreadsheet size={16} />Cierre de caja</Button><Button onClick={() => setExpenseModal(true)}>Agregar gasto</Button></div>}
+				actions={<div className="flex flex-wrap items-end gap-2">{dateAction}<Button variant="secondary" onClick={downloadCaja}><FileSpreadsheet size={16} />Cierre de caja</Button><Button onClick={() => expenseModalRef.current?.open()}>Agregar gasto</Button></div>}
 			/>
 			{adminTotals}
 			<div className="mt-4 grid gap-4 xl:grid-cols-2">
@@ -180,20 +179,6 @@ const Home = () => {
 					</div>
 				</Card>
 			</div>
-			<Modal
-				open={expenseModal}
-				title="Agregar gasto"
-				onClose={() => setExpenseModal(false)}
-				footer={<><Button variant="secondary" onClick={() => setExpenseModal(false)}>Cerrar</Button><Button onClick={createExpense}>Agregar</Button></>}
-			>
-				<div className="grid gap-3">
-					<Select label="Repartidor" items={dealerItems} value={expenseForm.userId} onChange={(value) => setExpenseForm((f) => ({ ...f, userId: value }))} />
-					<Input label="Descripcion" value={expenseForm.description} onChange={(value) => setExpenseForm((f) => ({ ...f, description: value }))} />
-					<Input label="Monto" type="number" min={0} value={expenseForm.amount} onChange={(value) => setExpenseForm((f) => ({ ...f, amount: value }))} />
-				</div>
-			</Modal>
 		</>
 	);
 };
-
-export default Home;

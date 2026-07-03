@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
-import { API, DateHelper, Formatters, Helpers, useIsDarkMode } from '@app';
-import { Button, Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
+import { API, DateHelper, Formatters, useIsDarkMode } from '@app';
+import { Button, Card, DataTable, Input, PageHeader, StatCard } from '@components';
+import { DealerCombo, MonthCombo, YearCombo } from '@screens/shared';
 
 const chartPalette = (isDark) => ({
 	accent: isDark ? '#2dd4bf' : '#0f766e',
@@ -42,7 +43,7 @@ const baseChartOptions = (isDark, categories) => {
 	};
 };
 
-const Stats = () => {
+export const Stats = () => {
 	const [years, setYears] = useState([]);
 	const [year, setYear] = useState(DateHelper.currentYear());
 	const [month, setMonth] = useState(DateHelper.currentMonth());
@@ -54,8 +55,6 @@ const Stats = () => {
 	const [dealers, setDealers] = useState([]);
 	const [dealerFilters, setDealerFilters] = useState({ startDate: DateHelper.monthStart(), endDate: DateHelper.monthEnd(), dealerId: '' });
 	const [dealerProducts, setDealerProducts] = useState([]);
-
-	const dealerOptions = useMemo(() => [{ value: '', label: 'Todos los repartos' }, ...Helpers.dealerComboItems(dealers)], [dealers]);
 
 	const isDark = useIsDarkMode();
 	const annualOptions = useMemo(() => ({
@@ -96,13 +95,8 @@ const Stats = () => {
 			<PageHeader title="Estadisticas" breadcrumbs={['Inicio', 'Estadisticas']} />
 			<Card title="Filtros">
 				<div className="grid gap-3 md:grid-cols-[200px_200px_220px_200px] md:items-end">
-					<Select label="Año" value={year} onChange={setYear} items={years.map((y) => ({ value: y, label: y }))} />
-					<Select label="Mes" value={month} onChange={setMonth} items={[
-						{ value: 1, label: 'Enero' }, { value: 2, label: 'Febrero' }, { value: 3, label: 'Marzo' },
-						{ value: 4, label: 'Abril' }, { value: 5, label: 'Mayo' }, { value: 6, label: 'Junio' },
-						{ value: 7, label: 'Julio' }, { value: 8, label: 'Agosto' }, { value: 9, label: 'Septiembre' },
-						{ value: 10, label: 'Octubre' }, { value: 11, label: 'Noviembre' }, { value: 12, label: 'Diciembre' },
-					]} />
+					<YearCombo label="A?o" value={year} onChange={setYear} years={years} />
+					<MonthCombo label="Mes" value={month} onChange={setMonth} />
 					<Input label="Balance al dia" type="date" value={balanceDate} onChange={setBalanceDate} />
 					<Button className="justify-self-start" onClick={load}>Actualizar</Button>
 				</div>
@@ -138,7 +132,7 @@ const Stats = () => {
 				<div className="mb-4 grid gap-3 md:grid-cols-[200px_200px_220px_auto] md:items-end">
 					<Input label="Desde" type="date" value={dealerFilters.startDate} onChange={(value) => setDealerFilters((f) => ({ ...f, startDate: value }))} />
 					<Input label="Hasta" type="date" value={dealerFilters.endDate} onChange={(value) => setDealerFilters((f) => ({ ...f, endDate: value }))} />
-					<Select label="Repartidor" items={dealerOptions} value={dealerFilters.dealerId} onChange={(value) => setDealerFilters((f) => ({ ...f, dealerId: value || '' }))} />
+					<DealerCombo label="Repartidor" dealers={dealers} includeAllLabel="Todos los repartos" value={dealerFilters.dealerId} onChange={(value) => setDealerFilters((f) => ({ ...f, dealerId: value || '' }))} />
 					<Button variant="secondary" className="justify-self-start" onClick={loadDealerProducts}>Buscar</Button>
 				</div>
 				<DataTable
@@ -161,4 +155,3 @@ const Stats = () => {
 	);
 };
 
-export default Stats;

@@ -25,4 +25,3 @@ export const useMediaQuery = (query, defaultMatches = false) => {
 	return matches;
 };
 
-export default useMediaQuery;

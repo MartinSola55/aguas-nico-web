@@ -1,6 +1,6 @@
 import { CONTROL_CLASS } from './Input.constants';
 
-const Input = ({
+export const Input = ({
 	label,
 	value,
 	type = 'text',
@@ -39,4 +39,3 @@ const Input = ({
 	);
 };
 
-export default Input;

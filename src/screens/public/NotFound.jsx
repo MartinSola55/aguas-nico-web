@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 
-const NotFound = () => (
+export const NotFound = () => (
 	<div className="grid min-h-screen place-items-center bg-bg-primary p-6 text-center">
 		<div>
 			<h1 className="text-3xl font-semibold">Pagina no encontrada</h1>
@@ -9,4 +9,3 @@ const NotFound = () => (
 	</div>
 );
 
-export default NotFound;

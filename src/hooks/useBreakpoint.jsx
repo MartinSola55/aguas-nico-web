@@ -23,4 +23,3 @@ const getBreakpointQuery = (breakpoint, direction) => {
 export const useBreakpoint = (breakpoint, direction = 'down') =>
 	useMediaQuery(getBreakpointQuery(breakpoint, direction));
 
-export default useBreakpoint;

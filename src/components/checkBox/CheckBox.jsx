@@ -1,4 +1,4 @@
-const CheckBox = ({ label, checked = false, disabled = false, onChange, className = '' }) => (
+export const CheckBox = ({ label, checked = false, disabled = false, onChange, className = '' }) => (
 	<label className={`inline-flex items-center gap-2 text-sm text-text-secondary ${className}`}>
 		<input
 			type="checkbox"
@@ -11,4 +11,3 @@ const CheckBox = ({ label, checked = false, disabled = false, onChange, classNam
 	</label>
 );
 
-export default CheckBox;

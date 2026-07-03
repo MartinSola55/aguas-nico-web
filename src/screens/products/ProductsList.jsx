@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { BarChart3, Check, Plus, X } from 'lucide-react';
-import { API, Formatters, useCatalog } from '@app';
-import { Button, Card, ConfirmButton, DataTable, Input, Modal, PageHeader, Select, Switch } from '@components';
-import { buildProductRequest, emptyProduct } from './Products.helpers.js';
 import { toast } from 'react-toastify';
+import { API, Formatters } from '@app';
+import { Button, Card, ConfirmButton, DataTable, PageHeader, Switch } from '@components';
+import { ClientsSummaryModal } from '@screens/shared';
+import { ProductFormModal } from './ProductFormModal.jsx';
+import { buildProductRequest } from './Products.helpers.js';
 
-const ProductsList = () => {
-	const { combos } = useCatalog();
+export const ProductsList = () => {
 	const [products, setProducts] = useState([]);
-	const [modal, setModal] = useState(false);
-	const [clientsModal, setClientsModal] = useState({ open: false, product: null, clients: [] });
-	const [form, setForm] = useState(emptyProduct);
 	const [loading, setLoading] = useState(false);
 	const [activeOnly, setActiveOnly] = useState(true);
+	const formModalRef = useRef(null);
+	const clientsModalRef = useRef(null);
 
 	const visibleProducts = activeOnly ? products.filter((p) => p.isActive) : products;
 
@@ -26,16 +26,11 @@ const ProductsList = () => {
 
 	useEffect(load, []);
 
-	const openForm = (product = emptyProduct) => {
-		setForm(product);
-		setModal(true);
-	};
-
-	const save = () => {
+	const save = (form, onSaved) => {
 		const action = form.id ? API.endpoints.products.update : API.endpoints.products.create;
 		action(buildProductRequest(form)).then((rs) => {
 			toast.success(rs.message);
-			setModal(false);
+			onSaved?.();
 			load();
 		});
 	};
@@ -49,13 +44,15 @@ const ProductsList = () => {
 
 	const showClients = (product) => {
 		API.endpoints.products.getClients({ productId: product.id }).then((rs) => {
-			setClientsModal({ open: true, product, clients: rs.data.items || [] });
+			clientsModalRef.current?.open({ title: `Clientes con ${product?.name || ''}`, clients: rs.data.items || [] });
 		});
 	};
 
 	return (
 		<>
-			<PageHeader title="Productos" breadcrumbs={['Inicio', 'Productos']} actions={<Button onClick={() => openForm()}><Plus size={16} />Nuevo producto</Button>} />
+			<ProductFormModal ref={formModalRef} onSave={save} />
+			<ClientsSummaryModal ref={clientsModalRef} />
+			<PageHeader title="Productos" breadcrumbs={['Inicio', 'Productos']} actions={<Button onClick={() => formModalRef.current?.open()}><Plus size={16} />Nuevo producto</Button>} />
 			<Card title="Listado">
 				<div className="mb-3 flex justify-start">
 					<Switch label="Mostrar solo activos" checked={activeOnly} onChange={setActiveOnly} />
@@ -75,7 +72,7 @@ const ProductsList = () => {
 						{
 							name: 'actions', text: 'Acciones', render: (_, row) => (
 								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-									<Button size="sm" variant="secondary" onClick={() => openForm(row)}>Editar</Button>
+									<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
 									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
 									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} /></Button></Link>
 									{row.isActive && <ConfirmButton size="sm" variant="danger" message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
@@ -87,38 +84,6 @@ const ProductsList = () => {
 					pagination
 				/>
 			</Card>
-			<Modal
-				open={modal}
-				title={form.id ? 'Editar producto' : 'Nuevo producto'}
-				onClose={() => setModal(false)}
-				footer={<><Button variant="secondary" onClick={() => setModal(false)}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}
-			>
-				<div className="grid gap-3">
-					<Input label="Nombre" value={form.name} onChange={(value) => setForm((f) => ({ ...f, name: value }))} />
-					<Input label="Precio" type="number" min={0} value={form.price} onChange={(value) => setForm((f) => ({ ...f, price: value }))} />
-					<Select label="Tipo" items={combos.productTypes} value={form.type} onChange={(value) => setForm((f) => ({ ...f, type: value }))} />
-					<Input label="Orden" type="number" min={0} value={form.sortOrder} onChange={(value) => setForm((f) => ({ ...f, sortOrder: value }))} />
-				</div>
-			</Modal>
-			<Modal
-				open={clientsModal.open}
-				title={`Clientes con ${clientsModal.product?.name || ''}`}
-				size="lg"
-				onClose={() => setClientsModal({ open: false, product: null, clients: [] })}
-			>
-				<DataTable
-					columns={[
-						{ name: 'name', text: 'Cliente' },
-						{ name: 'address', text: 'Direccion' },
-						{ name: 'dealerName', text: 'Reparto', render: (_, row) => `${row.dealerName || 'Sin repartidor'} - ${row.deliveryDay ? Formatters.dayName(row.deliveryDay) : 'Sin dia de reparto'}` },
-						{ name: 'debt', text: 'Deuda', render: Formatters.formatCurrency },
-					]}
-					rows={clientsModal.clients}
-					infinite
-				/>
-			</Modal>
 		</>
 	);
 };
-
-export default ProductsList;

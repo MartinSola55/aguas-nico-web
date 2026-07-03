@@ -1,18 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { API, DateHelper, Formatters, useCatalog } from '@app';
-import { Button, Card, DataTable, Input, PageHeader, Select, StatCard } from '@components';
+import { API, DateHelper, Formatters } from '@app';
+import { Button, Card, DataTable, Input, PageHeader, StatCard } from '@components';
+import { DayCombo, MonthCombo, YearCombo } from '@screens/shared';
 
-const MONTH_ITEMS = [
-	{ value: 1, label: 'Enero' }, { value: 2, label: 'Febrero' }, { value: 3, label: 'Marzo' },
-	{ value: 4, label: 'Abril' }, { value: 5, label: 'Mayo' }, { value: 6, label: 'Junio' },
-	{ value: 7, label: 'Julio' }, { value: 8, label: 'Agosto' }, { value: 9, label: 'Septiembre' },
-	{ value: 10, label: 'Octubre' }, { value: 11, label: 'Noviembre' }, { value: 12, label: 'Diciembre' },
-];
-
-const DealerDetails = () => {
-	const { id } = useParams();
-	const { combos } = useCatalog();
+export const DealerDetails = () => {
+	const { id } = useParams();
 	const [month, setMonth] = useState(DateHelper.currentMonth());
 	const [year, setYear] = useState(DateHelper.currentYear());
 	const [years, setYears] = useState([]);
@@ -48,8 +41,8 @@ const DealerDetails = () => {
 		<>
 			<PageHeader title={data?.dealer?.name || 'Repartidor'} breadcrumbs={['Inicio', 'Repartidores', 'Detalles']} actions={<Link to={`/repartidores/${id}/planillas`}><Button variant="secondary">Imprimir planillas</Button></Link>} />
 			<div className="mb-4 grid gap-3 md:grid-cols-2">
-				<Select label="Mes" items={MONTH_ITEMS} value={month} onChange={setMonth} />
-				<Select label="Anio" items={years.map((y) => ({ value: y, label: y }))} value={year} onChange={setYear} />
+				<MonthCombo label="Mes" value={month} onChange={setMonth} />
+				<YearCombo label="Anio" years={years} value={year} onChange={setYear} />
 			</div>
 			<div className="mb-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard label="Total bajadas" value={data?.totalCarts || 0} />
@@ -64,7 +57,7 @@ const DealerDetails = () => {
 				</Card>
 				<Card title="Clientes por dia">
 					<div className="mb-3 flex items-end gap-2">
-						<Select label="Dia" items={combos.days} value={day} onChange={setDay} />
+						<DayCombo label="Dia" value={day} onChange={setDay} />
 						<Button variant="secondary" onClick={loadClientsByDay}>Buscar</Button>
 					</div>
 					<DataTable columns={[{ name: 'name', text: 'Cliente' }, { name: 'address', text: 'Direccion' }, { name: 'debt', text: 'Deuda', render: Formatters.formatCurrency }]} rows={clientsByDay} infinite />
@@ -91,4 +84,3 @@ const DealerDetails = () => {
 	);
 };
 
-export default DealerDetails;

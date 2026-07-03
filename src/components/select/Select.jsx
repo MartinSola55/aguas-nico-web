@@ -1,7 +1,7 @@
 import ReactSelect from 'react-select';
 import { getSelectStyles } from './Select.constants';
 
-const Select = ({
+export const Select = ({
 	label,
 	value,
 	items = [],
@@ -50,4 +50,3 @@ const Select = ({
 	);
 };
 
-export default Select;

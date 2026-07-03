@@ -1,97 +1,29 @@
-export const Roles = {
-	Admin: 'ADMIN',
-	Dealer: 'DEALER',
-};
+import * as BreakpointCode from './BreakpointCode.js';
+import * as BusinessConstants from './BusinessConstants.js';
+import * as CartsTransfersType from './CartsTransfersType.js';
+import * as Day from './Day.js';
+import * as InvoiceType from './InvoiceType.js';
+import * as Messages from './Messages.js';
+import * as ProductActionType from './ProductActionType.js';
+import * as ProductType from './ProductType.js';
+import * as Roles from './Roles.js';
+import * as State from './State.js';
+import * as StorageKey from './StorageKey.js';
+import * as TaxCondition from './TaxCondition.js';
+import * as Theme from './Theme.js';
 
-export const StorageKey = {
-	TOKEN: 'aguas_nico_token',
-	USER_ID: 'aguas_nico_user_id',
-	USER_ROLE: 'aguas_nico_user_role',
-	USER_NAME: 'aguas_nico_user_name',
-	USER_EMAIL: 'aguas_nico_user_email',
-	TRUCK_NUMBER: 'aguas_nico_truck_number',
-	SESSION_EXPIRATION: 'aguas_nico_session_expiration',
-	THEME: 'aguas_nico_theme',
-	SIDEBAR_EXPANDED: 'aguas_nico_sidebar_expanded',
-};
-
-export const Theme = {
-	Light: 'light',
-	Dark: 'dark',
-	System: 'system',
-	Options: [
-		{ value: 'light', label: 'Claro' },
-		{ value: 'dark', label: 'Oscuro' },
-		{ value: 'system', label: 'Sistema' },
-	],
-};
-
-export const BreakpointCode = {
-	SM: 640,
-	MD: 768,
-	LG: 1024,
-	XL: 1280,
-	XXL: 1536,
-};
-
-export const State = {
-	Pending: 0,
-	Confirmed: 1,
-	Ausent: 2,
-	NotNeeded: 3,
-	Holidays: 4,
-};
-
-export const ProductType = {
-	B20L: 1,
-	B12L: 2,
-	Soda: 3,
-	Maquina: 4,
-	B5L: 5,
-};
-
-export const Day = {
-	Lunes: 1,
-	Martes: 2,
-	Miercoles: 3,
-	Jueves: 4,
-	Viernes: 5,
-};
-
-export const InvoiceType = {
-	A: 1,
-	B: 2,
-};
-
-export const TaxCondition = {
-	RI: 1,
-	MO: 2,
-	EX: 3,
-	CF: 4,
-};
-
-export const CartsTransfersType = {
-	Transfer: 0,
-	Cart: 1,
-	Abono: 2,
-};
-
-export const ProductActionType = {
-	Baja: 0,
-	Devuelve: 1,
-	Abono: 2,
-};
-
-export const Messages = {
-	Error: {
-		403: 'No tenes permisos para realizar esta operacion.',
-		404: 'No se encontro el recurso solicitado.',
-		500: 'Ha ocurrido un error inesperado.',
-		generic: 'No se pudo completar la operacion.',
-	},
-};
-
-export const BusinessConstants = {
-	invoiceUnitType: 7,
-	invoiceSalesPoint: 5,
+export {
+	BreakpointCode,
+	BusinessConstants,
+	CartsTransfersType,
+	Day,
+	InvoiceType,
+	Messages,
+	ProductActionType,
+	ProductType,
+	Roles,
+	State,
+	StorageKey,
+	TaxCondition,
+	Theme,
 };

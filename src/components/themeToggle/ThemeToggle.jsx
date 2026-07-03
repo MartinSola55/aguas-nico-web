@@ -9,7 +9,7 @@ const icons = {
 	[ThemeConstants.System]: Monitor,
 };
 
-const ThemeToggle = () => {
+export const ThemeToggle = () => {
 	const [theme, setTheme] = useState(Theme.getTheme());
 
 	useEffect(() => {
@@ -38,4 +38,3 @@ const ThemeToggle = () => {
 	);
 };
 
-export default ThemeToggle;

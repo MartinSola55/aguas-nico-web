@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { API, Formatters } from '@app';
 import { Card, DataTable, PageHeader } from '@components';
 
-const ClientsUnassigned = () => {
+export const ClientsUnassigned = () => {
 	const navigate = useNavigate();
 	const [clients, setClients] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -37,4 +37,3 @@ const ClientsUnassigned = () => {
 	);
 };
 
-export default ClientsUnassigned;

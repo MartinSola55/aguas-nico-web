@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import { API, Formatters } from '@app';
 import { Card, DataTable, PageHeader } from '@components';
 
-const DealerSheets = () => {
+export const DealerSheets = () => {
 	const { id } = useParams();
 	const [sheets, setSheets] = useState([]);
 
@@ -32,4 +32,3 @@ const DealerSheets = () => {
 	);
 };
 
-export default DealerSheets;

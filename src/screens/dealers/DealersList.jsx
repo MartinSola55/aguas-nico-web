@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { API } from '@app';
 import { Card, DataTable, PageHeader } from '@components';
 
-const DealersList = () => {
+export const DealersList = () => {
 	const navigate = useNavigate();
 	const [dealers, setDealers] = useState([]);
 
@@ -31,4 +31,3 @@ const DealersList = () => {
 	);
 };
 
-export default DealersList;

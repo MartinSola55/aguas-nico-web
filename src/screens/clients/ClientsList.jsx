@@ -1,20 +1,18 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Plus } from 'lucide-react';
-import { API, Formatters, Helpers, useCatalog } from '@app';
-import { Button, Card, ConfirmButton, DataTable, Input, PageHeader, Select } from '@components';
+import { API, Formatters } from '@app';
+import { Button, Card, ConfirmButton, DataTable, Input, PageHeader } from '@components';
+import { DayCombo, DealerCombo } from '@screens/shared';
 import { clientFilterRequest } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
 
-const ClientsList = () => {
-	const navigate = useNavigate();
-	const { combos } = useCatalog();
+export const ClientsList = () => {
+	const navigate = useNavigate();
 	const [clients, setClients] = useState([]);
 	const [dealers, setDealers] = useState([]);
 	const [filters, setFilters] = useState({ search: '', dealerId: '', deliveryDay: '', activeOnly: true });
 	const [loading, setLoading] = useState(false);
-
-	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
 
 	const load = () => {
 		setLoading(true);
@@ -61,8 +59,8 @@ const ClientsList = () => {
 			<Card title="Listado">
 				<div className="mb-4 grid gap-3 md:grid-cols-4">
 					<Input label="Buscar" value={filters.search} onChange={(value) => setFilters((f) => ({ ...f, search: value }))} />
-					<Select label="Repartidor" clearable items={dealerItems} value={filters.dealerId} onChange={(value) => setFilters((f) => ({ ...f, dealerId: value || '' }))} />
-					<Select label="Dia" clearable items={combos.days} value={filters.deliveryDay} onChange={(value) => setFilters((f) => ({ ...f, deliveryDay: value || '' }))} />
+					<DealerCombo label="Repartidor" clearable dealers={dealers} value={filters.dealerId} onChange={(value) => setFilters((f) => ({ ...f, dealerId: value || '' }))} />
+					<DayCombo label="Dia" clearable value={filters.deliveryDay} onChange={(value) => setFilters((f) => ({ ...f, deliveryDay: value || '' }))} />
 					<div className="flex items-end gap-2">
 						<Button variant="secondary" onClick={load}>Buscar</Button>
 						<Button variant="ghost" onClick={() => setFilters({ search: '', dealerId: '', deliveryDay: '', activeOnly: true })}>Limpiar</Button>
@@ -98,5 +96,3 @@ const ClientsList = () => {
 		</>
 	);
 };
-
-export default ClientsList;
