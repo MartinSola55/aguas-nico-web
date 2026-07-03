@@ -95,7 +95,7 @@ export const Stats = () => {
 			<PageHeader title="Estadisticas" breadcrumbs={['Inicio', 'Estadisticas']} />
 			<Card title="Filtros">
 				<div className="grid gap-3 md:grid-cols-[200px_200px_220px_200px] md:items-end">
-					<YearCombo label="A?o" value={year} onChange={setYear} years={years} />
+					<YearCombo label="Año" value={year} onChange={setYear} years={years} />
 					<MonthCombo label="Mes" value={month} onChange={setMonth} />
 					<Input label="Balance al dia" type="date" value={balanceDate} onChange={setBalanceDate} />
 					<Button className="justify-self-start" onClick={load}>Actualizar</Button>
@@ -154,4 +154,3 @@ export const Stats = () => {
 		</>
 	);
 };
-

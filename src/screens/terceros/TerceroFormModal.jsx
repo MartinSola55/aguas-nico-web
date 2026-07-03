@@ -26,10 +26,10 @@ export const TerceroFormModal = ({ onSave, ref }) => {
 				<div className="grid grid-cols-2 gap-3">
 					<Input label="Soda cantidad" type="number" min={0} value={form.sodaQuantity} onChange={(value) => setForm((f) => ({ ...f, sodaQuantity: value }))} />
 					<Input label="Soda importe" type="number" min={0} value={form.sodaAmount} onChange={(value) => setForm((f) => ({ ...f, sodaAmount: value }))} />
-					<Input label="BidÃ³n 12L cantidad" type="number" min={0} value={form.b12lQuantity} onChange={(value) => setForm((f) => ({ ...f, b12lQuantity: value }))} />
-					<Input label="BidÃ³n 12L importe" type="number" min={0} value={form.b12lAmount} onChange={(value) => setForm((f) => ({ ...f, b12lAmount: value }))} />
-					<Input label="BidÃ³n 20L cantidad" type="number" min={0} value={form.b20lQuantity} onChange={(value) => setForm((f) => ({ ...f, b20lQuantity: value }))} />
-					<Input label="BidÃ³n 20L importe" type="number" min={0} value={form.b20lAmount} onChange={(value) => setForm((f) => ({ ...f, b20lAmount: value }))} />
+					<Input label="Bidón 12L cantidad" type="number" min={0} value={form.b12lQuantity} onChange={(value) => setForm((f) => ({ ...f, b12lQuantity: value }))} />
+					<Input label="Bidón 12L importe" type="number" min={0} value={form.b12lAmount} onChange={(value) => setForm((f) => ({ ...f, b12lAmount: value }))} />
+					<Input label="Bidón 20L cantidad" type="number" min={0} value={form.b20lQuantity} onChange={(value) => setForm((f) => ({ ...f, b20lQuantity: value }))} />
+					<Input label="Bidón 20L importe" type="number" min={0} value={form.b20lAmount} onChange={(value) => setForm((f) => ({ ...f, b20lAmount: value }))} />
 				</div>
 			</div>
 		</Modal>

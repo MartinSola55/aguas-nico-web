@@ -3,7 +3,7 @@ import { API, DateHelper, Formatters } from '@app';
 import { Button, Card, DataTable, Input, PageHeader } from '@components';
 import { DayCombo, DealerCombo } from '@screens/shared';
 
-export const Invoices = () => {
+export const Invoices = () => {
 	const [dealers, setDealers] = useState([]);
 	const [filters, setFilters] = useState({
 		startDate: DateHelper.monthStart(),
@@ -77,4 +77,3 @@ export const Invoices = () => {
 		</>
 	);
 };
-

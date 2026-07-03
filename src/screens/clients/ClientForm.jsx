@@ -7,7 +7,7 @@ import { buildClientRequest, emptyClient } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
 
 export const ClientForm = () => {
-	const navigate = useNavigate();
+	const navigate = useNavigate();
 	const [client, setClient] = useState(emptyClient);
 	const [products, setProducts] = useState([]);
 	const [abonos, setAbonos] = useState([]);

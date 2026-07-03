@@ -17,7 +17,7 @@ export const Home = () => {
 	const [balance, setBalance] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const expenseModalRef = useRef(null);
-
+
 	const selectedDateLabel = Formatters.formatDate(date);
 	const totalSold = Helpers.numberOrZero(balance?.cartPaymentMethods) + Helpers.numberOrZero(balance?.transfers) + Helpers.numberOrZero(balance?.dispenserPrice);
 	const totalCollected = useMemo(() => routes.reduce((acc, route) => acc + Helpers.numberOrZero(route.collected), 0), [routes]);

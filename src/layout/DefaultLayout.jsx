@@ -48,4 +48,3 @@ export const DefaultLayout = ({ children }) => {
 		</div>
 	);
 };
-

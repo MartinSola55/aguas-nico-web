@@ -49,10 +49,10 @@ export const TercerosList = () => {
 						{ name: 'name', text: 'Distribuidora' },
 						{ name: 'sodaQuantity', text: 'Soda cant.' },
 						{ name: 'sodaAmount', text: 'Soda importe', render: Formatters.formatCurrency },
-						{ name: 'b12lQuantity', text: 'BidÃ³n 12L cant.' },
-						{ name: 'b12lAmount', text: 'BidÃ³n 12L importe', render: Formatters.formatCurrency },
-						{ name: 'b20lQuantity', text: 'BidÃ³n 20L cant.' },
-						{ name: 'b20lAmount', text: 'BidÃ³n 20L importe', render: Formatters.formatCurrency },
+						{ name: 'b12lQuantity', text: 'Bidón 12L cant.' },
+						{ name: 'b12lAmount', text: 'Bidón 12L importe', render: Formatters.formatCurrency },
+						{ name: 'b20lQuantity', text: 'Bidón 20L cant.' },
+						{ name: 'b20lAmount', text: 'Bidón 20L importe', render: Formatters.formatCurrency },
 						{ name: 'actions', text: 'Acciones', render: (_, row) => (
 							<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
 								<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>

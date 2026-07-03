@@ -29,4 +29,3 @@ export const NavItem = ({ to, label, icon: Icon, expanded, active, onNavigate })
 		)}
 	</li>
 );
-

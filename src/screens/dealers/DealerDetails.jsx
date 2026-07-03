@@ -5,7 +5,7 @@ import { Button, Card, DataTable, Input, PageHeader, StatCard } from '@component
 import { DayCombo, MonthCombo, YearCombo } from '@screens/shared';
 
 export const DealerDetails = () => {
-	const { id } = useParams();
+	const { id } = useParams();
 	const [month, setMonth] = useState(DateHelper.currentMonth());
 	const [year, setYear] = useState(DateHelper.currentYear());
 	const [years, setYears] = useState([]);
@@ -83,4 +83,3 @@ export const DealerDetails = () => {
 		</>
 	);
 };
-

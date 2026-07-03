@@ -18,4 +18,3 @@ export const Modal = ({ open, title, children, footer, size = 'md', onClose }) =
 		</div>
 	);
 };
-

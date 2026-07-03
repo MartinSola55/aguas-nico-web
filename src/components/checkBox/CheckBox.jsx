@@ -10,4 +10,3 @@ export const CheckBox = ({ label, checked = false, disabled = false, onChange, c
 		<span>{label}</span>
 	</label>
 );
-

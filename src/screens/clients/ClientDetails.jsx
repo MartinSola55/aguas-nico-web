@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 
 export const ClientDetails = () => {
 	const { id } = useParams();
-	const navigate = useNavigate();
+	const navigate = useNavigate();
 	const [client, setClient] = useState(null);
 	const [dealers, setDealers] = useState([]);
 	const [editingClient, setEditingClient] = useState(false);

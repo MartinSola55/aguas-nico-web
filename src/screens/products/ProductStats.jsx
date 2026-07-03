@@ -26,7 +26,7 @@ export const ProductStats = () => {
 		<>
 			<PageHeader title={data?.product?.name || 'Producto'} breadcrumbs={['Inicio', 'Productos', 'Estadisticas']} />
 			<div className="mb-4 grid gap-3 md:grid-cols-3">
-				<YearCombo label="A?o" value={year} onChange={setYear} years={years} />
+				<YearCombo label="Año" value={year} onChange={setYear} years={years} />
 				<StatCard label="Stock en clientes" value={data?.clientStock || 0} icon={<Boxes size={18} />} />
 				<StatCard label="Total vendido" value={Formatters.formatCurrency(data?.totalSold || 0)} icon={<CircleDollarSign size={18} />} tone="success" />
 			</div>
@@ -41,4 +41,3 @@ export const ProductStats = () => {
 		</>
 	);
 };
-

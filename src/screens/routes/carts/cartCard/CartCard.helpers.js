@@ -7,7 +7,7 @@ export const stateVariant = (state) => {
 };
 
 export const cartPreview = (data) => {
-	if (!data) return 'Cargandoâ€¦';
+	if (!data) return 'Cargando…';
 	const items = [...(data.products || []), ...(data.abonoProducts || [])]
 		.filter((item) => Number(item.quantity) > 0)
 		.map((item) => `${item.quantity}x ${item.typeName}`);

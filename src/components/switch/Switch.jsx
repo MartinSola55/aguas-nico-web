@@ -15,4 +15,3 @@ export const Switch = ({ label, checked = false, disabled = false, onChange, cla
 		{label && <span>{label}</span>}
 	</label>
 );
-

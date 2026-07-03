@@ -3,4 +3,3 @@ export const Footer = () => (
 		© {new Date().getFullYear()} - Aguas Nico
 	</footer>
 );
-

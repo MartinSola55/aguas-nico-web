@@ -27,4 +27,3 @@ export const SortableClientRow = ({ client, onRemove }) => {
 		</tr>
 	);
 };
-

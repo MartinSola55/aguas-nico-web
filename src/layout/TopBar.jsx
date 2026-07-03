@@ -60,4 +60,3 @@ export const TopBar = ({ onMobileMenuClick = () => { } }) => {
 		</header>
 	);
 };
-

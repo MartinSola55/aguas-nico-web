@@ -7,4 +7,3 @@ export const ConfirmButton = ({ message = 'Confirmar operacion?', onConfirm, chi
 	};
 	return <Button {...props} onClick={handleClick}>{children}</Button>;
 };
-

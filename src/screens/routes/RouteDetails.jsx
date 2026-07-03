@@ -186,7 +186,7 @@ export const RouteDetails = () => {
 							type="text"
 							value={cartSearch}
 							onChange={(e) => setCartSearch(e.target.value)}
-							placeholder="Buscar por nombre o cÃ³digo"
+							placeholder="Buscar por nombre o código"
 							className="w-full rounded-[var(--radius-md)] border border-border-default bg-bg-elevated py-2 pl-8 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-primary focus:outline-none focus:ring-2 focus:ring-accent-primary/20 sm:w-64"
 						/>
 					</div>

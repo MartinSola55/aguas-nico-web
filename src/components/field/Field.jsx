@@ -4,4 +4,3 @@ export const Field = ({ label, value, children }) => (
 		<div className="mt-1 text-sm text-text-primary">{children || value || '-'}</div>
 	</div>
 );
-

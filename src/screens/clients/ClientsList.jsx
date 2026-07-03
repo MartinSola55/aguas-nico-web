@@ -8,7 +8,7 @@ import { clientFilterRequest } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
 
 export const ClientsList = () => {
-	const navigate = useNavigate();
+	const navigate = useNavigate();
 	const [clients, setClients] = useState([]);
 	const [dealers, setDealers] = useState([]);
 	const [filters, setFilters] = useState({ search: '', dealerId: '', deliveryDay: '', activeOnly: true });

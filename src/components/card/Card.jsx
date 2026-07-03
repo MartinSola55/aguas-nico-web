@@ -12,4 +12,3 @@ export const Card = ({ title, subtitle, actions, children, className = '', bodyC
 		<div className={`p-4 ${bodyClassName}`}>{children}</div>
 	</section>
 );
-

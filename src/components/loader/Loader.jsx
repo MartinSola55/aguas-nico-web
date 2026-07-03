@@ -7,4 +7,3 @@ export const Loader = ({ label = 'Cargando' }) => (
 		{label}
 	</span>
 );
-

@@ -5,4 +5,3 @@ export const Badge = ({ children, variant = 'neutral' }) => (
 		{children}
 	</span>
 );
-

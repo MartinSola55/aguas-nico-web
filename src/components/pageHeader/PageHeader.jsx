@@ -13,4 +13,3 @@ export const PageHeader = ({ title, breadcrumbs = [], actions }) => (
 		{actions && <div className="flex flex-wrap gap-2">{actions}</div>}
 	</div>
 );
-

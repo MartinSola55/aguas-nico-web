@@ -11,4 +11,3 @@ export const StatCard = ({ label, value, icon, tone = 'primary' }) => (
 		</div>
 	</div>
 );
-
