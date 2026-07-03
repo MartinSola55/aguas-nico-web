@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Edit, PackageCheck, Play, Plus, Search } from 'lucide-react';
+import { ChevronRight, Edit, PackageCheck, Play, Plus, Search, UserPlus } from 'lucide-react';
 import { API, App, Formatters, Helpers, useCatalog } from '@app';
-import { State } from '@constants';
-import { Badge, Button, Card, ConfirmButton, DataTable, Field, Input, Modal, PageHeader, StatCard } from '@components';
+import { ProductType, State } from '@constants';
+import { Badge, Button, Card, ConfirmButton, DataTable, Field, Input, Modal, PageHeader, Select, StatCard } from '@components';
 import CartEditor from './CartEditor.jsx';
 import { confirmCartRequest } from './Routes.helpers.js';
 import TransferFormModal from '../transfers/TransferFormModal.jsx';
@@ -15,6 +15,21 @@ const stateVariant = (state) => {
 	return 'warning';
 };
 
+const productFilterItems = [
+	{ value: ProductType.B20L, label: 'Bidón 20L' },
+	{ value: ProductType.B12L, label: 'Bidón 12L' },
+	{ value: ProductType.Soda, label: 'Soda' },
+	{ value: ProductType.B5L, label: 'Bidón 5L' },
+];
+const serviceFilterItems = [
+	{ value: 'abono', label: 'Abono' },
+	{ value: 'bajada', label: 'Bajada' },
+];
+const paymentFilterItems = [
+	{ value: 'paid', label: 'Realizado' },
+	{ value: 'pending', label: 'Pendiente' },
+];
+
 const cartPreview = (data) => {
 	if (!data) return 'Cargando…';
 	const items = [...(data.products || []), ...(data.abonoProducts || [])]
@@ -25,22 +40,8 @@ const cartPreview = (data) => {
 
 const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	const expanded = !route.isStatic;
-	const [clientData, setClientData] = useState(null);
-	const [confirmedData, setConfirmedData] = useState(null);
 	const [returnRows, setReturnRows] = useState([]);
 	const [returnModal, setReturnModal] = useState(false);
-
-	useEffect(() => {
-		if (expanded && cart.state === State.Confirmed && !confirmedData) {
-			API.endpoints.carts.getForEdit({ id: cart.id }).then((rs) => setConfirmedData(rs.data));
-		}
-	}, [expanded, cart.id, cart.state, confirmedData]);
-
-	useEffect(() => {
-		if (expanded && cart.state === State.Pending) {
-			API.endpoints.clients.getProductsAndAbono({ id: cart.clientId }).then((rs) => setClientData(rs.data));
-		}
-	}, [expanded]);
 
 	const confirm = (payload) => {
 		API.endpoints.carts.confirm(confirmCartRequest(cart, payload)).then((rs) => {
@@ -90,7 +91,8 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 
 	return (
 		<Card
-			className="mb-3"
+			className="mb-8"
+			style={{ backgroundColor: 'var(--color-bg-secondary-alt)' }}
 			title={<span>{cart.clientName} {!route.isStatic && <Badge variant={stateVariant(cart.state)}>{Formatters.stateName(cart.state)}</Badge>}</span>}
 			subtitle={`${cart.clientAddress || ''} - ${Formatters.debtLabel(cart.clientDebt)}`}
 		>
@@ -99,18 +101,18 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 				<span className="text-text-muted">Cobrado <span className="font-medium text-text-primary">{Formatters.formatCurrency(cart.collected || 0)}</span></span>
 				<span className="text-text-muted">Estado <span className="font-medium text-text-primary">{Formatters.stateName(cart.state)}</span></span>
 			</div>
-			{cart.state === State.Confirmed && confirmedData && (
+			{cart.state === State.Confirmed && (
 				<div className="mt-3">
 					<div className="text-xs font-medium uppercase tracking-wide text-text-muted">Bajada</div>
-					<div className="mt-1 text-sm text-text-primary">{cartPreview(confirmedData)}</div>
+					<div className="mt-1 text-sm text-text-primary">{cartPreview(cart)}</div>
 				</div>
 			)}
-			{expanded && cart.state === State.Pending && clientData && (
+			{expanded && cart.state === State.Pending && (
 				<div className="mt-4">
 					<CartEditor
 						title="Confirmar bajada"
-						products={clientData.products || []}
-						abonoProducts={clientData.abonoProducts || []}
+						products={cart.availableProducts || []}
+						abonoProducts={cart.availableAbonoProducts || []}
 						paymentMethods={paymentMethods}
 						onSubmit={confirm}
 					/>
@@ -121,12 +123,21 @@ const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 					</div>
 				</div>
 			)}
-			{expanded && cart.state === State.Confirmed && confirmedData && (
+			{expanded && cart.state === State.Confirmed && (
 				<div className="mt-4 space-y-3">
 					<div className="grid gap-4 md:grid-cols-3">
-						<DataTable columns={[{ name: 'typeName', text: 'Producto' }, { name: 'quantity', text: 'Cantidad' }, { name: 'settedPrice', text: 'Precio', render: Formatters.formatCurrency }]} rows={confirmedData.products || []} infinite />
-						<DataTable columns={[{ name: 'typeName', text: 'Abono' }, { name: 'quantity', text: 'Cantidad' }]} rows={confirmedData.abonoProducts || []} infinite />
-						<DataTable columns={[{ name: 'name', text: 'Metodo' }, { name: 'amount', text: 'Monto', render: Formatters.formatCurrency }]} rows={confirmedData.paymentMethods || []} infinite />
+						<div>
+							<h4 className="mb-2 border-b border-border-subtle pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">Productos</h4>
+							<DataTable columns={[{ name: 'typeName', text: 'Producto' }, { name: 'quantity', text: 'Cantidad' }, { name: 'settedPrice', text: 'Precio', render: Formatters.formatCurrency }]} rows={cart.products || []} infinite />
+						</div>
+						<div>
+							<h4 className="mb-2 border-b border-border-subtle pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">Abonos</h4>
+							<DataTable columns={[{ name: 'typeName', text: 'Abono' }, { name: 'quantity', text: 'Cantidad' }]} rows={cart.abonoProducts || []} infinite />
+						</div>
+						<div>
+							<h4 className="mb-2 border-b border-border-subtle pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">Pagos</h4>
+							<DataTable columns={[{ name: 'name', text: 'Metodo' }, { name: 'amount', text: 'Monto', render: Formatters.formatCurrency }]} rows={cart.paymentMethods || []} infinite />
+						</div>
 					</div>
 					<div className="flex flex-wrap justify-end gap-2">
 						{App.isDealer() && <Button size="sm" variant="secondary" onClick={openReturn}>Devuelve</Button>}
@@ -163,6 +174,9 @@ const RouteDetails = () => {
 	const [dispenserOpen, setDispenserOpen] = useState(false);
 	const [dispenserPrice, setDispenserPrice] = useState('');
 	const [cartSearch, setCartSearch] = useState('');
+	const [productFilter, setProductFilter] = useState(null);
+	const [serviceFilter, setServiceFilter] = useState(null);
+	const [paymentFilter, setPaymentFilter] = useState(null);
 	const [transferOpen, setTransferOpen] = useState(false);
 	const [transfersViewOpen, setTransfersViewOpen] = useState(false);
 
@@ -218,7 +232,17 @@ const RouteDetails = () => {
 
 	const term = cartSearch.trim().toLowerCase();
 	const visibleCarts = (route.carts || [])
-		.filter((cart) => !term || cart.clientName?.toLowerCase().includes(term) || String(cart.clientId).includes(term))
+		.filter((cart) => {
+			if (term && !(cart.clientName?.toLowerCase().includes(term) || String(cart.clientId).includes(term))) return false;
+			const products = cart.products || [];
+			const abonoProducts = cart.abonoProducts || [];
+			if (productFilter && !products.some((p) => p.type === productFilter) && !abonoProducts.some((p) => p.type === productFilter)) return false;
+			if (serviceFilter === 'abono' && abonoProducts.length === 0) return false;
+			if (serviceFilter === 'bajada' && products.length === 0) return false;
+			if (paymentFilter === 'paid' && !(Number(cart.collected) > 0)) return false;
+			if (paymentFilter === 'pending' && Number(cart.collected) > 0) return false;
+			return true;
+		})
 		.sort((a, b) => a.priority - b.priority);
 
 	return (
@@ -229,6 +253,7 @@ const RouteDetails = () => {
 				actions={
 					<>
 						{route.isStatic && App.isAdmin() && <Button onClick={startRoute}><Play size={16} />Comenzar</Button>}
+						{App.isAdmin() && <Link to="/clientes/nuevo" target="_blank"><Button variant="secondary"><UserPlus size={16} />Nuevo cliente</Button></Link>}
 						{App.isAdmin() && <Link to={`/planillas/${route.id}/editar`}><Button variant="secondary"><Edit size={16} />Editar clientes</Button></Link>}
 						{!route.isStatic && <Link to={`/planillas/${route.id}/manual`}><Button variant="secondary"><Plus size={16} />Fuera de reparto</Button></Link>}
 						{!route.isStatic && <Button onClick={() => setTransferOpen(true)}>Nueva transferencia</Button>}
@@ -276,7 +301,30 @@ const RouteDetails = () => {
 				<Card title="Cobros y gastos">
 					<div className="space-y-2 text-sm">
 						{(route.payments || []).map((payment) => <div key={payment.paymentMethodId} className="flex justify-between"><span>{payment.paymentMethodName}</span><strong>{Formatters.formatCurrency(payment.amount)}</strong></div>)}
-						<button type="button" onClick={() => setTransfersViewOpen(true)} className="flex w-full items-center justify-between rounded-[var(--radius-sm)] px-1 py-0.5 text-left text-sm transition-colors hover:bg-bg-tertiary focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"><span className="text-accent-primary underline underline-offset-2">Transferencias</span><strong>{Formatters.formatCurrency((route.transfers || []).reduce((sum, x) => sum + Number(x.amount || 0), 0))}</strong></button>
+						{(() => {
+							const transfers = route.transfers || [];
+							const transfersTotal = transfers.reduce((sum, x) => sum + Number(x.amount || 0), 0);
+							const hasTransfers = transfers.length > 0;
+							return (
+								<button
+									type="button"
+									onClick={() => setTransfersViewOpen(true)}
+									disabled={!hasTransfers}
+									title={hasTransfers ? 'Ver detalle de transferencias' : 'No hay transferencias'}
+									className="group -mx-1 cursor-pointer flex w-full items-center justify-between rounded-[var(--radius-sm)] px-1 py-1 text-left text-sm transition-colors enabled:hover:bg-bg-tertiary disabled:cursor-default disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
+								>
+									<span className="flex items-center gap-1.5">
+										<span className={hasTransfers ? 'text-accent-primary' : ''}>Transferencias</span>
+										{hasTransfers && <Badge variant="neutral">{transfers.length}</Badge>}
+									</span>
+									<span className="flex items-center gap-1">
+										<strong>{Formatters.formatCurrency(transfersTotal)}</strong>
+										{hasTransfers && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
+									</span>
+								</button>
+							);
+						})()}
+						{Number(route.dispenserPrice) > 0 && <div className="flex justify-between"><span>Dispenser</span><strong>{Formatters.formatCurrency(route.dispenserPrice)}</strong></div>}
 						<div className="flex justify-between"><span>Gastos</span><strong>{Formatters.formatCurrency(route.totalExpenses || 0)}</strong></div>
 					</div>
 				</Card>
@@ -297,6 +345,11 @@ const RouteDetails = () => {
 					</div>
 				}
 			>
+				<div className="mb-4 grid gap-3 sm:grid-cols-3">
+					<Select clearable placeholder="Por producto" items={productFilterItems} value={productFilter} onChange={setProductFilter} />
+					<Select clearable placeholder="Por tipo de servicio" items={serviceFilterItems} value={serviceFilter} onChange={setServiceFilter} />
+					<Select clearable placeholder="Estado del pago" items={paymentFilterItems} value={paymentFilter} onChange={setPaymentFilter} />
+				</div>
 				{visibleCarts.length === 0 ? (
 					<p className="m-0 py-2 text-sm text-text-muted">No se encontraron clientes.</p>
 				) : (
