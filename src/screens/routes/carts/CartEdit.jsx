@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { API } from '@app';
 import { PageHeader } from '@components';
-import CartEditor from './CartEditor.jsx';
-import { updateCartRequest } from './Routes.helpers.js';
+import { CartEditor } from './CartEditor.jsx';
+import { updateCartRequest } from '../Routes.helpers.js';
 import { toast } from 'react-toastify';
 
-const CartEdit = () => {
+export const CartEdit = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [cart, setCart] = useState(null);
@@ -41,5 +41,3 @@ const CartEdit = () => {
 		</>
 	);
 };
-
-export default CartEdit;

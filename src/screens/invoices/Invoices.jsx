@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { API, DateHelper, Formatters, Helpers, useCatalog } from '@app';
-import { Button, Card, DataTable, Input, PageHeader, Select } from '@components';
+import { useEffect, useState } from 'react';
+import { API, DateHelper, Formatters } from '@app';
+import { Button, Card, DataTable, Input, PageHeader } from '@components';
+import { DayCombo, DealerCombo } from '@screens/shared';
 
-const Invoices = () => {
-	const { combos } = useCatalog();
+export const Invoices = () => {
 	const [dealers, setDealers] = useState([]);
 	const [filters, setFilters] = useState({
 		startDate: DateHelper.monthStart(),
@@ -13,10 +13,6 @@ const Invoices = () => {
 	});
 	const [items, setItems] = useState([]);
 	const [csvRows, setCsvRows] = useState([]);
-
-	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
-	const dealerOptions = useMemo(() => [{ value: '', label: 'Todos los repartos' }, ...dealerItems], [dealerItems]);
-	const dayItems = useMemo(() => [{ value: '', label: 'Todos los dias' }, ...(combos.days || [])], [combos.days]);
 
 	useEffect(() => {
 		API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || []));
@@ -43,8 +39,8 @@ const Invoices = () => {
 				<div className="grid gap-3 md:grid-cols-[180px_180px_1fr_1fr_auto] md:items-end">
 					<Input label="Desde" type="date" value={filters.startDate} onChange={(value) => setFilters((f) => ({ ...f, startDate: value }))} />
 					<Input label="Hasta" type="date" value={filters.endDate} onChange={(value) => setFilters((f) => ({ ...f, endDate: value }))} />
-					<Select label="Dia" items={dayItems} value={filters.invoiceDay} onChange={(value) => setFilters((f) => ({ ...f, invoiceDay: value || '' }))} />
-					<Select label="Repartidor" items={dealerOptions} value={filters.invoiceDealer} onChange={(value) => setFilters((f) => ({ ...f, invoiceDealer: value || '' }))} />
+					<DayCombo label="Dia" includeAllLabel="Todos los dias" value={filters.invoiceDay} onChange={(value) => setFilters((f) => ({ ...f, invoiceDay: value || '' }))} />
+					<DealerCombo label="Repartidor" dealers={dealers} includeAllLabel="Todos los repartos" value={filters.invoiceDealer} onChange={(value) => setFilters((f) => ({ ...f, invoiceDealer: value || '' }))} />
 					<Button variant="secondary" className="justify-self-start" onClick={search}>Buscar</Button>
 				</div>
 			</Card>
@@ -81,5 +77,3 @@ const Invoices = () => {
 		</>
 	);
 };
-
-export default Invoices;

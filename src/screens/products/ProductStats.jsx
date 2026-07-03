@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import Chart from 'react-apexcharts';
 import { API, DateHelper, Formatters } from '@app';
-import { Card, PageHeader, Select, StatCard } from '@components';
+import { Card, PageHeader, StatCard } from '@components';
+import { YearCombo } from '@screens/shared';
 import { Boxes, CircleDollarSign } from 'lucide-react';
 
-const ProductStats = () => {
+export const ProductStats = () => {
 	const { id } = useParams();
 	const [year, setYear] = useState(DateHelper.currentYear());
 	const [years, setYears] = useState([]);
@@ -25,7 +26,7 @@ const ProductStats = () => {
 		<>
 			<PageHeader title={data?.product?.name || 'Producto'} breadcrumbs={['Inicio', 'Productos', 'Estadisticas']} />
 			<div className="mb-4 grid gap-3 md:grid-cols-3">
-				<Select label="Año" value={year} onChange={setYear} items={years.map((y) => ({ value: y, label: y }))} />
+				<YearCombo label="Año" value={year} onChange={setYear} years={years} />
 				<StatCard label="Stock en clientes" value={data?.clientStock || 0} icon={<Boxes size={18} />} />
 				<StatCard label="Total vendido" value={Formatters.formatCurrency(data?.totalSold || 0)} icon={<CircleDollarSign size={18} />} tone="success" />
 			</div>
@@ -40,5 +41,3 @@ const ProductStats = () => {
 		</>
 	);
 };
-
-export default ProductStats;

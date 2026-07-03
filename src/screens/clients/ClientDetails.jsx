@@ -1,22 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { API, Formatters, Helpers, useCatalog } from '@app';
-import { Button, Card, CheckBox, ConfirmButton, DataTable, Field, Input, PageHeader, Select } from '@components';
+import { API, Formatters, Helpers } from '@app';
+import { Button, Card, CheckBox, ConfirmButton, DataTable, Field, Input, PageHeader } from '@components';
+import { DayCombo, DealerCombo, InvoiceTypeCombo, TaxConditionCombo } from '@screens/shared';
 import { buildClientRequest } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
 
-const ClientDetails = () => {
+export const ClientDetails = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { combos } = useCatalog();
 	const [client, setClient] = useState(null);
 	const [dealers, setDealers] = useState([]);
 	const [editingClient, setEditingClient] = useState(false);
 	const [editingProducts, setEditingProducts] = useState(false);
 	const [editingAbonos, setEditingAbonos] = useState(false);
 	const [editingInvoice, setEditingInvoice] = useState(false);
-
-	const dealerItems = Helpers.dealerComboItems(dealers);
 
 	const load = () => {
 		Promise.all([
@@ -170,8 +168,8 @@ const ClientDetails = () => {
 									<Input label="Direccion" value={client.address} onChange={(value) => update('address', value)} />
 									<Input label="Telefono" value={client.phone} onChange={(value) => update('phone', value)} />
 									<Input label="Email" value={client.email} onChange={(value) => update('email', value)} />
-									<Select label="Repartidor" clearable items={dealerItems} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />
-									<Select label="Dia" clearable items={combos.days} value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />
+									<DealerCombo label="Repartidor" clearable dealers={dealers} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />
+									<DayCombo label="Dia" clearable value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />
 									<Input label="Deuda" type="number" value={client.debt} onChange={(value) => update('debt', value)} />
 									<CheckBox label="Factura" checked={client.hasInvoice} onChange={(value) => update('hasInvoice', value)} />
 									<CheckBox label="Solo abonos" checked={client.onlyAbonos} onChange={(value) => update('onlyAbonos', value)} />
@@ -198,8 +196,8 @@ const ClientDetails = () => {
 					{client.hasInvoice && (
 						<Card title="Datos de facturacion" actions={editingInvoice ? <Button size="sm" onClick={saveInvoice}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingInvoice(true)}>Editar</Button>}>
 							<div className="grid gap-3">
-								<Select label="Tipo de factura" disabled={!editingInvoice} items={combos.invoiceTypes} value={client.invoiceType} onChange={(value) => update('invoiceType', value)} />
-								<Select label="Condicion IVA" disabled={!editingInvoice} items={combos.taxConditions} value={client.taxCondition} onChange={(value) => update('taxCondition', value)} />
+								<InvoiceTypeCombo label="Tipo de factura" disabled={!editingInvoice} value={client.invoiceType} onChange={(value) => update('invoiceType', value)} />
+								<TaxConditionCombo label="Condicion IVA" disabled={!editingInvoice} value={client.taxCondition} onChange={(value) => update('taxCondition', value)} />
 								<Input label="CUIT" disabled={!editingInvoice} value={client.cuit} onChange={(value) => update('cuit', value)} />
 							</div>
 						</Card>
@@ -209,5 +207,3 @@ const ClientDetails = () => {
 		</>
 	);
 };
-
-export default ClientDetails;

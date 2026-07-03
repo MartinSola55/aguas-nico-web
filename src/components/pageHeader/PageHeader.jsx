@@ -1,4 +1,4 @@
-const PageHeader = ({ title, breadcrumbs = [], actions }) => (
+export const PageHeader = ({ title, breadcrumbs = [], actions }) => (
 	<div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 		<div>
 			<h1 className="m-0 text-2xl font-semibold text-text-primary">{title}</h1>
@@ -13,5 +13,3 @@ const PageHeader = ({ title, breadcrumbs = [], actions }) => (
 		{actions && <div className="flex flex-wrap gap-2">{actions}</div>}
 	</div>
 );
-
-export default PageHeader;

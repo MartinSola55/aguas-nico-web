@@ -1,40 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { Plus, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import { CSS } from '@dnd-kit/utilities';
+import { toast } from 'react-toastify';
 import { API, Formatters } from '@app';
 import { Button, Card, DataTable, EmptyState, Input, PageHeader } from '@components';
-import { toast } from 'react-toastify';
+import { SortableClientRow } from './sortableClientRow/SortableClientRow.jsx';
 
-const SortableClientRow = ({ client, onRemove }) => {
-	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: client.id });
-	const style = {
-		transform: CSS.Transform.toString(transform),
-		transition,
-		opacity: isDragging ? 0.5 : 1,
-	};
-
-	return (
-		<tr
-			ref={setNodeRef}
-			style={style}
-			{...attributes}
-			{...listeners}
-			className={`select-none touch-none cursor-grab hover:bg-bg-tertiary/60 active:cursor-grabbing ${isDragging ? 'relative z-10' : ''}`}
-		>
-			<td className="border border-border-subtle px-3 py-2 align-top">{client.name}</td>
-			<td className="border border-border-subtle px-3 py-2 align-top">{client.address}</td>
-			<td className="border border-border-subtle px-3 py-2 text-center align-top">
-				<Button size="sm" variant="danger" onClick={() => onRemove(client.id)}><X size={14} /></Button>
-			</td>
-		</tr>
-	);
-};
-
-const RouteEdit = () => {
+export const RouteEdit = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [route, setRoute] = useState(null);
@@ -141,5 +116,3 @@ const RouteEdit = () => {
 		</>
 	);
 };
-
-export default RouteEdit;

@@ -1,6 +1,6 @@
 import { KNOB_CLASS, TRACK_BASE_CLASS, TRACK_OFF_CLASS, TRACK_ON_CLASS } from './Switch.constants';
 
-const Switch = ({ label, checked = false, disabled = false, onChange, className = '' }) => (
+export const Switch = ({ label, checked = false, disabled = false, onChange, className = '' }) => (
 	<label className={`inline-flex items-center gap-2 text-sm text-text-secondary ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${className}`}>
 		<button
 			type="button"
@@ -15,5 +15,3 @@ const Switch = ({ label, checked = false, disabled = false, onChange, className 
 		{label && <span>{label}</span>}
 	</label>
 );
-
-export default Switch;

@@ -1,4 +1,4 @@
-const Card = ({ title, subtitle, actions, children, className = '', bodyClassName = '', style }) => (
+export const Card = ({ title, subtitle, actions, children, className = '', bodyClassName = '', style }) => (
 	<section style={style} className={`min-w-0 rounded-[var(--radius-md)] border border-border-subtle bg-bg-secondary shadow-sm ${className}`}>
 		{(title || actions) && (
 			<header className="flex flex-col gap-3 border-b border-border-subtle px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
@@ -12,5 +12,3 @@ const Card = ({ title, subtitle, actions, children, className = '', bodyClassNam
 		<div className={`p-4 ${bodyClassName}`}>{children}</div>
 	</section>
 );
-
-export default Card;

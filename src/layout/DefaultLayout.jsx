@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { LocalStorage } from '@app';
 import { BreakpointCode } from '@constants';
 import { useBreakpoint } from '@hooks';
-import NavBar from './NavBar.jsx';
-import TopBar from './TopBar.jsx';
-import Footer from './Footer.jsx';
+import { NavBar } from './NavBar.jsx';
+import { TopBar } from './TopBar.jsx';
+import { Footer } from './Footer.jsx';
 import { SIDEBAR_COLLAPSED_WIDTH, SIDEBAR_EXPANDED_WIDTH } from './Layout.constants.js';
 
-const DefaultLayout = ({ children }) => {
+export const DefaultLayout = ({ children }) => {
 	const [navExpanded, setNavExpanded] = useState(() => Boolean(LocalStorage.getSidebarExpanded()));
 	const [mobileNavOpen, setMobileNavOpen] = useState(false);
 	const isMobile = useBreakpoint(BreakpointCode.MD);
@@ -48,5 +48,3 @@ const DefaultLayout = ({ children }) => {
 		</div>
 	);
 };
-
-export default DefaultLayout;

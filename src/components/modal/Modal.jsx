@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 import { Button } from '@components';
 import { widths } from './Modal.constants';
 
-const Modal = ({ open, title, children, footer, size = 'md', onClose }) => {
+export const Modal = ({ open, title, children, footer, size = 'md', onClose }) => {
 	if (!open) return null;
 
 	return (
@@ -18,5 +18,3 @@ const Modal = ({ open, title, children, footer, size = 'md', onClose }) => {
 		</div>
 	);
 };
-
-export default Modal;

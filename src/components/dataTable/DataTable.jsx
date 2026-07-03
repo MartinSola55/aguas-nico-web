@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button, EmptyState, Loader } from '@components';
 import { DEFAULT_PAGE_SIZE } from './DataTable.constants';
 
-const DataTable = ({
+export const DataTable = ({
 	columns = [],
 	rows = [],
 	loading = false,
@@ -127,5 +127,3 @@ const DataTable = ({
 		</div>
 	);
 };
-
-export default DataTable;

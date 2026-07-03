@@ -1,19 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { API, App, Helpers, useCatalog } from '@app';
-import { Button, Card, CheckBox, DataTable, Input, PageHeader, Select } from '@components';
+import { API, App, Helpers } from '@app';
+import { Button, Card, CheckBox, DataTable, Input, PageHeader } from '@components';
+import { DayCombo, DealerCombo, InvoiceTypeCombo, TaxConditionCombo } from '@screens/shared';
 import { buildClientRequest, emptyClient } from './Clients.helpers.js';
 import { toast } from 'react-toastify';
 
-const ClientForm = () => {
+export const ClientForm = () => {
 	const navigate = useNavigate();
-	const { combos } = useCatalog();
 	const [client, setClient] = useState(emptyClient);
 	const [products, setProducts] = useState([]);
 	const [abonos, setAbonos] = useState([]);
 	const [dealers, setDealers] = useState([]);
-
-	const dealerItems = useMemo(() => Helpers.dealerComboItems(dealers), [dealers]);
 
 	useEffect(() => {
 		Promise.all([
@@ -63,8 +61,8 @@ const ClientForm = () => {
 						<Input label="Direccion" required value={client.address} onChange={(value) => update('address', value)} />
 						<Input label="Telefono" required value={client.phone} onChange={(value) => update('phone', value)} />
 						<Input label="Email" type="email" value={client.email} onChange={(value) => update('email', value)} />
-						{App.isAdmin() && <Select label="Repartidor" clearable items={dealerItems} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />}
-						{App.isAdmin() && <Select label="Dia de reparto" clearable items={combos.days} value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />}
+						{App.isAdmin() && <DealerCombo label="Repartidor" clearable dealers={dealers} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />}
+						{App.isAdmin() && <DayCombo label="Dia de reparto" clearable value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />}
 						<Input label="Deuda inicial" type="number" value={client.debt} onChange={(value) => update('debt', value)} />
 						<div className="flex flex-col justify-end gap-2">
 							<CheckBox label="Factura" checked={client.hasInvoice} onChange={(value) => update('hasInvoice', value)} />
@@ -75,8 +73,8 @@ const ClientForm = () => {
 					</div>
 					{client.hasInvoice && (
 						<div className="mt-4 grid gap-3 md:grid-cols-3">
-							<Select label="Tipo de factura" items={combos.invoiceTypes} value={client.invoiceType} onChange={(value) => update('invoiceType', value)} />
-							<Select label="Condicion IVA" items={combos.taxConditions} value={client.taxCondition} onChange={(value) => update('taxCondition', value)} />
+							<InvoiceTypeCombo label="Tipo de factura" value={client.invoiceType} onChange={(value) => update('invoiceType', value)} />
+							<TaxConditionCombo label="Condicion IVA" value={client.taxCondition} onChange={(value) => update('taxCondition', value)} />
 							<Input label="CUIT" max={11} value={client.cuit} onChange={(value) => update('cuit', value)} />
 						</div>
 					)}
@@ -110,5 +108,3 @@ const ClientForm = () => {
 		</>
 	);
 };
-
-export default ClientForm;

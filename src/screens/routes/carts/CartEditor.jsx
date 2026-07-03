@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helpers, Formatters } from '@app';
-import { Button, Card, DataTable, Input, Select } from '@components';
+import { Button, Card, DataTable, Input } from '@components';
+import { PaymentMethodCombo } from '@screens/shared';
 
 const EMPTY_ARRAY = [];
 
@@ -13,7 +14,7 @@ const normalizeProducts = (items = EMPTY_ARRAY) =>
 		quantity: item.quantity ?? '',
 	}));
 
-const CartEditor = ({
+export const CartEditor = ({
 	title = 'Bajada',
 	products = EMPTY_ARRAY,
 	abonoProducts = EMPTY_ARRAY,
@@ -126,9 +127,9 @@ const CartEditor = ({
 				)}
 			</div>
 			<div className="mt-4 grid gap-3 md:grid-cols-[240px_180px_auto] md:items-end">
-				<Select
+				<PaymentMethodCombo
 					label="Metodo de pago"
-					items={paymentMethods.map((item) => ({ value: item.id ?? item.paymentMethodId, label: item.name ?? item.paymentMethodName ?? item.description }))}
+					paymentMethods={paymentMethods}
 					value={paymentMethodId}
 					onChange={setPaymentMethodId}
 				/>
@@ -141,5 +142,3 @@ const CartEditor = ({
 		</Card>
 	);
 };
-
-export default CartEditor;
