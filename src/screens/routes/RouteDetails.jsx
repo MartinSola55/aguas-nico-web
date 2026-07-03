@@ -324,7 +324,7 @@ const RouteDetails = () => {
 								</button>
 							);
 						})()}
-						{Number(route.dispenserPrice) > 0 && <div className="flex justify-between"><span>Dispenser</span><strong>{Formatters.formatCurrency(route.dispenserPrice)}</strong></div>}
+						<div className="flex justify-between"><span>Dispenser</span><strong>{Formatters.formatCurrency(route.dispenserPrice)}</strong></div>
 						<div className="flex justify-between"><span>Gastos</span><strong>{Formatters.formatCurrency(route.totalExpenses || 0)}</strong></div>
 					</div>
 				</Card>
