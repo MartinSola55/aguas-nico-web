@@ -34,6 +34,7 @@ export const TransfersList = lazyScreen(() => import('../screens/transfers/Trans
 export const Invoices = lazyScreen(() => import('../screens/invoices/Invoices.jsx'), 'Invoices');
 export const Stats = lazyScreen(() => import('../screens/stats/Stats.jsx'), 'Stats');
 export const TercerosList = lazyScreen(() => import('../screens/terceros/TercerosList.jsx'), 'TercerosList');
+export const Profile = lazyScreen(() => import('../screens/profile/Profile.jsx'), 'Profile');
 
 export const AppRoutes = () => (
 	<>
@@ -47,6 +48,7 @@ export const AppRoutes = () => (
 					<Route path="/planillas/:id/manual" element={<LayoutShell><ManualCart /></LayoutShell>} />
 					<Route path="/bajadas/:id/editar" element={<LayoutShell><CartEdit /></LayoutShell>} />
 					<Route path="/clientes/nuevo" element={<LayoutShell><ClientForm /></LayoutShell>} />
+					<Route path="/mi-perfil" element={<LayoutShell><Profile /></LayoutShell>} />
 					<Route element={<AdminRoute />}>
 						<Route path="/clientes" element={<LayoutShell><ClientsList /></LayoutShell>} />
 						<Route path="/clientes/sin-asignar" element={<LayoutShell><ClientsUnassigned /></LayoutShell>} />
@@ -58,6 +60,7 @@ export const AppRoutes = () => (
 						<Route path="/planillas/:id/editar" element={<LayoutShell><RouteEdit /></LayoutShell>} />
 						<Route path="/repartidores" element={<LayoutShell><DealersList /></LayoutShell>} />
 						<Route path="/repartidores/:id" element={<LayoutShell><DealerDetails /></LayoutShell>} />
+						<Route path="/repartidores/:id/perfil" element={<LayoutShell><Profile /></LayoutShell>} />
 						<Route path="/repartidores/:id/planillas" element={<LayoutShell><DealerSheets /></LayoutShell>} />
 						<Route path="/gastos" element={<LayoutShell><ExpensesList /></LayoutShell>} />
 						<Route path="/transferencias" element={<LayoutShell><TransfersList /></LayoutShell>} />
