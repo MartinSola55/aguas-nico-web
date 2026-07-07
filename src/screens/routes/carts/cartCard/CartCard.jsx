@@ -102,28 +102,28 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 						<div className="grid gap-4 md:grid-cols-3">
 							<div>
 								<h4 className="mb-2 border-b border-border-subtle pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">Productos</h4>
-								{cart.products.length > 0 && (
+								{cart?.products?.length > 0 && (
 									<DataTable
 										columns={[{ name: 'typeName', text: 'Producto' }, { name: 'quantity', text: 'Cantidad' }, { name: 'settedPrice', text: 'Precio', render: Formatters.formatCurrency }]}
-										rows={cart.products || []}
+										rows={cart.products}
 										infinite />
 								)}
 							</div>
 							<div>
 								<h4 className="mb-2 border-b border-border-subtle pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">Abonos</h4>
-								{cart.abonoProducts.length > 0 && (
+								{cart?.abonoProducts?.length > 0 && (
 									<DataTable
 										columns={[{ name: 'typeName', text: 'Abono' }, { name: 'quantity', text: 'Cantidad' }]}
-										rows={cart.abonoProducts || []}
+										rows={cart.abonoProducts}
 										infinite />
 								)}
 							</div>
 							<div>
 								<h4 className="mb-2 border-b border-border-subtle pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">Pagos</h4>
-								{cart.paymentMethods.length > 0 && (
+								{cart?.paymentMethods?.length > 0 && (
 									<DataTable
 										columns={[{ name: 'name', text: 'Metodo' }, { name: 'amount', text: 'Monto', render: Formatters.formatCurrency }]}
-										rows={cart.paymentMethods || []}
+										rows={cart.paymentMethods}
 										infinite />
 								)}
 							</div>

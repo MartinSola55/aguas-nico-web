@@ -35,11 +35,12 @@ export const toInputDate = (value = new Date()) => {
 };
 
 // Devuelve el dia de la semana como valor del enum Day (Lunes=1 ... Viernes=5).
-// getDay() usa 0=Domingo..6=Sabado, que para Lunes-Viernes ya coincide con Day.
+// getDay() usa 0=Domingo..6=Sabado; fines de semana vuelven a Lunes.
 export const toDay = (value = new Date()) => {
 	const parts = getDateParts(value);
 	if (!parts) return null;
-	return new Date(Number(parts.year), Number(parts.month) - 1, Number(parts.day)).getDay();
+	const day = new Date(Number(parts.year), Number(parts.month) - 1, Number(parts.day)).getDay();
+	return day >= 1 && day <= 5 ? day : 1;
 };
 
 export const monthStart = () => {
