@@ -31,10 +31,9 @@ export const DealerHome = () => {
 			<Card title={`Mis repartos de los ${selectedDayName}`} actions={dayAction}>
 				<DataTable
 					columns={[
-						{ name: 'dealerName', text: 'Nombre' },
+						{ name: 'createdAt', text: 'Fecha', render: Formatters.formatDate },
 						{ name: 'completedCarts', text: 'Envios completados', render: (_, row) => `${row.completedCarts}/${row.totalCarts}` },
 						{ name: 'isClosed', text: 'Estado', render: (_, row) => row.isClosed ? 'Cerrada' : row.pendingCarts === 0 ? 'Completado' : 'Pendiente' },
-						{ name: 'createdAt', text: 'Fecha', render: Formatters.formatDate },
 					]}
 					rows={routes}
 					loading={loading}
