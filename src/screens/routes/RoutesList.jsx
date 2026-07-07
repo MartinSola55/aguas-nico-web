@@ -85,7 +85,7 @@ export const RoutesList = () => {
 						{ name: 'truckNumber', text: 'Camion', render: (value) => value || '-' },
 						{ name: 'dayOfWeek', text: 'Dia', render: Formatters.dayName },
 						{ name: 'totalCarts', text: 'Envios a realizar' },
-						{ name: 'print', text: 'Planilla', render: (value, route) => <Button size="sm" variant="secondary" onClick={(event) => printSheet(event, route)}><Printer size={16} />Imprimir</Button> },
+						...(App.isAdmin() ? [{ name: 'print', text: 'Planilla', render: (value, route) => <Button size="sm" variant="secondary" onClick={(event) => printSheet(event, route)}><Printer size={16} />Imprimir</Button> }] : []),
 					]}
 					rows={routes}
 					pagination

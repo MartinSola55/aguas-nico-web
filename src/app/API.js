@@ -74,7 +74,7 @@ export const endpoints = {
 		logout: () => post('Auth/Logout', {}),
 	},
 	home: {
-		getDashboard: () => get('Home/GetDashboard'),
+		getDashboard: (rq) => get('Home/GetDashboard', rq),
 	},
 	catalog: {
 		getAll: () => get('Catalog/GetAll'),

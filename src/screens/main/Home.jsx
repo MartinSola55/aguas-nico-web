@@ -2,15 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Banknote, ClipboardList, FileSpreadsheet, ReceiptText, Truck } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { API, DateHelper, Formatters, Helpers, LocalStorage } from '@app';
-import { App } from '@app';
+import { API, App, DateHelper, Formatters, Helpers, LocalStorage } from '@app';
 import { Button, Card, DataTable, Input, PageHeader, StatCard } from '@components';
+import { DayCombo } from '@screens/shared/index.js';
 import { DashboardExpenseModal } from './modals/DashboardExpenseModal.jsx';
 
 export const Home = () => {
 	const navigate = useNavigate();
 	const [dealers, setDealers] = useState([]);
 	const [date, setDate] = useState(DateHelper.toInputDate());
+	const [day, setDay] = useState(DateHelper.toDay(new Date()));
 	const [routes, setRoutes] = useState([]);
 	const [expenses, setExpenses] = useState([]);
 	const [soldProducts, setSoldProducts] = useState([]);
@@ -33,21 +34,38 @@ export const Home = () => {
 		return items.filter((route) => route.userId === userId);
 	};
 
-	const loadDashboard = (selectedDate = date) => {
+	const loadAdminDashboard = (selectedDate = date) => {
+		if (App.isDealer()) return;
 		setLoading(true);
+
 		const rq = { date: DateHelper.toApiDate(selectedDate) };
 		Promise.all([
 			API.endpoints.routes.searchByDate(rq).then((rs) => setRoutes(filterRoutesForRole(rs.data.routes || []))),
 			API.endpoints.routes.searchSoldProducts(rq).then((rs) => setSoldProducts(rs.data.items || [])),
 			API.endpoints.expenses.searchByDate(rq).then((rs) => setExpenses((rs.data.items || []).map(normalizeExpense))),
 			API.endpoints.stats.getBalanceByDate(rq).then((rs) => setBalance(rs.data)),
-			App.isAdmin() ? API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || [])) : Promise.resolve(),
+			API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || [])),
 		]).catch(() => null).finally(() => setLoading(false));
 	};
 
+	const loadDealerDashboard = (selectedDay = day) => {
+		if (!App.isDealer()) return;
+		setLoading(true);
+
+		API.endpoints.home.getDashboard({ day: selectedDay })
+			.then((rs) => setRoutes(rs.data.dealerRoutes || []))
+			.catch(() => null)
+			.finally(() => setLoading(false));
+		return;
+	};
+
 	useEffect(() => {
-		loadDashboard(date);
+		loadAdminDashboard(date);
 	}, [date]);
+
+	useEffect(() => {
+		loadDealerDashboard(day);
+	}, [day]);
 
 	const downloadCaja = () => API.endpoints.caja.downloadDailyClose({ date: DateHelper.toApiDate(date) });
 
@@ -59,7 +77,7 @@ export const Home = () => {
 		}).then((rs) => {
 			toast.success(rs.message);
 			onSaved?.();
-			loadDashboard(date);
+			loadAdminDashboard(date);
 		});
 	};
 
@@ -82,11 +100,19 @@ export const Home = () => {
 		</div>
 	);
 
+	const dayAction = (
+		<div className="w-44">
+			<DayCombo label="Dia" value={day} onChange={setDay} />
+		</div>
+	);
+
 	if (App.isDealer()) {
+		const selectedDayName = Formatters.dayName(day);
+
 		return (
 			<>
-				<PageHeader title="Inicio" breadcrumbs={['Inicio']} actions={dateAction} />
-				<Card title={`Repartos del ${selectedDateLabel}`}>
+				<PageHeader title="Inicio" breadcrumbs={['Inicio']} />
+				<Card title={`Mis repartos de los ${selectedDayName}`} actions={dayAction}>
 					<DataTable
 						columns={[
 							{ name: 'dealerName', text: 'Nombre' },
@@ -96,7 +122,7 @@ export const Home = () => {
 						]}
 						rows={routes}
 						loading={loading}
-						empty="No hay repartos para la fecha seleccionada"
+						empty={`No hay repartos para los ${selectedDayName}`}
 						infinite
 						onRowClick={(row) => navigate(`/planillas/${row.id}`)}
 					/>
