@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { Plus, Printer } from 'lucide-react';
-import { API, App, Formatters } from '@app';
+import { API, App, DateHelper, Formatters } from '@app';
 import { Button, Card, ConfirmButton, DataTable, PageHeader } from '@components';
 import { DayCombo, DealerCombo } from '@screens/shared';
 import { CreateRouteModal } from './CreateRouteModal.jsx';
@@ -13,10 +13,7 @@ export const RoutesList = () => {
 	const navigate = useNavigate();
 	const [routes, setRoutes] = useState([]);
 	const [dealers, setDealers] = useState([]);
-	const [day, setDay] = useState(() => {
-		const today = new Date().getDay();
-		return today >= 1 && today <= 5 ? today : '';
-	});
+	const [day, setDay] = useState(DateHelper.toDay(new Date()));
 	const [userId, setUserId] = useState('');
 	const createRouteModalRef = useRef(null);
 
@@ -81,9 +78,9 @@ export const RoutesList = () => {
 				)}
 				<DataTable
 					columns={[
-						{ name: 'dealerName', text: 'Reparto' },
-						{ name: 'truckNumber', text: 'Camion', render: (value) => value || '-' },
+						...(App.isAdmin() ? [{ name: 'dealerName', text: 'Reparto' }] : []),
 						{ name: 'dayOfWeek', text: 'Dia', render: Formatters.dayName },
+						...(App.isAdmin() ? [{ name: 'truckNumber', text: 'Camion', render: (value) => value || '-' }] : []),
 						{ name: 'totalCarts', text: 'Envios a realizar' },
 						...(App.isAdmin() ? [{ name: 'print', text: 'Planilla', render: (value, route) => <Button size="sm" variant="secondary" onClick={(event) => printSheet(event, route)}><Printer size={16} />Imprimir</Button> }] : []),
 					]}
