@@ -73,6 +73,11 @@ export const endpoints = {
 		login: (rq) => post('Auth/Login', rq),
 		logout: () => post('Auth/Logout', {}),
 	},
+	user: {
+		getProfile: (rq) => get('User/GetProfile', rq),
+		updateTruckNumber: (rq) => post('User/UpdateTruckNumber', rq),
+		updatePassword: (rq) => post('User/UpdatePassword', rq),
+	},
 	home: {
 		getDashboard: () => get('Home/GetDashboard'),
 	},

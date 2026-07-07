@@ -39,7 +39,16 @@ export const DealerDetails = () => {
 
 	return (
 		<>
-			<PageHeader title={data?.dealer?.name || 'Repartidor'} breadcrumbs={['Inicio', 'Repartidores', 'Detalles']} actions={<Link to={`/repartidores/${id}/planillas`}><Button variant="secondary">Imprimir planillas</Button></Link>} />
+			<PageHeader
+				title={data?.dealer?.name || 'Repartidor'}
+				breadcrumbs={['Inicio', 'Repartidores', 'Detalles']}
+				actions={
+					<>
+						<Link to={`/repartidores/${id}/perfil`}><Button variant="secondary">Editar perfil</Button></Link>
+						<Link to={`/repartidores/${id}/planillas`}><Button variant="secondary">Imprimir planillas</Button></Link>
+					</>
+				}
+			/>
 			<div className="mb-4 grid gap-3 md:grid-cols-2">
 				<MonthCombo label="Mes" value={month} onChange={setMonth} />
 				<YearCombo label="Anio" years={years} value={year} onChange={setYear} />
