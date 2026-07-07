@@ -1,5 +1,11 @@
 import { CartsTransfersType, Day, ProductActionType, State } from '@constants';
 
+const DATE_OPTIONS = {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric'
+};
+
 export const formatCurrency = (value, decimals = 0) => {
 	if (value === null || value === undefined || value === '') return '-';
 	const number = Number(value);
@@ -20,14 +26,14 @@ export const formatDate = (value) => {
 		? new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
 		: new Date(value);
 	if (Number.isNaN(date.getTime())) return '-';
-	return date.toLocaleDateString('es-AR');
+	return date.toLocaleDateString('es-AR', DATE_OPTIONS);
 };
 
 export const formatDateTime = (value) => {
 	if (!value) return '-';
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) return '-';
-	return `${date.toLocaleDateString('es-AR')} ${date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs`;
+	return `${date.toLocaleDateString('es-AR', DATE_OPTIONS)} ${date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs`;
 };
 
 export const stateName = (value) => ({
@@ -45,6 +51,12 @@ export const dayName = (value) => ({
 	[Day.Jueves]: 'Jueves',
 	[Day.Viernes]: 'Viernes',
 }[Number(value)] ?? '-');
+
+// Nombre del dia de la semana a partir de un objeto Date (getDay(): 0=Domingo).
+export const weekdayName = (date) => {
+	if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '-';
+	return dayName(date.getDay());
+};
 
 export const historyTypeName = (value) => ({
 	[CartsTransfersType.Transfer]: 'Transferencia',

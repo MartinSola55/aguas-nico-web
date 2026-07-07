@@ -79,7 +79,7 @@ export const endpoints = {
 		updatePassword: (rq) => post('User/UpdatePassword', rq),
 	},
 	home: {
-		getDashboard: () => get('Home/GetDashboard'),
+		getDashboard: (rq) => get('Home/GetDashboard', rq),
 	},
 	catalog: {
 		getAll: () => get('Catalog/GetAll'),

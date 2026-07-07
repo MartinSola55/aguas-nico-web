@@ -14,11 +14,11 @@ export const ClientForm = () => {
 	const [dealers, setDealers] = useState([]);
 
 	useEffect(() => {
-		Promise.all([
-			API.endpoints.products.getAll({ activeOnly: true }).then((rs) => setProducts(rs.data.items || [])),
-			API.endpoints.abonos.getAll().then((rs) => setAbonos(rs.data.items || [])),
-			API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || [])),
-		]);
+		API.endpoints.products.getAll({ activeOnly: true }).then((rs) => setProducts(rs.data.items || []));
+		if (App.isAdmin()) {
+			API.endpoints.abonos.getAll().then((rs) => setAbonos(rs.data.items || []));
+			API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || []));
+		}
 	}, []);
 
 	const update = (key, value) => setClient((current) => ({ ...current, [key]: value }));
@@ -93,16 +93,18 @@ export const ClientForm = () => {
 							rows={productRows}
 						/>
 					</Card>
-					<Card title="Abonos asociados">
-						<DataTable
-							columns={[
-								{ name: 'name', text: 'Abono' },
-								{ name: 'price', text: 'Precio', render: (value) => Helpers.numberOrZero(value).toLocaleString('es-AR') },
-								{ name: 'assigned', text: 'Asociar', render: (_, row) => <CheckBox checked={client.abonoIds.includes(row.id)} onChange={(checked) => toggleAbono(row.id, checked)} /> },
-							]}
-							rows={abonos}
-						/>
-					</Card>
+					{App.isAdmin() && (
+						<Card title="Abonos asociados">
+							<DataTable
+								columns={[
+									{ name: 'name', text: 'Abono' },
+									{ name: 'price', text: 'Precio', render: (value) => Helpers.numberOrZero(value).toLocaleString('es-AR') },
+									{ name: 'assigned', text: 'Asociar', render: (_, row) => <CheckBox checked={client.abonoIds.includes(row.id)} onChange={(checked) => toggleAbono(row.id, checked)} /> },
+								]}
+								rows={abonos}
+							/>
+						</Card>
+					)}
 				</div>
 			</form>
 		</>
