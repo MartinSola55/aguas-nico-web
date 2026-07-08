@@ -15,6 +15,7 @@ export const AdminHome = () => {
 	const [soldProducts, setSoldProducts] = useState([]);
 	const [balance, setBalance] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [saving, setSaving] = useState(false);
 	const expenseModalRef = useRef(null);
 
 	const selectedDateLabel = Formatters.formatDate(date);
@@ -45,6 +46,7 @@ export const AdminHome = () => {
 	const downloadCaja = () => API.endpoints.caja.downloadDailyClose({ date: DateHelper.toApiDate(date) });
 
 	const createExpense = (expenseForm, onSaved) => {
+		setSaving(true);
 		API.endpoints.expenses.create({
 			userId: expenseForm.userId,
 			description: expenseForm.description,
@@ -53,7 +55,7 @@ export const AdminHome = () => {
 			toast.success(rs.message);
 			onSaved?.();
 			loadDashboard(date);
-		});
+		}).finally(() => setSaving(false));
 	};
 
 	const adminTotals = (
@@ -77,7 +79,7 @@ export const AdminHome = () => {
 
 	return (
 		<>
-			<DashboardExpenseModal ref={expenseModalRef} dealers={dealers} onSave={createExpense} />
+			<DashboardExpenseModal ref={expenseModalRef} dealers={dealers} onSave={createExpense} loading={saving} />
 			<PageHeader
 				title="Inicio"
 				breadcrumbs={['Inicio']}

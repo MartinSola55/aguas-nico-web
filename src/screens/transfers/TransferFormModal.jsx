@@ -11,6 +11,7 @@ export const TransferFormModal = ({ onSaved, ref }) => {
 	const [clientSearch, setClientSearch] = useState('');
 	const [clientOptions, setClientOptions] = useState([]);
 	const [form, setForm] = useState(emptyTransfer);
+	const [loading, setLoading] = useState(false);
 
 	const clientItems = useMemo(() => clientOptions.map((c) => {
 		const parts = [c.name, c.address, c.dealerName, c.deliveryDay ? Formatters.dayName(c.deliveryDay) : ''].filter(Boolean);
@@ -39,25 +40,31 @@ export const TransferFormModal = ({ onSaved, ref }) => {
 	}, []);
 
 	const searchClients = () => {
-		API.endpoints.clients.getAll({ activeOnly: true, search: clientSearch }).then((rs) => setClientOptions(rs.data.items || []));
+		setLoading(true);
+		API.endpoints.clients.getAll({ activeOnly: true, search: clientSearch })
+			.then((rs) => setClientOptions(rs.data.items || []))
+			.finally(() => setLoading(false));
 	};
 
 	const save = () => {
+		setLoading(true);
 		const action = form.id ? API.endpoints.transfers.update : API.endpoints.transfers.create;
-		action(buildTransferRequest(form)).then((rs) => {
-			toast.success(rs.message);
-			close();
-			onSaved?.();
-		});
+		action(buildTransferRequest(form))
+			.then((rs) => {
+				toast.success(rs.message);
+				close();
+				onSaved?.();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
-		<Modal open={open} title={form.id ? 'Editar transferencia' : 'Nueva transferencia'} onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}>
+		<Modal open={open} title={form.id ? 'Editar transferencia' : 'Nueva transferencia'} onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={save}>Guardar</Button></>}>
 			<div className="grid gap-3">
 				{!form.id && (
 					<div className="flex items-end gap-2">
 						<Input label="Buscar cliente" value={clientSearch} onChange={setClientSearch} />
-						<Button variant="secondary" onClick={searchClients}>Buscar</Button>
+						<Button variant="secondary" loading={loading} onClick={searchClients}>Buscar</Button>
 					</div>
 				)}
 				<Select label="Cliente" disabled={!!form.id} items={clientItems} value={form.clientId} onChange={(value) => setForm((f) => ({ ...f, clientId: value }))} />

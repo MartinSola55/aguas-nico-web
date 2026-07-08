@@ -7,6 +7,8 @@ import { TerceroFormModal } from './TerceroFormModal.jsx';
 export const TercerosList = () => {
 	const [date, setDate] = useState(DateHelper.toInputDate());
 	const [terceros, setTerceros] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const formModalRef = useRef(null);
 
 	const load = () => API.endpoints.terceros.getByDate({ date: DateHelper.toApiDate(date) }).then((rs) => setTerceros(rs.data.items || []));
@@ -23,6 +25,7 @@ export const TercerosList = () => {
 			b20lQuantity: Helpers.numberOrZero(form.b20lQuantity),
 			b20lAmount: Helpers.numberOrZero(form.b20lAmount),
 		};
+		setSaving(true);
 		const action = form.id
 			? API.endpoints.terceros.update({ id: form.id, ...payload })
 			: API.endpoints.terceros.create({ date: DateHelper.toApiDate(date), ...payload });
@@ -30,14 +33,22 @@ export const TercerosList = () => {
 			toast.success(rs.message);
 			onSaved?.();
 			load();
-		});
+		}).finally(() => setSaving(false));
 	};
 
-	const remove = (id) => API.endpoints.terceros.delete({ id }).then((rs) => { toast.success(rs.message); load(); });
+	const remove = (id) => {
+		setLoading(true);
+		API.endpoints.terceros.delete({ id })
+			.then((rs) => {
+				toast.success(rs.message);
+				load();
+			})
+			.finally(() => setLoading(false));
+	};
 
 	return (
 		<>
-			<TerceroFormModal ref={formModalRef} onSave={save} />
+			<TerceroFormModal ref={formModalRef} onSave={save} loading={saving} />
 			<PageHeader title="Terceros" breadcrumbs={['Inicio', 'Terceros']} actions={<Button onClick={() => formModalRef.current?.open()}>Nuevo tercero</Button>} />
 			<Card title="Distribuidoras (carga manual para el cierre de caja)">
 				<div className="mb-4 grid gap-3 md:grid-cols-[220px_auto] md:items-end">
@@ -53,12 +64,14 @@ export const TercerosList = () => {
 						{ name: 'b12lAmount', text: 'Bidón 12L importe', render: Formatters.formatCurrency },
 						{ name: 'b20lQuantity', text: 'Bidón 20L cant.' },
 						{ name: 'b20lAmount', text: 'Bidón 20L importe', render: Formatters.formatCurrency },
-						{ name: 'actions', text: 'Acciones', render: (_, row) => (
-							<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-								<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
-								<ConfirmButton size="sm" variant="danger" message="Eliminar tercero?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
-							</div>
-						) },
+						{
+							name: 'actions', text: 'Acciones', render: (_, row) => (
+								<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+									<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
+									<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar tercero?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
+								</div>
+							)
+						},
 					]}
 					rows={terceros}
 					pagination

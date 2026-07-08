@@ -15,6 +15,7 @@ export const ClientDetails = () => {
 	const [editingProducts, setEditingProducts] = useState(false);
 	const [editingAbonos, setEditingAbonos] = useState(false);
 	const [editingInvoice, setEditingInvoice] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const load = () => {
 		Promise.all([
@@ -32,51 +33,66 @@ export const ClientDetails = () => {
 	const update = (key, value) => setClient((current) => ({ ...current, [key]: value }));
 
 	const saveClient = () => {
-		API.endpoints.clients.update({ id: client.id, ...buildClientRequest(client) }).then((rs) => {
-			toast.success(rs.message);
-			setEditingClient(false);
-			load();
-		});
+		setLoading(true);
+		API.endpoints.clients.update({ id: client.id, ...buildClientRequest(client) })
+			.then((rs) => {
+				toast.success(rs.message);
+				setEditingClient(false);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const saveInvoice = () => {
+		setLoading(true);
 		API.endpoints.clients.updateInvoiceData({
 			id: client.id,
 			invoiceType: client.invoiceType ? Number(client.invoiceType) : null,
 			taxCondition: client.taxCondition ? Number(client.taxCondition) : null,
 			cuit: client.cuit || '',
-		}).then((rs) => {
-			toast.success(rs.message);
-			setEditingInvoice(false);
-			load();
-		});
+		})
+			.then((rs) => {
+				toast.success(rs.message);
+				setEditingInvoice(false);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const saveProducts = () => {
 		const products = (client.products || [])
 			.filter((item) => item.assigned)
 			.map((item) => ({ productId: item.productId, stock: Helpers.numberOrZero(item.stock) }));
-		API.endpoints.clients.updateProducts({ clientId: client.id, products }).then((rs) => {
-			toast.success(rs.message);
-			setEditingProducts(false);
-			load();
-		});
+		setLoading(true);
+		API.endpoints.clients.updateProducts({ clientId: client.id, products })
+			.then((rs) => {
+				toast.success(rs.message);
+				setEditingProducts(false);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const saveAbonos = () => {
 		const abonoIds = (client.abonos || []).filter((item) => item.assigned).map((item) => item.abonoId);
-		API.endpoints.clients.updateAbonos({ clientId: client.id, abonoIds }).then((rs) => {
-			toast.success(rs.message);
-			setEditingAbonos(false);
-			load();
-		});
+		setLoading(true);
+		API.endpoints.clients.updateAbonos({ clientId: client.id, abonoIds })
+			.then((rs) => {
+				toast.success(rs.message);
+				setEditingAbonos(false);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const deleteClient = () => {
-		API.endpoints.clients.delete({ id: client.id }).then((rs) => {
-			toast.success(rs.message);
-			navigate('/clientes');
-		});
+		setLoading(true);
+		API.endpoints.clients.delete({ id: client.id })
+			.then((rs) => {
+				toast.success(rs.message);
+				navigate('/clientes');
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const updateProduct = (productId, changes) => {
@@ -98,7 +114,7 @@ export const ClientDetails = () => {
 			<PageHeader
 				title={client.name}
 				breadcrumbs={['Inicio', 'Clientes', 'Detalles']}
-				actions={<ConfirmButton variant="danger" message="Eliminar cliente?" onConfirm={deleteClient}>Eliminar</ConfirmButton>}
+				actions={<ConfirmButton variant="danger" loading={loading} message="Eliminar cliente?" onConfirm={deleteClient}>Eliminar</ConfirmButton>}
 			/>
 			<div className="grid gap-4 xl:grid-cols-[1fr_420px]">
 				<div className="space-y-4">
@@ -134,7 +150,7 @@ export const ClientDetails = () => {
 						/>
 					</Card>
 					<div className="grid gap-4 lg:grid-cols-2">
-						<Card title="Productos asociados" actions={editingProducts ? <Button size="sm" onClick={saveProducts}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingProducts(true)}>Editar</Button>}>
+						<Card title="Productos asociados" actions={editingProducts ? <Button size="sm" loading={loading} onClick={saveProducts}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingProducts(true)}>Editar</Button>}>
 							<DataTable
 								columns={[
 									{ name: 'productName', text: 'Producto' },
@@ -146,7 +162,7 @@ export const ClientDetails = () => {
 								infinite
 							/>
 						</Card>
-						<Card title="Abonos asociados" actions={editingAbonos ? <Button size="sm" onClick={saveAbonos}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingAbonos(true)}>Editar</Button>}>
+						<Card title="Abonos asociados" actions={editingAbonos ? <Button size="sm" loading={loading} onClick={saveAbonos}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingAbonos(true)}>Editar</Button>}>
 							<DataTable
 								columns={[
 									{ name: 'abonoName', text: 'Abono' },
@@ -160,7 +176,7 @@ export const ClientDetails = () => {
 					</div>
 				</div>
 				<div className="space-y-4">
-					<Card title="Cliente" actions={editingClient ? <Button size="sm" onClick={saveClient}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingClient(true)}>Editar</Button>}>
+					<Card title="Cliente" actions={editingClient ? <Button size="sm" loading={loading} onClick={saveClient}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingClient(true)}>Editar</Button>}>
 						<div className="grid gap-3">
 							{editingClient ? (
 								<>
@@ -194,7 +210,7 @@ export const ClientDetails = () => {
 						</div>
 					</Card>
 					{client.hasInvoice && (
-						<Card title="Datos de facturacion" actions={editingInvoice ? <Button size="sm" onClick={saveInvoice}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingInvoice(true)}>Editar</Button>}>
+						<Card title="Datos de facturacion" actions={editingInvoice ? <Button size="sm" loading={loading} onClick={saveInvoice}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingInvoice(true)}>Editar</Button>}>
 							<div className="grid gap-3">
 								<InvoiceTypeCombo label="Tipo de factura" disabled={!editingInvoice} value={client.invoiceType} onChange={(value) => update('invoiceType', value)} />
 								<TaxConditionCombo label="Condicion IVA" disabled={!editingInvoice} value={client.taxCondition} onChange={(value) => update('taxCondition', value)} />

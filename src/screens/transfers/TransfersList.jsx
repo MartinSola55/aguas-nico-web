@@ -10,6 +10,7 @@ export const TransfersList = () => {
 	const [transfers, setTransfers] = useState([]);
 	const [dealers, setDealers] = useState([]);
 	const [filters, setFilters] = useState({ dateFrom: DateHelper.monthStart(), dateTo: DateHelper.monthEnd(), userId: '' });
+	const [loading, setLoading] = useState(false);
 	const formModalRef = useRef(null);
 
 
@@ -20,7 +21,15 @@ export const TransfersList = () => {
 		load();
 	}, []);
 
-	const remove = (id) => API.endpoints.transfers.delete({ id }).then((rs) => { toast.success(rs.message); load(); });
+	const remove = (id) => {
+		setLoading(true);
+		API.endpoints.transfers.delete({ id })
+			.then((rs) => {
+				toast.success(rs.message);
+				load();
+			})
+			.finally(() => setLoading(false));
+	};
 
 	return (
 		<>
@@ -43,7 +52,7 @@ export const TransfersList = () => {
 						{ name: 'actions', text: 'Acciones', render: (_, row) => (
 							<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
 								<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
-								<ConfirmButton size="sm" variant="danger" message="Eliminar transferencia?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
+								<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar transferencia?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
 							</div>
 						) },
 					]}

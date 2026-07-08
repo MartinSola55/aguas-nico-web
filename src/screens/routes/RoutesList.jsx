@@ -15,6 +15,8 @@ export const RoutesList = () => {
 	const [dealers, setDealers] = useState([]);
 	const [day, setDay] = useState(DateHelper.toDay(new Date()));
 	const [userId, setUserId] = useState('');
+	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const createRouteModalRef = useRef(null);
 
 	const load = () => {
@@ -27,15 +29,23 @@ export const RoutesList = () => {
 	}, []);
 
 	const create = (form, onCreated) => {
-		API.endpoints.routes.create(routeRequest(form)).then((rs) => {
-			toast.success(rs.message);
-			onCreated?.();
-			load();
-			navigate(`/planillas/${rs.data.id}`);
-		});
+		setSaving(true);
+		API.endpoints.routes.create(routeRequest(form))
+			.then((rs) => {
+				toast.success(rs.message);
+				onCreated?.();
+				load();
+				navigate(`/planillas/${rs.data.id}`);
+			})
+			.finally(() => setSaving(false));
 	};
 
-	const renewAll = () => API.endpoints.abonos.renewAll().then((rs) => toast.success(rs.message));
+	const renewAll = () => {
+		setLoading(true);
+		API.endpoints.abonos.renewAll()
+			.then((rs) => toast.success(rs.message))
+			.finally(() => setLoading(false));
+	};
 
 	const printSheet = (event, route) => {
 		event.stopPropagation();
@@ -60,11 +70,11 @@ export const RoutesList = () => {
 
 	return (
 		<>
-			<CreateRouteModal ref={createRouteModalRef} dealers={dealers} onCreate={create} />
+			<CreateRouteModal ref={createRouteModalRef} dealers={dealers} onCreate={create} loading={saving} />
 			<PageHeader
 				title="Planillas"
 				breadcrumbs={['Inicio', 'Planillas']}
-				actions={App.isAdmin() && <><ConfirmButton variant="secondary" message="Renovar todos los abonos?" onConfirm={renewAll}>Renovar abonos</ConfirmButton><Button onClick={() => createRouteModalRef.current?.open()}><Plus size={16} />Nueva planilla</Button></>}
+				actions={App.isAdmin() && <><ConfirmButton variant="secondary" loading={loading} message="Renovar todos los abonos?" onConfirm={renewAll}>Renovar abonos</ConfirmButton><Button onClick={() => createRouteModalRef.current?.open()}><Plus size={16} />Nueva planilla</Button></>}
 			/>
 			<Card title="Planillas">
 				{App.isAdmin() && (

@@ -3,7 +3,7 @@ import { useCatalog } from '@app';
 import { Button, DataTable, Input, Modal } from '@components';
 import { emptyAbono } from './Abonos.helpers.js';
 
-export const AbonoFormModal = ({ onSave, ref }) => {
+export const AbonoFormModal = ({ onSave, loading = false, ref }) => {
 	const { combos } = useCatalog();
 	const [open, setOpen] = useState(false);
 	const [form, setForm] = useState(emptyAbono);
@@ -36,7 +36,7 @@ export const AbonoFormModal = ({ onSave, ref }) => {
 			open={open}
 			title={form.id ? 'Editar abono' : 'Nuevo abono'}
 			onClose={close}
-			footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}
+			footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={save}>Guardar</Button></>}
 		>
 			<div className="grid gap-3">
 				<Input label="Nombre" value={form.name} onChange={(value) => setForm((f) => ({ ...f, name: value }))} />

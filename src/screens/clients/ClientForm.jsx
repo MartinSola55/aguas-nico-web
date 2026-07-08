@@ -12,6 +12,7 @@ export const ClientForm = () => {
 	const [products, setProducts] = useState([]);
 	const [abonos, setAbonos] = useState([]);
 	const [dealers, setDealers] = useState([]);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		API.endpoints.products.getAll({ activeOnly: true }).then((rs) => setProducts(rs.data.items || []));
@@ -45,10 +46,13 @@ export const ClientForm = () => {
 
 	const submit = (e) => {
 		e.preventDefault();
-		API.endpoints.clients.create(buildClientRequest(client)).then((rs) => {
-			toast.success(rs.message);
-			navigate(App.isAdmin() ? `/clientes/${rs.data.id}` : '/');
-		});
+		setLoading(true);
+		API.endpoints.clients.create(buildClientRequest(client))
+			.then((rs) => {
+				toast.success(rs.message);
+				navigate(App.isAdmin() ? `/clientes/${rs.data.id}` : '/');
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
@@ -79,7 +83,7 @@ export const ClientForm = () => {
 						</div>
 					)}
 					<div className="mt-4 flex justify-end">
-						<Button type="submit">Guardar cliente</Button>
+						<Button type="submit" loading={loading}>Guardar cliente</Button>
 					</div>
 				</Card>
 				<div className="space-y-4">

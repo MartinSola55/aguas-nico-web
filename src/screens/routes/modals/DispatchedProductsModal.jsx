@@ -1,7 +1,7 @@
 import { useImperativeHandle, useState } from 'react';
 import { Button, DataTable, Input, Modal } from '@components';
 
-export const DispatchedProductsModal = ({ onSave, ref }) => {
+export const DispatchedProductsModal = ({ onSave, loading = false, ref }) => {
 	const [open, setOpen] = useState(false);
 	const [rows, setRows] = useState([]);
 
@@ -18,7 +18,7 @@ export const DispatchedProductsModal = ({ onSave, ref }) => {
 	const save = () => onSave?.(rows, close);
 
 	return (
-		<Modal open={open} title="Productos cargados" onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}>
+		<Modal open={open} title="Productos cargados" onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={save}>Guardar</Button></>}>
 			<DataTable
 				columns={[
 					{ name: 'typeName', text: 'Producto' },

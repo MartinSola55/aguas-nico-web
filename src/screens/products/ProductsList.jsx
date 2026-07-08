@@ -11,6 +11,7 @@ import { buildProductRequest } from './Products.helpers.js';
 export const ProductsList = () => {
 	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const [activeOnly, setActiveOnly] = useState(true);
 	const formModalRef = useRef(null);
 	const clientsModalRef = useRef(null);
@@ -27,19 +28,25 @@ export const ProductsList = () => {
 	useEffect(load, []);
 
 	const save = (form, onSaved) => {
+		setSaving(true);
 		const action = form.id ? API.endpoints.products.update : API.endpoints.products.create;
-		action(buildProductRequest(form)).then((rs) => {
-			toast.success(rs.message);
-			onSaved?.();
-			load();
-		});
+		action(buildProductRequest(form))
+			.then((rs) => {
+				toast.success(rs.message);
+				onSaved?.();
+				load();
+			})
+			.finally(() => setSaving(false));
 	};
 
 	const remove = (id) => {
-		API.endpoints.products.delete({ id }).then((rs) => {
-			toast.success(rs.message);
-			load();
-		});
+		setLoading(true);
+		API.endpoints.products.delete({ id })
+			.then((rs) => {
+				toast.success(rs.message);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const showClients = (product) => {
@@ -50,7 +57,7 @@ export const ProductsList = () => {
 
 	return (
 		<>
-			<ProductFormModal ref={formModalRef} onSave={save} />
+			<ProductFormModal ref={formModalRef} onSave={save} loading={saving} />
 			<ClientsSummaryModal ref={clientsModalRef} />
 			<PageHeader title="Productos" breadcrumbs={['Inicio', 'Productos']} actions={<Button onClick={() => formModalRef.current?.open()}><Plus size={16} />Nuevo producto</Button>} />
 			<Card title="Listado">
@@ -75,7 +82,7 @@ export const ProductsList = () => {
 									<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
 									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
 									<Link to={`/productos/${row.id}/estadisticas`}><Button size="sm" variant="info"><BarChart3 size={14} /></Button></Link>
-									{row.isActive && <ConfirmButton size="sm" variant="danger" message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
+									{row.isActive && <ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar producto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>}
 								</div>
 							)
 						},

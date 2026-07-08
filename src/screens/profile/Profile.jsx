@@ -21,10 +21,9 @@ export const Profile = () => {
 
 	const [profile, setProfile] = useState(null);
 	const [truckNumber, setTruckNumber] = useState('');
-	const [savingTruck, setSavingTruck] = useState(false);
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	const [savingPassword, setSavingPassword] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const load = () => {
 		API.endpoints.user.getProfile(id ? { id } : {}).then((rs) => {
@@ -45,13 +44,13 @@ export const Profile = () => {
 			toast.error('Ingresa un número de camión válido.');
 			return;
 		}
-		setSavingTruck(true);
+		setLoading(true);
 		API.endpoints.user.updateTruckNumber({ id: targetId, truckNumber: value })
 			.then((rs) => {
 				toast.success(rs.message);
 				load();
 			})
-			.finally(() => setSavingTruck(false));
+			.finally(() => setLoading(false));
 	};
 
 	const savePassword = () => {
@@ -63,14 +62,14 @@ export const Profile = () => {
 			toast.error('Las contraseñas no coinciden.');
 			return;
 		}
-		setSavingPassword(true);
+		setLoading(true);
 		API.endpoints.user.updatePassword({ id: targetId, password })
 			.then((rs) => {
 				toast.success(rs.message);
 				setPassword('');
 				setConfirmPassword('');
 			})
-			.finally(() => setSavingPassword(false));
+			.finally(() => setLoading(false));
 	};
 
 	const breadcrumbs = isSelf ? ['Inicio', 'Mi perfil'] : ['Inicio', 'Repartidores', 'Perfil'];
@@ -96,8 +95,8 @@ export const Profile = () => {
 						)}
 						{canEditTruck && (
 							<div className="flex justify-end">
-								<Button onClick={saveTruck} disabled={savingTruck}>
-									{savingTruck ? 'Guardando...' : 'Guardar camión'}
+								<Button onClick={saveTruck} loading={loading}>
+									{loading ? 'Guardando...' : 'Guardar camión'}
 								</Button>
 							</div>
 						)}
@@ -111,8 +110,8 @@ export const Profile = () => {
 							Mínimo 8 caracteres, con mayúscula, minúscula y número.
 						</p>
 						<div className="flex justify-end">
-							<Button onClick={savePassword} disabled={savingPassword}>
-								{savingPassword ? 'Guardando...' : 'Guardar contraseña'}
+							<Button onClick={savePassword} loading={loading}>
+								{loading ? 'Guardando...' : 'Guardar contraseña'}
 							</Button>
 						</div>
 					</div>

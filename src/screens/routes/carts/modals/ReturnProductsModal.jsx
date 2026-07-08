@@ -3,7 +3,7 @@ import { Button, DataTable, Input, Modal } from '@components';
 
 const emptyState = { open: false, title: '', rows: [] };
 
-export const ReturnProductsModal = ({ onConfirm, ref }) => {
+export const ReturnProductsModal = ({ onConfirm, loading = false, ref }) => {
 	const [state, setState] = useState(emptyState);
 
 	const close = () => setState(emptyState);
@@ -23,7 +23,7 @@ export const ReturnProductsModal = ({ onConfirm, ref }) => {
 	const confirm = () => onConfirm?.(state.rows, close);
 
 	return (
-		<Modal open={state.open} title={state.title} onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={confirm}>Confirmar</Button></>}>
+		<Modal open={state.open} title={state.title} onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={confirm}>Confirmar</Button></>}>
 			<DataTable
 				columns={[
 					{ name: 'typeName', text: 'Producto' },

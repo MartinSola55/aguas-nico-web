@@ -16,6 +16,7 @@ export const RouteEdit = () => {
 	const [clients, setClients] = useState([]);
 	const [search, setSearch] = useState('');
 	const [results, setResults] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const sensors = useSensors(
 		useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -37,7 +38,10 @@ export const RouteEdit = () => {
 		const call = /^\d+$/.test(search)
 			? API.endpoints.routes.clientsByIDNotInRoute({ ...rq, clientId: Number(search) })
 			: API.endpoints.routes.clientsByNameNotInRoute({ ...rq, name: search });
-		call.then((rs) => setResults(rs.data.items || []));
+		setLoading(true);
+		call
+			.then((rs) => setResults(rs.data.items || []))
+			.finally(() => setLoading(false));
 	};
 
 	const add = (client) => {
@@ -57,15 +61,18 @@ export const RouteEdit = () => {
 	};
 
 	const save = () => {
-		API.endpoints.routes.updateClients({ routeId: Number(id), clientIds: clients.map((item) => item.id) }).then((rs) => {
-			toast.success(rs.message);
-			navigate(`/planillas/${id}`);
-		});
+		setLoading(true);
+		API.endpoints.routes.updateClients({ routeId: Number(id), clientIds: clients.map((item) => item.id) })
+			.then((rs) => {
+				toast.success(rs.message);
+				navigate(`/planillas/${id}`);
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
 		<>
-			<PageHeader title="Editar clientes de planilla" breadcrumbs={['Inicio', 'Planillas', 'Editar']} actions={<Button onClick={save}>Guardar planilla</Button>} />
+			<PageHeader title="Editar clientes de planilla" breadcrumbs={['Inicio', 'Planillas', 'Editar']} actions={<Button loading={loading} onClick={save}>Guardar planilla</Button>} />
 			<div className="grid gap-4 xl:grid-cols-2">
 				<Card title={`Clientes en planilla ${route ? Formatters.dayName(route.dayOfWeek) : ''}`}>
 					<div className="overflow-x-auto">
@@ -99,7 +106,7 @@ export const RouteEdit = () => {
 				<Card title="Agregar clientes">
 					<div className="mb-3 flex items-end gap-2">
 						<Input label="Buscar por nombre, direccion o ID" value={search} onChange={setSearch} />
-						<Button variant="secondary" onClick={searchClients}>Buscar</Button>
+						<Button variant="secondary" loading={loading} onClick={searchClients}>Buscar</Button>
 					</div>
 					<DataTable
 						columns={[

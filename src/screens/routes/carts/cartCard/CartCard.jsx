@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { Edit } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -14,56 +14,76 @@ import { cartPreview, stateVariant } from './CartCard.helpers.js';
 export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	const expanded = !route.isStatic;
 	const returnModalRef = useRef(null);
+	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 
 	const confirm = (payload) => {
-		API.endpoints.carts.confirm(confirmCartRequest(cart, payload)).then((rs) => {
-			toast.success(rs.message);
-			onChanged();
-		});
+		setLoading(true);
+		API.endpoints.carts.confirm(confirmCartRequest(cart, payload))
+			.then((rs) => {
+				toast.success(rs.message);
+				onChanged();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const setState = (state) => {
-		API.endpoints.carts.setState({ cartId: cart.id, state }).then((rs) => {
-			toast.success(rs.message);
-			onChanged();
-		});
+		setLoading(true);
+		API.endpoints.carts.setState({ cartId: cart.id, state })
+			.then((rs) => {
+				toast.success(rs.message);
+				onChanged();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const resetState = () => {
-		API.endpoints.carts.resetState({ cartId: cart.id }).then((rs) => {
-			toast.success(rs.message);
-			onChanged();
-		});
+		setLoading(true);
+		API.endpoints.carts.resetState({ cartId: cart.id })
+			.then((rs) => {
+				toast.success(rs.message);
+				onChanged();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const deleteCart = () => {
-		API.endpoints.carts.delete({ cartId: cart.id }).then((rs) => {
-			toast.success(rs.message);
-			onChanged();
-		});
+		setLoading(true);
+		API.endpoints.carts.delete({ cartId: cart.id })
+			.then((rs) => {
+				toast.success(rs.message);
+				onChanged();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const openReturn = () => {
-		API.endpoints.carts.getReturnedProducts({ cartId: cart.id }).then((rs) => {
-			const rows = (rs.data.items || []).map((item) => ({ ...item, quantity: item.quantity || '' }));
-			returnModalRef.current?.open({ clientName: cart.clientName, rows });
-		});
+		setLoading(true);
+		API.endpoints.carts.getReturnedProducts({ cartId: cart.id })
+			.then((rs) => {
+				const rows = (rs.data.items || []).map((item) => ({ ...item, quantity: item.quantity || '' }));
+				returnModalRef.current?.open({ clientName: cart.clientName, rows });
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const saveReturn = (rows, onSaved) => {
+		setSaving(true);
 		API.endpoints.carts.returnProducts({
 			cartId: cart.id,
 			products: rows.filter((item) => Helpers.numberOrZero(item.quantity) > 0).map((item) => ({ type: item.type, quantity: Helpers.numberOrZero(item.quantity) })),
-		}).then((rs) => {
-			toast.success(rs.message);
-			onSaved?.();
-			onChanged();
-		});
+		})
+			.then((rs) => {
+				toast.success(rs.message);
+				onSaved?.();
+				onChanged();
+			})
+			.finally(() => setSaving(false));
 	};
 
 	return (
 		<>
-			<ReturnProductsModal ref={returnModalRef} onConfirm={saveReturn} />
+			<ReturnProductsModal ref={returnModalRef} onConfirm={saveReturn} loading={saving} />
 			<Card
 				className="mb-8"
 				style={{ backgroundColor: 'var(--color-bg-secondary-alt)' }}
@@ -89,10 +109,11 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 							abonoProducts={cart.availableAbonoProducts || []}
 							paymentMethods={paymentMethods}
 							onSubmit={confirm}
+							loading={loading}
 						/>
 						<div className="mt-3 flex flex-wrap gap-2">
 							{[State.Ausent, State.NotNeeded, State.Holidays].map((state) => (
-								<Button key={state} size="sm" variant="secondary" onClick={() => setState(state)}>{Formatters.stateName(state)}</Button>
+								<Button key={state} size="sm" variant="secondary" loading={loading} onClick={() => setState(state)}>{Formatters.stateName(state)}</Button>
 							))}
 						</div>
 					</div>
@@ -129,15 +150,15 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 							</div>
 						</div>
 						<div className="flex flex-wrap justify-end gap-2">
-							{App.isDealer() && <Button size="sm" variant="secondary" onClick={openReturn}>Devuelve</Button>}
+							{App.isDealer() && <Button size="sm" variant="secondary" loading={loading} onClick={openReturn}>Devuelve</Button>}
 							<Link to={`/bajadas/${cart.id}/editar`}><Button size="sm" variant="secondary"><Edit size={14} />Editar bajada</Button></Link>
-							{App.isAdmin() && <ConfirmButton size="sm" variant="danger" message="Eliminar bajada?" onConfirm={deleteCart}>Eliminar</ConfirmButton>}
+							{App.isAdmin() && <ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar bajada?" onConfirm={deleteCart}>Eliminar</ConfirmButton>}
 						</div>
 					</div>
 				)}
 				{expanded && cart.state !== State.Pending && cart.state !== State.Confirmed && (
 					<div className="mt-4 flex justify-end">
-						<Button size="sm" variant="warning" onClick={resetState}>Cancelar estado</Button>
+						<Button size="sm" variant="warning" loading={loading} onClick={resetState}>Cancelar estado</Button>
 					</div>
 				)}
 			</Card>

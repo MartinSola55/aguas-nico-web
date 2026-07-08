@@ -10,16 +10,20 @@ export const CartEdit = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [cart, setCart] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		API.endpoints.carts.getForEdit({ id }).then((rs) => setCart(rs.data));
 	}, [id]);
 
 	const save = (payload) => {
-		API.endpoints.carts.update(updateCartRequest(cart, payload)).then((rs) => {
-			toast.success(rs.message);
-			navigate(`/planillas/${cart.routeId}`);
-		});
+		setLoading(true);
+		API.endpoints.carts.update(updateCartRequest(cart, payload))
+			.then((rs) => {
+				toast.success(rs.message);
+				navigate(`/planillas/${cart.routeId}`);
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
@@ -36,6 +40,7 @@ export const CartEdit = () => {
 					allowReturnedOnly
 					submitText="Guardar"
 					onSubmit={save}
+					loading={loading}
 				/>
 			)}
 		</>

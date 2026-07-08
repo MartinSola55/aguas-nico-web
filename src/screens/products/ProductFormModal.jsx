@@ -3,7 +3,7 @@ import { Button, Input, Modal } from '@components';
 import { ProductTypeCombo } from '@screens/shared';
 import { emptyProduct } from './Products.helpers.js';
 
-export const ProductFormModal = ({ onSave, ref }) => {
+export const ProductFormModal = ({ onSave, loading = false, ref }) => {
 	const [open, setOpen] = useState(false);
 	const [form, setForm] = useState(emptyProduct);
 
@@ -24,7 +24,7 @@ export const ProductFormModal = ({ onSave, ref }) => {
 			open={open}
 			title={form.id ? 'Editar producto' : 'Nuevo producto'}
 			onClose={close}
-			footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}
+			footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={save}>Guardar</Button></>}
 		>
 			<div className="grid gap-3">
 				<Input label="Nombre" value={form.name} onChange={(value) => setForm((f) => ({ ...f, name: value }))} />

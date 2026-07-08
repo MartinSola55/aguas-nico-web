@@ -10,6 +10,8 @@ export const ExpensesList = () => {
 	const [expenses, setExpenses] = useState([]);
 	const [dealers, setDealers] = useState([]);
 	const [filters, setFilters] = useState({ dateFrom: DateHelper.monthStart(), dateTo: DateHelper.monthEnd(), userId: '' });
+	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const formModalRef = useRef(null);
 
 
@@ -21,19 +23,30 @@ export const ExpensesList = () => {
 	}, []);
 
 	const save = (form, onSaved) => {
+		setSaving(true);
 		const action = form.id ? API.endpoints.expenses.update : API.endpoints.expenses.create;
-		action(buildExpenseRequest(form)).then((rs) => {
-			toast.success(rs.message);
-			onSaved?.();
-			load();
-		});
+		action(buildExpenseRequest(form))
+			.then((rs) => {
+				toast.success(rs.message);
+				onSaved?.();
+				load();
+			})
+			.finally(() => setSaving(false));
 	};
 
-	const remove = (id) => API.endpoints.expenses.delete({ id }).then((rs) => { toast.success(rs.message); load(); });
+	const remove = (id) => {
+		setLoading(true);
+		API.endpoints.expenses.delete({ id })
+			.then((rs) => {
+				toast.success(rs.message);
+				load();
+			})
+			.finally(() => setLoading(false));
+	};
 
 	return (
 		<>
-			<ExpenseFormModal ref={formModalRef} dealers={dealers} onSave={save} />
+			<ExpenseFormModal ref={formModalRef} dealers={dealers} onSave={save} loading={saving} />
 			<PageHeader title="Gastos" breadcrumbs={['Inicio', 'Gastos']} actions={<Button onClick={() => formModalRef.current?.open()}>Nuevo gasto</Button>} />
 			<Card title="Listado">
 				<div className="mb-4 grid gap-3 md:grid-cols-[180px_180px_1fr_auto] md:items-end">
@@ -51,7 +64,7 @@ export const ExpensesList = () => {
 						{ name: 'actions', text: 'Acciones', render: (_, row) => (
 							<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
 								<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
-								<ConfirmButton size="sm" variant="danger" message="Eliminar gasto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
+								<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar gasto?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
 							</div>
 						) },
 					]}

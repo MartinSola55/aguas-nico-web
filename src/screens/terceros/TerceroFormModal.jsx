@@ -3,7 +3,7 @@ import { Button, Input, Modal } from '@components';
 
 const emptyTercero = { id: 0, name: '', sodaQuantity: '', sodaAmount: '', b12lQuantity: '', b12lAmount: '', b20lQuantity: '', b20lAmount: '' };
 
-export const TerceroFormModal = ({ onSave, ref }) => {
+export const TerceroFormModal = ({ onSave, loading = false, ref }) => {
 	const [open, setOpen] = useState(false);
 	const [form, setForm] = useState(emptyTercero);
 
@@ -20,7 +20,7 @@ export const TerceroFormModal = ({ onSave, ref }) => {
 	const save = () => onSave?.(form, close);
 
 	return (
-		<Modal open={open} title={form.id ? 'Editar tercero' : 'Nuevo tercero'} onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={save}>Guardar</Button></>}>
+		<Modal open={open} title={form.id ? 'Editar tercero' : 'Nuevo tercero'} onClose={close} footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={save}>Guardar</Button></>}>
 			<div className="grid gap-3">
 				<Input label="Distribuidora" value={form.name} onChange={(value) => setForm((f) => ({ ...f, name: value }))} />
 				<div className="grid grid-cols-2 gap-3">

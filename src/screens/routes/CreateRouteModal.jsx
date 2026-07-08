@@ -4,7 +4,7 @@ import { DayCombo, DealerCombo } from '@screens/shared';
 
 const emptyRoute = { userId: '', dayOfWeek: '' };
 
-export const CreateRouteModal = ({ dealers = [], onCreate, ref }) => {
+export const CreateRouteModal = ({ dealers = [], onCreate, loading = false, ref }) => {
 	const [open, setOpen] = useState(false);
 	const [form, setForm] = useState(emptyRoute);
 
@@ -25,7 +25,7 @@ export const CreateRouteModal = ({ dealers = [], onCreate, ref }) => {
 			open={open}
 			title="Nueva planilla"
 			onClose={close}
-			footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button onClick={create}>Crear</Button></>}
+			footer={<><Button variant="secondary" onClick={close}>Cerrar</Button><Button loading={loading} onClick={create}>Crear</Button></>}
 		>
 			<div className="grid gap-3">
 				<DealerCombo label="Repartidor" dealers={dealers} value={form.userId} onChange={(value) => setForm((f) => ({ ...f, userId: value }))} />

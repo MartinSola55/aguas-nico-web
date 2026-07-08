@@ -68,7 +68,7 @@ export const TopBar = ({ onMobileMenuClick = () => { } }) => {
 						type="button"
 						onClick={() => setShowUser((current) => !current)}
 						title="Mi perfil"
-						className={`flex items-center gap-3 rounded-full p-1 pr-2 transition-colors ${showUser ? 'bg-bg-tertiary' : 'hover:bg-bg-tertiary'}`}
+						className={`flex items-center gap-3 rounded-full p-1 pr-2 transition-colors cursor-pointer ${showUser ? 'bg-bg-tertiary' : 'hover:bg-bg-tertiary'}`}
 					>
 						<div className="grid h-9 w-9 place-items-center rounded-full bg-accent-primary-muted text-accent-primary">
 							<UserRound size={18} />

@@ -26,6 +26,7 @@ export const CartEditor = ({
 	submitText = 'Confirmar',
 	onSubmit,
 	disabled = false,
+	loading = false,
 }) => {
 	const [regularRows, setRegularRows] = useState([]);
 	const [abonoRows, setAbonoRows] = useState([]);
@@ -94,7 +95,7 @@ export const CartEditor = ({
 					min={0}
 					max={row.available}
 					value={row.quantity}
-					disabled={disabled}
+					disabled={disabled || loading}
 					onChange={(value) => onChange(row.type, value)}
 				/>
 			),
@@ -136,7 +137,7 @@ export const CartEditor = ({
 				<Input label="Entrega" type="number" min={0} value={amount} onChange={setAmount} />
 				<div className="flex gap-2">
 					<Button variant="secondary" onClick={() => setAmount(total)}>Usar total</Button>
-					<Button onClick={submit} disabled={disabled}>{submitText}</Button>
+					<Button onClick={submit} disabled={disabled} loading={loading}>{submitText}</Button>
 				</div>
 			</div>
 		</Card>

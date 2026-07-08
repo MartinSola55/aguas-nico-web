@@ -14,6 +14,7 @@ export const ManualCart = () => {
 	const [clients, setClients] = useState([]);
 	const [selected, setSelected] = useState(null);
 	const [clientData, setClientData] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		API.endpoints.routes.getManualCartData({ routeId: id }).then((rs) => {
@@ -27,21 +28,30 @@ export const ManualCart = () => {
 		const call = /^\d+$/.test(search)
 			? API.endpoints.routes.clientsByIDNotInRoute({ ...rq, clientId: Number(search) })
 			: API.endpoints.routes.clientsByNameNotInRoute({ ...rq, name: search });
-		call.then((rs) => setClients(rs.data.items || []));
+		setLoading(true);
+		call
+			.then((rs) => setClients(rs.data.items || []))
+			.finally(() => setLoading(false));
 	};
 
 	const selectClient = (client) => {
 		setSelected(client);
-		API.endpoints.clients.getProductsAndAbono({ id: client.id }).then((rs) => setClientData(rs.data));
+		setLoading(true);
+		API.endpoints.clients.getProductsAndAbono({ id: client.id })
+			.then((rs) => setClientData(rs.data))
+			.finally(() => setLoading(false));
 	};
 
 	const confirm = (payload) => {
-		API.endpoints.carts.confirmManual(manualCartRequest({ routeId: id, clientId: selected.id }, payload)).then((rs) => {
-			toast.success(rs.message);
-			setSelected(null);
-			setClientData(null);
-			if (search) searchClients();
-		});
+		setLoading(true);
+		API.endpoints.carts.confirmManual(manualCartRequest({ routeId: id, clientId: selected.id }, payload))
+			.then((rs) => {
+				toast.success(rs.message);
+				setSelected(null);
+				setClientData(null);
+				if (search) searchClients();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	return (
@@ -51,7 +61,7 @@ export const ManualCart = () => {
 				<Card title={`Planilla ${route ? Formatters.dayName(route.dayOfWeek) : ''}`}>
 					<div className="mb-3 flex items-end gap-2">
 						<Input label="Cliente" value={search} onChange={setSearch} />
-						<Button variant="secondary" onClick={searchClients}>Buscar</Button>
+						<Button variant="secondary" loading={loading} onClick={searchClients}>Buscar</Button>
 					</div>
 					<DataTable
 						columns={[
@@ -65,7 +75,7 @@ export const ManualCart = () => {
 								}
 							},
 							{ name: 'debt', text: 'Saldo', render: Formatters.debtLabel },
-							{ name: 'actions', text: '', render: (_, row) => <Button size="sm" onClick={() => selectClient(row)}>Seleccionar</Button> },
+							{ name: 'actions', text: '', render: (_, row) => <Button size="sm" loading={loading} onClick={() => selectClient(row)}>Seleccionar</Button> },
 						]}
 						rows={clients}
 						pagination
@@ -78,6 +88,7 @@ export const ManualCart = () => {
 						abonoProducts={clientData.abonoProducts || []}
 						paymentMethods={paymentMethods}
 						onSubmit={confirm}
+						loading={loading}
 					/>
 				) : (
 					<Card title="Bajada"><p className="text-text-muted">Selecciona un cliente para cargar productos.</p></Card>

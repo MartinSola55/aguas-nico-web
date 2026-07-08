@@ -20,6 +20,8 @@ export const RouteDetails = () => {
 	const [productFilter, setProductFilter] = useState(null);
 	const [serviceFilter, setServiceFilter] = useState(null);
 	const [paymentFilter, setPaymentFilter] = useState(null);
+	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const dispatchedModalRef = useRef(null);
 	const dispenserModalRef = useRef(null);
 	const transferModalRef = useRef(null);
@@ -38,39 +40,68 @@ export const RouteDetails = () => {
 	if (!route) return <PageHeader title="Planilla" breadcrumbs={['Inicio', 'Planillas']} />;
 
 	const startRoute = () => {
-		API.endpoints.routes.createByDealer({ routeId: route.id }).then((rs) => {
-			toast.success(rs.message);
-			navigate(`/planillas/${rs.data.id}`);
-		});
+		setLoading(true);
+		API.endpoints.routes.createByDealer({ routeId: route.id })
+			.then((rs) => {
+				toast.success(rs.message);
+				navigate(`/planillas/${rs.data.id}`);
+			})
+			.finally(() => setLoading(false));
 	};
 
-	const closeRoute = () => API.endpoints.routes.close({ routeId: route.id }).then((rs) => { toast.success(rs.message); load(); });
-	const deleteRoute = () => API.endpoints.routes.delete({ routeId: route.id }).then((rs) => { toast.success(rs.message); navigate('/planillas'); });
-	const renewByRoute = () => API.endpoints.abonos.renewByRoute({ routeId: route.id }).then((rs) => toast.success(rs.message));
+	const closeRoute = () => {
+		setLoading(true);
+		API.endpoints.routes.close({ routeId: route.id })
+			.then((rs) => { toast.success(rs.message); load(); })
+			.finally(() => setLoading(false));
+	};
+
+	const deleteRoute = () => {
+		setLoading(true);
+		API.endpoints.routes.delete({ routeId: route.id })
+			.then((rs) => { toast.success(rs.message); navigate('/planillas'); })
+			.finally(() => setLoading(false));
+	};
+
+	const renewByRoute = () => {
+		setLoading(true);
+		API.endpoints.abonos.renewByRoute({ routeId: route.id })
+			.then((rs) => toast.success(rs.message))
+			.finally(() => setLoading(false));
+	};
 
 	const openDispatched = () => {
-		API.endpoints.routes.getDispatched({ routeId: route.id }).then((rs) => {
-			dispatchedModalRef.current?.open(rs.data.items || []);
-		});
+		setLoading(true);
+		API.endpoints.routes.getDispatched({ routeId: route.id })
+			.then((rs) => {
+				dispatchedModalRef.current?.open(rs.data.items || []);
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const saveDispatched = (dispatched, onSaved) => {
+		setSaving(true);
 		API.endpoints.routes.updateDispatched({
 			routeId: route.id,
 			products: dispatched.map((item) => ({ type: item.type, quantity: Helpers.numberOrZero(item.quantity) })),
-		}).then((rs) => {
-			toast.success(rs.message);
-			onSaved?.();
-			load();
-		});
+		})
+			.then((rs) => {
+				toast.success(rs.message);
+				onSaved?.();
+				load();
+			})
+			.finally(() => setSaving(false));
 	};
 
 	const saveDispenser = (dispenserPrice, onSaved) => {
-		API.endpoints.routes.setDispenserPrice({ routeId: route.id, price: Helpers.numberOrZero(dispenserPrice) }).then((rs) => {
-			toast.success(rs.message);
-			onSaved?.();
-			load();
-		});
+		setSaving(true);
+		API.endpoints.routes.setDispenserPrice({ routeId: route.id, price: Helpers.numberOrZero(dispenserPrice) })
+			.then((rs) => {
+				toast.success(rs.message);
+				onSaved?.();
+				load();
+			})
+			.finally(() => setSaving(false));
 	};
 
 	const term = cartSearch.trim().toLowerCase();
@@ -90,8 +121,8 @@ export const RouteDetails = () => {
 
 	return (
 		<>
-			<DispatchedProductsModal ref={dispatchedModalRef} onSave={saveDispatched} />
-			<DispenserPriceModal ref={dispenserModalRef} onSave={saveDispenser} />
+			<DispatchedProductsModal ref={dispatchedModalRef} onSave={saveDispatched} loading={saving} />
+			<DispenserPriceModal ref={dispenserModalRef} onSave={saveDispenser} loading={saving} />
 			<TransfersViewModal ref={transfersViewModalRef} />
 			{App.isAdmin() && <TransferFormModal ref={transferModalRef} onSaved={load} />}
 
@@ -100,7 +131,7 @@ export const RouteDetails = () => {
 				breadcrumbs={['Inicio', 'Planillas', 'Detalles']}
 				actions={
 					<>
-						{route.isStatic && App.isAdmin() && <Button onClick={startRoute}><Play size={16} />Comenzar</Button>}
+						{route.isStatic && App.isAdmin() && <Button loading={loading} onClick={startRoute}><Play size={16} />Comenzar</Button>}
 						{App.isAdmin() && <Link to="/clientes/nuevo" target="_blank"><Button variant="secondary"><UserPlus size={16} />Nuevo cliente</Button></Link>}
 						{App.isAdmin() && <Link to={`/planillas/${route.id}/editar`}><Button variant="secondary"><Edit size={16} />Editar clientes</Button></Link>}
 						{!route.isStatic && <Link to={`/planillas/${route.id}/manual`}><Button variant="secondary"><Plus size={16} />Fuera de reparto</Button></Link>}
@@ -117,11 +148,11 @@ export const RouteDetails = () => {
 			{App.isAdmin() && (
 				<Card className="mb-4" title="Administracion" actions={
 					<>
-						{!route.isStatic && <Button variant="secondary" onClick={openDispatched}>Productos cargados</Button>}
+						{!route.isStatic && <Button variant="secondary" loading={loading} onClick={openDispatched}>Productos cargados</Button>}
 						{!route.isStatic && <Button variant="secondary" onClick={() => dispenserModalRef.current?.open(route.dispenserPrice || 0)}>Precio dispenser</Button>}
-						{route.isStatic && <ConfirmButton variant="secondary" message="Renovar abonos de esta planilla?" onConfirm={renewByRoute}>Renovar abonos</ConfirmButton>}
-						{!route.isStatic && !route.isClosed && <ConfirmButton variant="warning" message="Cerrar planilla?" onConfirm={closeRoute}>Cerrar</ConfirmButton>}
-						<ConfirmButton variant="danger" message="Eliminar planilla?" onConfirm={deleteRoute}>Eliminar</ConfirmButton>
+						{route.isStatic && <ConfirmButton variant="secondary" loading={loading} message="Renovar abonos de esta planilla?" onConfirm={renewByRoute}>Renovar abonos</ConfirmButton>}
+						{!route.isStatic && !route.isClosed && <ConfirmButton variant="warning" loading={loading} message="Cerrar planilla?" onConfirm={closeRoute}>Cerrar</ConfirmButton>}
+						<ConfirmButton variant="danger" loading={loading} message="Eliminar planilla?" onConfirm={deleteRoute}>Eliminar</ConfirmButton>
 					</>
 				}>
 					<div className="grid gap-3 md:grid-cols-3">

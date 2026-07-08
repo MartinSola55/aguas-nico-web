@@ -27,10 +27,13 @@ export const ClientsList = () => {
 	}, []);
 
 	const deleteClient = (id) => {
-		API.endpoints.clients.delete({ id }).then((rs) => {
-			toast.success(rs.message);
-			load();
-		});
+		setLoading(true);
+		API.endpoints.clients.delete({ id })
+			.then((rs) => {
+				toast.success(rs.message);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const copyClient = (row) => {
@@ -83,7 +86,7 @@ export const ClientsList = () => {
 							render: (_, row) => (
 								<div className="flex gap-2">
 									<Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); navigate(`/clientes/${row.id}`); }}>Ver</Button>
-									<ConfirmButton size="sm" variant="danger" message="Eliminar cliente?" onConfirm={() => deleteClient(row.id)}>Eliminar</ConfirmButton>
+									<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar cliente?" onConfirm={() => deleteClient(row.id)}>Eliminar</ConfirmButton>
 								</div>
 							),
 						},

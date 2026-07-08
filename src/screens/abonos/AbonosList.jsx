@@ -8,6 +8,8 @@ import { buildAbonoRequest } from './Abonos.helpers.js';
 
 export const AbonosList = () => {
 	const [abonos, setAbonos] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const formModalRef = useRef(null);
 	const clientsModalRef = useRef(null);
 
@@ -18,23 +20,32 @@ export const AbonosList = () => {
 	useEffect(load, []);
 
 	const save = (form, onSaved) => {
+		setSaving(true);
 		const action = form.id ? API.endpoints.abonos.update : API.endpoints.abonos.create;
-		action(buildAbonoRequest(form)).then((rs) => {
-			toast.success(rs.message);
-			onSaved?.();
-			load();
-		});
+		action(buildAbonoRequest(form))
+			.then((rs) => {
+				toast.success(rs.message);
+				onSaved?.();
+				load();
+			})
+			.finally(() => setSaving(false));
 	};
 
 	const remove = (id) => {
-		API.endpoints.abonos.delete({ id }).then((rs) => {
-			toast.success(rs.message);
-			load();
-		});
+		setLoading(true);
+		API.endpoints.abonos.delete({ id })
+			.then((rs) => {
+				toast.success(rs.message);
+				load();
+			})
+			.finally(() => setLoading(false));
 	};
 
 	const renewAll = () => {
-		API.endpoints.abonos.renewAll().then((rs) => toast.success(rs.message));
+		setLoading(true);
+		API.endpoints.abonos.renewAll()
+			.then((rs) => toast.success(rs.message))
+			.finally(() => setLoading(false));
 	};
 
 	const showClients = (abono) => {
@@ -45,12 +56,12 @@ export const AbonosList = () => {
 
 	return (
 		<>
-			<AbonoFormModal ref={formModalRef} onSave={save} />
+			<AbonoFormModal ref={formModalRef} onSave={save} loading={saving} />
 			<ClientsSummaryModal ref={clientsModalRef} />
 			<PageHeader
 				title="Abonos"
 				breadcrumbs={['Inicio', 'Abonos']}
-				actions={<><ConfirmButton variant="secondary" message="Renovar todos los abonos?" onConfirm={renewAll}>Renovar todos</ConfirmButton><Button onClick={() => formModalRef.current?.openCreate()}>Nuevo abono</Button></>}
+				actions={<><ConfirmButton variant="secondary" loading={loading} message="Renovar todos los abonos?" onConfirm={renewAll}>Renovar todos</ConfirmButton><Button onClick={() => formModalRef.current?.openCreate()}>Nuevo abono</Button></>}
 			/>
 			<Card title="Listado">
 				<DataTable
@@ -63,7 +74,7 @@ export const AbonosList = () => {
 								<div className="flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
 									<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.openEdit(row)}>Editar</Button>
 									<Button size="sm" variant="secondary" onClick={() => showClients(row)}>Clientes</Button>
-									<ConfirmButton size="sm" variant="danger" message="Eliminar abono?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
+									<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar abono?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
 								</div>
 							)
 						},
