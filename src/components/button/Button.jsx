@@ -29,13 +29,13 @@ export const Button = ({
 				className,
 			].join(' ')}
 		>
+			{children}
 			{loading && (
 				<span
 					className="inline-block h-4 w-4 shrink-0 rounded-full border-2 border-current/30 border-b-current"
 					style={{ animation: 'rotation 1s linear infinite' }}
 				/>
 			)}
-			{children}
 		</button>
 	);
 };
