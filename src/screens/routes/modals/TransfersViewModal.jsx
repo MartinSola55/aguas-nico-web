@@ -11,7 +11,7 @@ export const TransfersViewModal = ({ ref }) => {
 	const total = (state.transfers || []).reduce((sum, x) => sum + Number(x.amount || 0), 0);
 
 	useImperativeHandle(ref, () => ({
-		open: ({ dayOfWeek, transfers = [] } = {}) => setState({ open: true, title: `Transferencias - ${Formatters.dayName(dayOfWeek)}`, transfers }),
+		open: ({ dayOfWeek, title, transfers = [] } = {}) => setState({ open: true, title: title || `Transferencias - ${Formatters.dayName(dayOfWeek)}`, transfers }),
 		close,
 	}));
 
