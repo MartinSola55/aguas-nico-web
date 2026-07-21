@@ -25,7 +25,7 @@ export const TransfersViewModal = ({ ref }) => {
 						columns={[
 							{ name: 'clientName', text: 'Cliente' },
 							{ name: 'amount', text: 'Monto', render: Formatters.formatCurrency },
-							{ name: 'date', text: 'Fecha', render: Formatters.formatDate },
+							{ name: 'date', text: 'Fecha', render: Formatters.formatDateOnly },
 						]}
 						rows={state.transfers || []}
 						infinite

@@ -29,6 +29,21 @@ export const formatDate = (value) => {
 	return date.toLocaleDateString('es-AR', DATE_OPTIONS);
 };
 
+// Formatea una fecha de calendario (sin hora) ignorando la zona horaria.
+// Sirve para campos que representan un dia (ej. la fecha establecida de una
+// transferencia), que el backend puede devolver como "2026-07-20" o como
+// "2026-07-20T00:00:00Z". A diferencia de formatDate, toma el prefijo de la
+// fecha del string y NO convierte a hora local, evitando el corrimiento de dia.
+export const formatDateOnly = (value) => {
+	if (!value) return '-';
+	const dateOnlyMatch = typeof value === 'string' ? value.match(/^(\d{4})-(\d{2})-(\d{2})/) : null;
+	const date = dateOnlyMatch
+		? new Date(Number(dateOnlyMatch[1]), Number(dateOnlyMatch[2]) - 1, Number(dateOnlyMatch[3]))
+		: new Date(value);
+	if (Number.isNaN(date.getTime())) return '-';
+	return date.toLocaleDateString('es-AR', DATE_OPTIONS);
+};
+
 export const formatDateTime = (value) => {
 	if (!value) return '-';
 	const date = new Date(value);

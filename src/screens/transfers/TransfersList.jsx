@@ -44,7 +44,7 @@ export const TransfersList = () => {
 				</div>
 				<DataTable
 					columns={[
-						{ name: 'date', text: 'Fecha establecida', render: Formatters.formatDate },
+						{ name: 'date', text: 'Fecha establecida', render: Formatters.formatDateOnly },
 						{ name: 'createdAt', text: 'Recibida', render: Formatters.formatDate },
 						{ name: 'clientName', text: 'Cliente' },
 						{ name: 'dealerName', text: 'Repartidor' },

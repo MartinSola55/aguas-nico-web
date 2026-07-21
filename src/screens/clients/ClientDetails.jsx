@@ -121,7 +121,7 @@ export const ClientDetails = () => {
 					<Card title="Historial de bajadas y transferencias">
 						<DataTable
 							columns={[
-								{ name: 'date', text: 'Fecha', render: Formatters.formatDate },
+								{ name: 'date', text: 'Fecha', render: Formatters.formatDateOnly },
 								{
 									name: 'type', text: 'Movimiento', render: (_, row) => {
 										if (row.transferAmount) return 'Transferencia';
