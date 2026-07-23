@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Helpers, Formatters } from '@app';
 import { Button, Card, DataTable, Input } from '@components';
 import { PaymentMethodCombo } from '@screens/shared';
 
 const EMPTY_ARRAY = [];
+
+const methodId = (method) => method.id ?? method.paymentMethodId;
 
 const normalizeProducts = (items = EMPTY_ARRAY) =>
 	items.map((item) => ({
@@ -13,6 +16,14 @@ const normalizeProducts = (items = EMPTY_ARRAY) =>
 		available: item.available,
 		quantity: item.quantity ?? '',
 	}));
+
+const buildPaymentRows = (paymentMethods, defaultPaymentMethodId) => {
+	const selected = paymentMethods
+		.filter((method) => method.selected || Helpers.numberOrZero(method.amount) > 0)
+		.map((method) => ({ paymentMethodId: methodId(method), amount: method.amount ?? '' }));
+	if (selected.length > 0) return selected;
+	return [{ paymentMethodId: defaultPaymentMethodId, amount: '' }];
+};
 
 export const CartEditor = ({
 	title = 'Bajada',
@@ -31,16 +42,13 @@ export const CartEditor = ({
 	const [regularRows, setRegularRows] = useState([]);
 	const [abonoRows, setAbonoRows] = useState([]);
 	const [returnedRows, setReturnedRows] = useState([]);
-	const [paymentMethodId, setPaymentMethodId] = useState(defaultPaymentMethodId);
-	const [amount, setAmount] = useState('');
+	const [paymentRows, setPaymentRows] = useState([]);
 
 	useEffect(() => {
 		setRegularRows(normalizeProducts(products));
 		setAbonoRows(normalizeProducts(abonoProducts));
 		setReturnedRows(normalizeProducts(returnedProducts));
-		const selected = paymentMethods.find((method) => method.selected || method.amount > 0);
-		setPaymentMethodId(selected?.id ?? selected?.paymentMethodId ?? defaultPaymentMethodId);
-		setAmount(selected?.amount ?? '');
+		setPaymentRows(buildPaymentRows(paymentMethods, defaultPaymentMethodId));
 	}, [products, abonoProducts, returnedProducts, paymentMethods, defaultPaymentMethodId]);
 
 	const total = useMemo(() => regularRows.reduce((sum, row) => sum + Helpers.numberOrZero(row.quantity) * Helpers.numberOrZero(row.price), 0), [regularRows]);
@@ -50,8 +58,50 @@ export const CartEditor = ({
 	const visibleTablesCount = [showRegularTable, showAbonosTable, showReturnedTable].filter(Boolean).length;
 	const gridColsClass = { 1: 'xl:grid-cols-1', 2: 'xl:grid-cols-2', 3: 'xl:grid-cols-3' }[visibleTablesCount] || 'xl:grid-cols-1';
 
+	const lastPaymentRow = paymentRows[paymentRows.length - 1];
+	const canAddPaymentRow = paymentRows.length < paymentMethods.length
+		&& Boolean(lastPaymentRow?.paymentMethodId)
+		&& Helpers.numberOrZero(lastPaymentRow?.amount) > 0;
+
+	const availableMethodsForRow = (index) => {
+		const takenIds = paymentRows.filter((_, i) => i !== index).map((row) => row.paymentMethodId);
+		return paymentMethods.filter((method) => {
+			const id = methodId(method);
+			return id === paymentRows[index]?.paymentMethodId || !takenIds.includes(id);
+		});
+	};
+
 	const updateQuantity = (setter) => (type, value) => {
 		setter((rows) => rows.map((row) => row.type === type ? { ...row, quantity: value } : row));
+	};
+
+	const setPaymentMethod = (index, value) => {
+		setPaymentRows((rows) => rows.map((row, i) => i === index ? { ...row, paymentMethodId: value } : row));
+	};
+
+	const setPaymentAmount = (index, value) => {
+		setPaymentRows((rows) => rows.map((row, i) => i === index ? { ...row, amount: value } : row));
+	};
+
+	const removePaymentRow = (index) => {
+		setPaymentRows((rows) => rows.filter((_, i) => i !== index));
+	};
+
+	const addPaymentRow = () => {
+		setPaymentRows((rows) => {
+			const takenIds = rows.map((row) => row.paymentMethodId);
+			const nextMethod = paymentMethods.find((method) => !takenIds.includes(methodId(method)));
+			if (!nextMethod) return rows;
+			return [...rows, { paymentMethodId: methodId(nextMethod), amount: '' }];
+		});
+	};
+
+	const fillTotal = () => {
+		setPaymentRows((rows) => {
+			const others = rows.slice(1).reduce((sum, row) => sum + Helpers.numberOrZero(row.amount), 0);
+			const remaining = Math.max(total - others, 0);
+			return rows.map((row, i) => i === 0 ? { ...row, amount: remaining } : row);
+		});
 	};
 
 	const buildPayload = () => {
@@ -61,11 +111,14 @@ export const CartEditor = ({
 		const abonoOverflow = abonoRows.some((item) => item.available !== undefined && Helpers.numberOrZero(item.quantity) > item.available);
 		if (abonoOverflow) throw new Error('No se puede bajar mas productos del abono de los que dispone.');
 
+		const paidRows = paymentRows.filter((row) => Helpers.numberOrZero(row.amount) > 0);
+		if (paidRows.some((row) => !row.paymentMethodId)) throw new Error('Selecciona un metodo de pago para cada monto ingresado.');
+
 		const payload = {
 			products: Helpers.positiveItems(regularRows).map((item) => ({ type: item.type, quantity: Helpers.numberOrZero(item.quantity) })),
 			abonoProducts: Helpers.positiveItems(abonoRows).map((item) => ({ type: item.type, quantity: Helpers.numberOrZero(item.quantity) })),
 			returnedProducts: Helpers.positiveItems(returnedRows).map((item) => ({ type: item.type, quantity: Helpers.numberOrZero(item.quantity) })),
-			paymentMethods: Helpers.numberOrZero(amount) > 0 ? [{ paymentMethodId: Number(paymentMethodId), amount: Helpers.numberOrZero(amount) }] : [],
+			paymentMethods: paidRows.map((row) => ({ paymentMethodId: Number(row.paymentMethodId), amount: Helpers.numberOrZero(row.amount) })),
 		};
 
 		if (!allowReturnedOnly && payload.products.length === 0 && payload.abonoProducts.length === 0 && payload.paymentMethods.length === 0) {
@@ -127,18 +180,39 @@ export const CartEditor = ({
 					</div>
 				)}
 			</div>
-			<div className="mt-4 grid gap-3 md:grid-cols-[240px_180px_auto] md:items-end">
-				<PaymentMethodCombo
-					label="Metodo de pago"
-					paymentMethods={paymentMethods}
-					value={paymentMethodId}
-					onChange={setPaymentMethodId}
-				/>
-				<Input label="Entrega" type="number" min={0} value={amount} onChange={setAmount} />
-				<div className="flex gap-2">
-					<Button variant="secondary" onClick={() => setAmount(total)}>Usar total</Button>
-					<Button onClick={submit} disabled={disabled} loading={loading}>{submitText}</Button>
-				</div>
+			<div className="mt-4 space-y-2">
+				<h3 className="text-sm font-semibold">Metodos de pago</h3>
+				{paymentRows.map((row, index) => (
+					<div key={index} className="grid gap-3 md:grid-cols-[240px_180px_auto] md:items-end">
+						<PaymentMethodCombo
+							label={index === 0 ? 'Metodo de pago' : undefined}
+							paymentMethods={availableMethodsForRow(index)}
+							value={row.paymentMethodId}
+							disabled={disabled || loading}
+							onChange={(value) => setPaymentMethod(index, value)}
+						/>
+						<Input
+							label={index === 0 ? 'Entrega' : undefined}
+							type="number"
+							min={0}
+							value={row.amount}
+							disabled={disabled || loading}
+							onChange={(value) => setPaymentAmount(index, value)}
+						/>
+						<div className="flex gap-2">
+							{paymentRows.length > 1 && (
+								<Button variant="secondary" size="icon" disabled={disabled || loading} onClick={() => removePaymentRow(index)}><Trash2 size={16} /></Button>
+							)}
+							{index === paymentRows.length - 1 && (
+								<Button variant="secondary" size="icon" disabled={disabled || loading || !canAddPaymentRow} onClick={addPaymentRow}><Plus size={16} /></Button>
+							)}
+						</div>
+					</div>
+				))}
+			</div>
+			<div className="mt-4 flex flex-wrap justify-end gap-2">
+				<Button variant="secondary" disabled={disabled || loading} onClick={fillTotal}>Usar total</Button>
+				<Button onClick={submit} disabled={disabled} loading={loading}>{submitText}</Button>
 			</div>
 		</Card>
 	);

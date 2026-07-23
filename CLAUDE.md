@@ -1,4 +1,4 @@
-# Project Agent Notes
+# Project Notes
 
 Use these conventions for future work in this repository.
 

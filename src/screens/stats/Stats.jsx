@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
-import { API, DateHelper, Formatters, useIsDarkMode } from '@app';
+import { API, DateHelper, Formatters, Helpers, useIsDarkMode } from '@app';
 import { Button, Card, DataTable, Input, PageHeader, StatCard } from '@components';
 import { DealerCombo, MonthCombo, YearCombo } from '@screens/shared';
 
@@ -104,7 +104,7 @@ export const Stats = () => {
 			<div className="mt-4 grid gap-3 md:grid-cols-4">
 				<StatCard label="Total mensual" value={Formatters.formatCurrency(monthly?.total || 0)} />
 				<StatCard label="Balance" value={Formatters.formatCurrency(balance?.total || 0)} tone="info" />
-				<StatCard label="Cobros" value={Formatters.formatCurrency(balance?.cartPaymentMethods || 0)} tone="success" />
+				<StatCard label="Cobros" value={Formatters.formatCurrency(Helpers.numberOrZero(balance?.cash) + Helpers.numberOrZero(balance?.mercadoPago))} tone="success" />
 				<StatCard label="Gastos" value={Formatters.formatCurrency(balance?.expenses || 0)} tone="danger" />
 			</div>
 			<div className="mt-4 grid gap-4 xl:grid-cols-2">

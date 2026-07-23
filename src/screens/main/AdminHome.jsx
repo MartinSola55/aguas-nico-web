@@ -22,7 +22,7 @@ export const AdminHome = () => {
 	const transfersViewModalRef = useRef(null);
 
 	const selectedDateLabel = Formatters.formatDate(date);
-	const totalSold = Helpers.numberOrZero(balance?.cartPaymentMethods) + Helpers.numberOrZero(balance?.transfers) + Helpers.numberOrZero(balance?.dispenserPrice);
+	const totalSold = Helpers.numberOrZero(balance?.cash) + Helpers.numberOrZero(balance?.mercadoPago) + Helpers.numberOrZero(balance?.transfers) + Helpers.numberOrZero(balance?.dispenserPrice);
 	const totalCollected = useMemo(() => routes.reduce((acc, route) => acc + Helpers.numberOrZero(route.collected), 0), [routes]);
 
 	const normalizeExpense = (expense) => ({
@@ -147,7 +147,8 @@ export const AdminHome = () => {
 				</Card>
 				<Card title={`Balance del ${selectedDateLabel}`}>
 					<div className="space-y-2 text-sm">
-						<div className="flex justify-between"><span>Efectivo</span><strong>{Formatters.formatCurrency(balance?.cartPaymentMethods || 0)}</strong></div>
+						<div className="flex justify-between"><span>Efectivo</span><strong>{Formatters.formatCurrency(balance?.cash || 0)}</strong></div>
+						<div className="flex justify-between"><span>Mercado Pago</span><strong>{Formatters.formatCurrency(balance?.mercadoPago || 0)}</strong></div>
 						<button
 							type="button"
 							onClick={() => transfersViewModalRef.current?.open({ title: `Transferencias del ${selectedDateLabel}`, transfers })}
