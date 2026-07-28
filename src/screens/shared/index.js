@@ -1,4 +1,5 @@
 export { ClientsSummaryModal } from './modals/ClientsSummaryModal.jsx';
+export { MercadoPagoPaymentsModal } from './modals/MercadoPagoPaymentsModal.jsx';
 export { DayCombo } from './controls/DayCombo.jsx';
 export { DealerCombo } from './controls/DealerCombo.jsx';
 export { InvoiceTypeCombo } from './controls/InvoiceTypeCombo.jsx';

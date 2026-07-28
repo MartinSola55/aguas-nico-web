@@ -32,6 +32,7 @@ export const CartEditor = ({
 	returnedProducts = EMPTY_ARRAY,
 	paymentMethods = EMPTY_ARRAY,
 	showReturned = false,
+	mirrorReturned = false,
 	allowReturnedOnly = false,
 	defaultPaymentMethodId = 1,
 	submitText = 'Confirmar',
@@ -73,6 +74,13 @@ export const CartEditor = ({
 
 	const updateQuantity = (setter) => (type, value) => {
 		setter((rows) => rows.map((row) => row.type === type ? { ...row, quantity: value } : row));
+	};
+
+	// Lo bajado arrastra a lo devuelto (se entrega lleno y se retira el vacío), pero no al revés:
+	// una vez que el repartidor corrige una devolución, esa cantidad queda como la cargó.
+	const updateDeliveredQuantity = (type, value) => {
+		updateQuantity(setRegularRows)(type, value);
+		if (mirrorReturned) updateQuantity(setReturnedRows)(type, value);
 	};
 
 	const setPaymentMethod = (index, value) => {
@@ -164,7 +172,7 @@ export const CartEditor = ({
 				{showRegularTable > 0 && (
 					<div className="xl:col-span-1">
 						<h3 className="mb-2 text-sm font-semibold">Bajada</h3>
-						<DataTable columns={productColumns(updateQuantity(setRegularRows), true)} rows={regularRows} empty="Sin productos" />
+						<DataTable columns={productColumns(updateDeliveredQuantity, true)} rows={regularRows} empty="Sin productos" />
 					</div>
 				)}
 				{showAbonosTable && (

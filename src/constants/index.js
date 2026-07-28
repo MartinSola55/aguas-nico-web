@@ -4,6 +4,7 @@ import * as CartsTransfersType from './CartsTransfersType.js';
 import * as Day from './Day.js';
 import * as InvoiceType from './InvoiceType.js';
 import * as Messages from './Messages.js';
+import * as PaymentMethodCode from './PaymentMethodCode.js';
 import * as ProductActionType from './ProductActionType.js';
 import * as ProductType from './ProductType.js';
 import * as Roles from './Roles.js';
@@ -19,6 +20,7 @@ export {
 	Day,
 	InvoiceType,
 	Messages,
+	PaymentMethodCode,
 	ProductActionType,
 	ProductType,
 	Roles,

@@ -19,7 +19,7 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 
 	const confirm = (payload) => {
 		setLoading(true);
-		API.endpoints.carts.confirm(confirmCartRequest(cart, payload))
+		API.endpoints.carts.confirm(confirmCartRequest(cart, payload, App.isDealer()))
 			.then((rs) => {
 				toast.success(rs.message);
 				onChanged();
@@ -107,6 +107,9 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 							title="Confirmar bajada"
 							products={cart.availableProducts || []}
 							abonoProducts={cart.availableAbonoProducts || []}
+							returnedProducts={cart.availableProducts || []}
+							showReturned={App.isDealer()}
+							mirrorReturned={App.isDealer()}
 							paymentMethods={paymentMethods}
 							onSubmit={confirm}
 							loading={loading}

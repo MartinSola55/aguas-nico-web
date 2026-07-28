@@ -129,6 +129,7 @@ export const endpoints = {
 		clientsByIDNotInRoute: (rq) => get('Route/ClientsByIDNotInRoute', rq),
 		clientsByNameNotInRoute: (rq) => get('Route/ClientsByNameNotInRoute', rq),
 		getDispatched: (rq) => get('Route/GetDispatched', rq),
+		getMercadoPagoPayments: (rq) => get('Route/GetMercadoPagoPayments', rq),
 		updateDispatched: (rq) => post('Route/UpdateDispatched', rq),
 		setDispenserPrice: (rq) => post('Route/SetDispenserPrice', rq),
 		getManualCartData: (rq) => get('Route/GetManualCartData', rq),
@@ -179,6 +180,7 @@ export const endpoints = {
 		getProductsSold: (rq) => get('Stats/GetProductsSold', rq),
 		getProductsSoldByDealer: (rq) => get('Stats/GetProductsSoldByDealer', rq),
 		getBalanceByDate: (rq) => get('Stats/GetBalanceByDate', rq),
+		getMercadoPagoPaymentsByDate: (rq) => get('Stats/GetMercadoPagoPaymentsByDate', rq),
 	},
 	terceros: {
 		getByDate: (rq) => get('Tercero/GetByDate', rq),
