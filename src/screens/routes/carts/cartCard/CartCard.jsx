@@ -107,7 +107,7 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 							title="Confirmar bajada"
 							products={cart.availableProducts || []}
 							abonoProducts={cart.availableAbonoProducts || []}
-							returnedProducts={cart.availableProducts || []}
+							returnedProducts={cart.availableProducts}
 							showReturned={App.isDealer()}
 							mirrorReturned={App.isDealer()}
 							paymentMethods={paymentMethods}
