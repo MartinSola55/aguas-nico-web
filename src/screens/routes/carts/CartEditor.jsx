@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Helpers, Formatters } from '@app';
+import { PaymentMethodCode } from '@constants';
 import { Button, Card, DataTable, Input } from '@components';
 import { PaymentMethodCombo } from '@screens/shared';
 
@@ -22,7 +23,10 @@ const buildPaymentRows = (paymentMethods, defaultPaymentMethodId) => {
 		.filter((method) => method.selected || Helpers.numberOrZero(method.amount) > 0)
 		.map((method) => ({ paymentMethodId: methodId(method), amount: method.amount ?? '' }));
 	if (selected.length > 0) return selected;
-	return [{ paymentMethodId: defaultPaymentMethodId, amount: '' }];
+	// Se busca el efectivo por código en lugar de asumir un id fijo, porque los métodos de pago
+	// viven en la base y pueden cambiar.
+	const cash = paymentMethods.find((method) => method.code === PaymentMethodCode.Cash);
+	return [{ paymentMethodId: cash ? methodId(cash) : defaultPaymentMethodId, amount: '' }];
 };
 
 export const CartEditor = ({
