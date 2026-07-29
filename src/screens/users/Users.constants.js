@@ -1,10 +1,3 @@
-import { Roles } from '@constants';
+const emptyUser = { id: '', name: '', email: '', roleId: '', truckNumber: '', password: '' };
 
-const emptyUser = { id: '', name: '', lastName: '', email: '', roleId: '', truckNumber: '', password: '' };
-
-const roleLabels = {
-	[Roles.Admin]: 'Administrador',
-	[Roles.Dealer]: 'Repartidor',
-};
-
-export { emptyUser, roleLabels };
+export { emptyUser };

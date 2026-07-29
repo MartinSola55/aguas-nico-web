@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { API, Formatters } from '@app';
+import { API, Formatters, Helpers } from '@app';
+import { Roles } from '@constants';
 import { Badge, Button, Card, ConfirmButton, DataTable, PageHeader } from '@components';
 import { UserFormModal } from './UserFormModal.jsx';
-import { roleComboItems, roleName, userFormRequest, validateUserForm } from './Users.helpers.js';
+import { userFormRequest, validateUserForm } from './Users.helpers.js';
 
 export const UsersList = () => {
 	const [users, setUsers] = useState([]);
-	const [roleItems, setRoleItems] = useState([]);
+	const [roles, setRoles] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const formModalRef = useRef(null);
@@ -16,7 +17,7 @@ export const UsersList = () => {
 
 	useEffect(() => {
 		load();
-		API.endpoints.users.getRolesCombo().then((rs) => setRoleItems(roleComboItems(rs.data.items || [])));
+		API.endpoints.users.getRolesCombo().then((rs) => setRoles(rs.data.items || []));
 	}, []);
 
 	const save = (form, isDealer, onSaved) => {
@@ -50,7 +51,7 @@ export const UsersList = () => {
 
 	return (
 		<>
-			<UserFormModal ref={formModalRef} roleItems={roleItems} onSave={save} loading={saving} />
+			<UserFormModal ref={formModalRef} roles={roles} onSave={save} loading={saving} />
 			<PageHeader
 				title="Usuarios"
 				breadcrumbs={['Inicio', 'Usuarios']}
@@ -58,9 +59,9 @@ export const UsersList = () => {
 			<Card title="Usuarios del sistema">
 				<DataTable
 					columns={[
-						{ name: 'name', text: 'Nombre', render: (_, row) => `${row.name} ${row.lastName ?? ''}`.trim() },
+						{ name: 'name', text: 'Nombre' },
 						{ name: 'email', text: 'Email' },
-						{ name: 'role', text: 'Rol', render: (value) => <Badge variant={value === 'ADMIN' ? 'success' : 'neutral'}>{roleName(value)}</Badge> },
+						{ name: 'role', text: 'Rol', render: (value) => <Badge variant={value === Roles.Admin ? 'success' : 'neutral'}>{Helpers.getRoleName(value)}</Badge> },
 						{ name: 'truckNumber', text: 'Camión', render: (value) => value ?? '-' },
 						{ name: 'createdAt', text: 'Alta', render: Formatters.formatDate },
 						{
