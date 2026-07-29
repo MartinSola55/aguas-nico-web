@@ -16,6 +16,7 @@ export const AdminHome = () => {
 	const [expenses, setExpenses] = useState([]);
 	const [soldProducts, setSoldProducts] = useState([]);
 	const [transfers, setTransfers] = useState([]);
+	const [mercadoPagoPayments, setMercadoPagoPayments] = useState([]);
 	const [balance, setBalance] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
@@ -40,6 +41,7 @@ export const AdminHome = () => {
 			API.endpoints.routes.searchSoldProducts(rq).then((rs) => setSoldProducts(rs.data.items || [])),
 			API.endpoints.expenses.searchByDate(rq).then((rs) => setExpenses((rs.data.items || []).map(normalizeExpense))),
 			API.endpoints.transfers.getByDate(rq).then((rs) => setTransfers(rs.data.items || [])),
+			API.endpoints.stats.getMercadoPagoPaymentsByDate(rq).then((rs) => setMercadoPagoPayments(rs.data.items || [])),
 			API.endpoints.stats.getBalanceByDate(rq).then((rs) => setBalance(rs.data)),
 			API.endpoints.dealers.getAll().then((rs) => setDealers(rs.data.items || [])),
 		]).catch(() => null).finally(() => setLoading(false));
@@ -51,14 +53,11 @@ export const AdminHome = () => {
 
 	const downloadCaja = () => API.endpoints.caja.downloadDailyClose({ date: DateHelper.toApiDate(date) });
 
-	const openMercadoPago = () => {
-		API.endpoints.stats.getMercadoPagoPaymentsByDate({ date: DateHelper.toApiDate(date) })
-			.then((rs) => mercadoPagoModalRef.current?.open({
-				title: `Pagos de Mercado Pago del ${selectedDateLabel}`,
-				items: rs.data.items || [],
-				showDealer: true,
-			}));
-	};
+	const openMercadoPago = () => mercadoPagoModalRef.current?.open({
+		title: `Pagos de Mercado Pago del ${selectedDateLabel}`,
+		items: mercadoPagoPayments,
+		showDealer: true,
+	});
 
 	const createExpense = (expenseForm, onSaved) => {
 		setSaving(true);
@@ -163,14 +162,17 @@ export const AdminHome = () => {
 						<button
 							type="button"
 							onClick={openMercadoPago}
-							disabled={!balance?.mercadoPago}
-							title={balance?.mercadoPago ? 'Ver detalle de pagos de Mercado Pago' : 'No hay pagos de Mercado Pago'}
+							disabled={mercadoPagoPayments.length === 0}
+							title={mercadoPagoPayments.length > 0 ? 'Ver detalle de pagos de Mercado Pago' : 'No hay pagos de Mercado Pago'}
 							className="group -mx-1 flex w-full cursor-pointer items-center justify-between rounded-[var(--radius-sm)] px-1 py-1 text-left transition-colors enabled:hover:bg-bg-tertiary disabled:cursor-default disabled:opacity-100 focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
 						>
-							<span className={balance?.mercadoPago ? 'text-accent-primary' : ''}>Mercado Pago</span>
+							<span className="flex items-center gap-1.5">
+								<span className={mercadoPagoPayments.length > 0 ? 'text-accent-primary' : ''}>Mercado Pago</span>
+								{mercadoPagoPayments.length > 0 && <Badge variant="neutral">{mercadoPagoPayments.length}</Badge>}
+							</span>
 							<span className="flex items-center gap-1">
 								<strong>{Formatters.formatCurrency(balance?.mercadoPago || 0)}</strong>
-								{Boolean(balance?.mercadoPago) && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
+								{mercadoPagoPayments.length > 0 && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
 							</span>
 						</button>
 						<button

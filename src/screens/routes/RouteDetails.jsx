@@ -29,12 +29,18 @@ export const RouteDetails = () => {
 	const transferModalRef = useRef(null);
 	const transfersViewModalRef = useRef(null);
 	const mercadoPagoModalRef = useRef(null);
+	const [mercadoPagoPayments, setMercadoPagoPayments] = useState([]);
 
 	const paymentMethods = useMemo(() => catalog?.paymentMethods || [], [catalog]);
 
 	const load = () => {
 		API.endpoints.routes.getOne({ id }).then((rs) => {
 			setRoute(rs.data);
+			// Se traen junto con la planilla para poder mostrar cuántos son antes de abrir el modal.
+			if (App.isAdmin() && !rs.data.isStatic) {
+				API.endpoints.routes.getMercadoPagoPayments({ routeId: rs.data.id })
+					.then((payments) => setMercadoPagoPayments(payments.data.items || []));
+			}
 		});
 	};
 
@@ -73,13 +79,10 @@ export const RouteDetails = () => {
 			.finally(() => setLoading(false));
 	};
 
-	const openMercadoPago = () => {
-		API.endpoints.routes.getMercadoPagoPayments({ routeId: route.id })
-			.then((rs) => mercadoPagoModalRef.current?.open({
-				title: `Pagos de Mercado Pago - ${route.dealerName}`,
-				items: rs.data.items || [],
-			}));
-	};
+	const openMercadoPago = () => mercadoPagoModalRef.current?.open({
+		title: `Pagos de Mercado Pago - ${route.dealerName}`,
+		items: mercadoPagoPayments,
+	});
 
 	const openDispatched = () => {
 		setLoading(true);
@@ -195,14 +198,17 @@ export const RouteDetails = () => {
 								key={payment.code}
 								type="button"
 								onClick={openMercadoPago}
-								disabled={!payment.amount}
-								title={payment.amount ? 'Ver detalle de pagos de Mercado Pago' : 'No hay pagos de Mercado Pago'}
+								disabled={mercadoPagoPayments.length === 0}
+								title={mercadoPagoPayments.length > 0 ? 'Ver detalle de pagos de Mercado Pago' : 'No hay pagos de Mercado Pago'}
 								className="group -mx-1 flex w-full cursor-pointer items-center justify-between rounded-[var(--radius-sm)] px-1 py-1 text-left text-sm transition-colors enabled:hover:bg-bg-tertiary disabled:cursor-default disabled:opacity-100 focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
 							>
-								<span className={payment.amount ? 'text-accent-primary' : ''}>{payment.paymentMethodName}</span>
+								<span className="flex items-center gap-1.5">
+									<span className={mercadoPagoPayments.length > 0 ? 'text-accent-primary' : ''}>{payment.paymentMethodName}</span>
+									{mercadoPagoPayments.length > 0 && <Badge variant="neutral">{mercadoPagoPayments.length}</Badge>}
+								</span>
 								<span className="flex items-center gap-1">
 									<strong>{Formatters.formatCurrency(payment.amount)}</strong>
-									{Boolean(payment.amount) && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
+									{mercadoPagoPayments.length > 0 && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
 								</span>
 							</button>
 						) : (
