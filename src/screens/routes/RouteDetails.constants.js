@@ -5,6 +5,7 @@ export const productFilterItems = [
 	{ value: ProductType.B12L, label: 'Bidón 12L' },
 	{ value: ProductType.Soda, label: 'Soda' },
 	{ value: ProductType.B5L, label: 'Bidón 5L' },
+	{ value: ProductType.Dispenser, label: 'Dispenser' },
 ];
 
 export const serviceFilterItems = [
