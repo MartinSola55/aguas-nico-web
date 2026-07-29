@@ -24,12 +24,12 @@ export const RouteDetails = () => {
 	const [paymentFilter, setPaymentFilter] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const [mercadoPagoPayments, setMercadoPagoPayments] = useState([]);
 	const dispatchedModalRef = useRef(null);
 	const dispenserModalRef = useRef(null);
 	const transferModalRef = useRef(null);
 	const transfersViewModalRef = useRef(null);
 	const mercadoPagoModalRef = useRef(null);
-	const [mercadoPagoPayments, setMercadoPagoPayments] = useState([]);
 
 	const paymentMethods = useMemo(() => catalog?.paymentMethods || [], [catalog]);
 
