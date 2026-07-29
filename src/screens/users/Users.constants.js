@@ -1,3 +1,8 @@
-const emptyUser = { id: '', name: '', email: '', roleId: '', truckNumber: '', password: '' };
-
-export { emptyUser };
+export const emptyUser = {
+    id: '',
+    name: '',
+    email: '',
+    roleId: '',
+    truckNumber: '',
+    password: ''
+};
