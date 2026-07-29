@@ -57,7 +57,7 @@ export const stateName = (value) => ({
 	[State.Ausent]: 'No estaba',
 	[State.NotNeeded]: 'No necesitaba',
 	[State.Holidays]: 'De vacaciones',
-	[State.Debe]: 'Debe',
+	[State.Owes]: 'Debe',
 }[Number(value)] ?? '-');
 
 export const dayName = (value) => ({
