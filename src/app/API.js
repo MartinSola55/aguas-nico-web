@@ -78,6 +78,14 @@ export const endpoints = {
 		updateTruckNumber: (rq) => post('User/UpdateTruckNumber', rq),
 		updatePassword: (rq) => post('User/UpdatePassword', rq),
 	},
+	users: {
+		getRolesCombo: () => get('User/GetRolesCombo'),
+		getAll: (rq) => get('User/GetAll', rq),
+		getOne: (rq) => get('User/GetOne', rq),
+		create: (rq) => post('User/Create', rq),
+		update: (rq) => post('User/Update', rq),
+		delete: (rq) => post('User/Delete', rq),
+	},
 	home: {
 		getDashboard: (rq) => get('Home/GetDashboard', rq),
 	},

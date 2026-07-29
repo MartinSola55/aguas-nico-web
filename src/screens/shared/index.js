@@ -5,5 +5,6 @@ export { InvoiceTypeCombo } from './controls/InvoiceTypeCombo.jsx';
 export { MonthCombo } from './controls/MonthCombo.jsx';
 export { PaymentMethodCombo } from './controls/PaymentMethodCombo.jsx';
 export { ProductTypeCombo } from './controls/ProductTypeCombo.jsx';
+export { RoleCombo } from './controls/RoleCombo.jsx';
 export { TaxConditionCombo } from './controls/TaxConditionCombo.jsx';
 export { YearCombo } from './controls/YearCombo.jsx';

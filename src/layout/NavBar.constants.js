@@ -9,6 +9,7 @@ import {
 	Package,
 	Route,
 	Truck,
+	UserCog,
 	Users,
 } from 'lucide-react';
 
@@ -25,4 +26,5 @@ export const navItems = [
 	{ to: '/facturas', label: 'Facturas', icon: FileSpreadsheet, admin: true },
 	{ to: '/terceros', label: 'Terceros', icon: Handshake, admin: true },
 	{ to: '/estadisticas', label: 'Estadisticas', icon: BarChart3, admin: true },
+	{ to: '/usuarios', label: 'Usuarios', icon: UserCog, admin: true },
 ];
