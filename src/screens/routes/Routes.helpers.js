@@ -3,11 +3,14 @@ export const routeRequest = ({ userId, dayOfWeek }) => ({
 	dayOfWeek: Number(dayOfWeek || 0),
 });
 
-export const confirmCartRequest = (cart, payload) => ({
+export const confirmCartRequest = (cart, payload, sendReturned = false) => ({
 	id: cart.id,
 	clientId: cart.clientId,
 	products: payload.products,
 	abonoProducts: payload.abonoProducts,
+	// Sin devoluciones explícitas la API asume que vuelve un vacío por cada producto bajado,
+	// así que solo se mandan cuando el repartidor las completó en pantalla.
+	returnedProducts: sendReturned ? payload.returnedProducts : null,
 	paymentMethods: payload.paymentMethods,
 });
 

@@ -78,6 +78,14 @@ export const endpoints = {
 		updateTruckNumber: (rq) => post('User/UpdateTruckNumber', rq),
 		updatePassword: (rq) => post('User/UpdatePassword', rq),
 	},
+	users: {
+		getRolesCombo: () => get('User/GetRolesCombo'),
+		getAll: (rq) => get('User/GetAll', rq),
+		getOne: (rq) => get('User/GetOne', rq),
+		create: (rq) => post('User/Create', rq),
+		update: (rq) => post('User/Update', rq),
+		delete: (rq) => post('User/Delete', rq),
+	},
 	home: {
 		getDashboard: (rq) => get('Home/GetDashboard', rq),
 	},
@@ -129,6 +137,7 @@ export const endpoints = {
 		clientsByIDNotInRoute: (rq) => get('Route/ClientsByIDNotInRoute', rq),
 		clientsByNameNotInRoute: (rq) => get('Route/ClientsByNameNotInRoute', rq),
 		getDispatched: (rq) => get('Route/GetDispatched', rq),
+		getMercadoPagoPayments: (rq) => get('Route/GetMercadoPagoPayments', rq),
 		updateDispatched: (rq) => post('Route/UpdateDispatched', rq),
 		setDispenserPrice: (rq) => post('Route/SetDispenserPrice', rq),
 		getManualCartData: (rq) => get('Route/GetManualCartData', rq),
@@ -179,6 +188,7 @@ export const endpoints = {
 		getProductsSold: (rq) => get('Stats/GetProductsSold', rq),
 		getProductsSoldByDealer: (rq) => get('Stats/GetProductsSoldByDealer', rq),
 		getBalanceByDate: (rq) => get('Stats/GetBalanceByDate', rq),
+		getMercadoPagoPaymentsByDate: (rq) => get('Stats/GetMercadoPagoPaymentsByDate', rq),
 	},
 	terceros: {
 		getByDate: (rq) => get('Tercero/GetByDate', rq),

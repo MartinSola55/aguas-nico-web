@@ -10,6 +10,7 @@ import { CartEditor } from '../CartEditor.jsx';
 import { ReturnProductsModal } from '../modals/ReturnProductsModal.jsx';
 import { confirmCartRequest } from '../../Routes.helpers.js';
 import { cartPreview, stateVariant } from './CartCard.helpers.js';
+import { notDeliveredStates } from './CartCard.constants.js';
 
 export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 	const expanded = !route.isStatic;
@@ -19,7 +20,7 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 
 	const confirm = (payload) => {
 		setLoading(true);
-		API.endpoints.carts.confirm(confirmCartRequest(cart, payload))
+		API.endpoints.carts.confirm(confirmCartRequest(cart, payload, App.isDealer()))
 			.then((rs) => {
 				toast.success(rs.message);
 				onChanged();
@@ -107,12 +108,15 @@ export const CartCard = ({ route, cart, paymentMethods, onChanged }) => {
 							title="Confirmar bajada"
 							products={cart.availableProducts || []}
 							abonoProducts={cart.availableAbonoProducts || []}
+							returnedProducts={cart.availableProducts}
+							showReturned={App.isDealer()}
+							mirrorReturned={App.isDealer()}
 							paymentMethods={paymentMethods}
 							onSubmit={confirm}
 							loading={loading}
 						/>
 						<div className="mt-3 flex flex-wrap gap-2">
-							{[State.Ausent, State.NotNeeded, State.Holidays].map((state) => (
+							{notDeliveredStates.map((state) => (
 								<Button key={state} size="sm" variant="secondary" loading={loading} onClick={() => setState(state)}>{Formatters.stateName(state)}</Button>
 							))}
 						</div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Helpers, Formatters } from '@app';
+import { PaymentMethodCode } from '@constants';
 import { Button, Card, DataTable, Input } from '@components';
 import { PaymentMethodCombo } from '@screens/shared';
 
@@ -17,12 +18,14 @@ const normalizeProducts = (items = EMPTY_ARRAY) =>
 		quantity: item.quantity ?? '',
 	}));
 
-const buildPaymentRows = (paymentMethods, defaultPaymentMethodId) => {
+const buildPaymentRows = (paymentMethods, defaultPaymentMethodCode) => {
 	const selected = paymentMethods
 		.filter((method) => method.selected || Helpers.numberOrZero(method.amount) > 0)
 		.map((method) => ({ paymentMethodId: methodId(method), amount: method.amount ?? '' }));
 	if (selected.length > 0) return selected;
-	return [{ paymentMethodId: defaultPaymentMethodId, amount: '' }];
+	// Se busca por código, porque los métodos de pago viven en la base y pueden cambiar.
+	const fallback = paymentMethods.find((method) => method.code === defaultPaymentMethodCode) ?? paymentMethods[0];
+	return [{ paymentMethodId: fallback ? methodId(fallback) : null, amount: '' }];
 };
 
 export const CartEditor = ({
@@ -32,8 +35,9 @@ export const CartEditor = ({
 	returnedProducts = EMPTY_ARRAY,
 	paymentMethods = EMPTY_ARRAY,
 	showReturned = false,
+	mirrorReturned = false,
 	allowReturnedOnly = false,
-	defaultPaymentMethodId = 1,
+	defaultPaymentMethodCode = PaymentMethodCode.Cash,
 	submitText = 'Confirmar',
 	onSubmit,
 	disabled = false,
@@ -48,8 +52,8 @@ export const CartEditor = ({
 		setRegularRows(normalizeProducts(products));
 		setAbonoRows(normalizeProducts(abonoProducts));
 		setReturnedRows(normalizeProducts(returnedProducts));
-		setPaymentRows(buildPaymentRows(paymentMethods, defaultPaymentMethodId));
-	}, [products, abonoProducts, returnedProducts, paymentMethods, defaultPaymentMethodId]);
+		setPaymentRows(buildPaymentRows(paymentMethods, defaultPaymentMethodCode));
+	}, [products, abonoProducts, returnedProducts, paymentMethods, defaultPaymentMethodCode]);
 
 	const total = useMemo(() => regularRows.reduce((sum, row) => sum + Helpers.numberOrZero(row.quantity) * Helpers.numberOrZero(row.price), 0), [regularRows]);
 	const showRegularTable = regularRows.length > 0;
@@ -73,6 +77,13 @@ export const CartEditor = ({
 
 	const updateQuantity = (setter) => (type, value) => {
 		setter((rows) => rows.map((row) => row.type === type ? { ...row, quantity: value } : row));
+	};
+
+	// Lo bajado arrastra a lo devuelto (se entrega lleno y se retira el vacío), pero no al revés:
+	// una vez que el repartidor corrige una devolución, esa cantidad queda como la cargó.
+	const updateDeliveredQuantity = (type, value) => {
+		updateQuantity(setRegularRows)(type, value);
+		if (mirrorReturned) updateQuantity(setReturnedRows)(type, value);
 	};
 
 	const setPaymentMethod = (index, value) => {
@@ -164,7 +175,7 @@ export const CartEditor = ({
 				{showRegularTable > 0 && (
 					<div className="xl:col-span-1">
 						<h3 className="mb-2 text-sm font-semibold">Bajada</h3>
-						<DataTable columns={productColumns(updateQuantity(setRegularRows), true)} rows={regularRows} empty="Sin productos" />
+						<DataTable columns={productColumns(updateDeliveredQuantity, true)} rows={regularRows} empty="Sin productos" />
 					</div>
 				)}
 				{showAbonosTable && (

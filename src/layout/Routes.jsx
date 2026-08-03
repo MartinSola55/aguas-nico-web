@@ -34,6 +34,7 @@ export const TransfersList = lazyScreen(() => import('../screens/transfers/Trans
 export const Invoices = lazyScreen(() => import('../screens/invoices/Invoices.jsx'), 'Invoices');
 export const Stats = lazyScreen(() => import('../screens/stats/Stats.jsx'), 'Stats');
 export const TercerosList = lazyScreen(() => import('../screens/terceros/TercerosList.jsx'), 'TercerosList');
+export const UsersList = lazyScreen(() => import('../screens/users/UsersList.jsx'), 'UsersList');
 export const Profile = lazyScreen(() => import('../screens/profile/Profile.jsx'), 'Profile');
 
 export const AppRoutes = () => (
@@ -67,6 +68,7 @@ export const AppRoutes = () => (
 						<Route path="/facturas" element={<LayoutShell><Invoices /></LayoutShell>} />
 						<Route path="/estadisticas" element={<LayoutShell><Stats /></LayoutShell>} />
 						<Route path="/terceros" element={<LayoutShell><TercerosList /></LayoutShell>} />
+						<Route path="/usuarios" element={<LayoutShell><UsersList /></LayoutShell>} />
 					</Route>
 				</Route>
 				<Route path="/login" element={<Login />} />

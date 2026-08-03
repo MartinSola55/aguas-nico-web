@@ -3,13 +3,15 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { ChevronRight, Edit, PackageCheck, Play, Plus, Search, UserPlus } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { API, App, Formatters, Helpers, useCatalog } from '@app';
+import { PaymentMethodCode } from '@constants';
 import { Badge, Button, Card, ConfirmButton, DataTable, Field, PageHeader, Select, StatCard } from '@components';
+import { MercadoPagoPaymentsModal } from '@screens/shared';
 import { CartCard } from './carts/cartCard/CartCard.jsx';
 import { DispatchedProductsModal } from './modals/DispatchedProductsModal.jsx';
 import { DispenserPriceModal } from './modals/DispenserPriceModal.jsx';
 import { TransfersViewModal } from './modals/TransfersViewModal.jsx';
 import { TransferFormModal } from '../transfers/TransferFormModal.jsx';
-import { paymentFilterItems, productFilterItems, serviceFilterItems } from './RouteDetails.constants.js';
+import { paymentFilterItems, productFilterItems, serviceFilterItems, soldProductColumns } from './RouteDetails.constants.js';
 
 export const RouteDetails = () => {
 	const { id } = useParams();
@@ -22,16 +24,23 @@ export const RouteDetails = () => {
 	const [paymentFilter, setPaymentFilter] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const [mercadoPagoPayments, setMercadoPagoPayments] = useState([]);
 	const dispatchedModalRef = useRef(null);
 	const dispenserModalRef = useRef(null);
 	const transferModalRef = useRef(null);
 	const transfersViewModalRef = useRef(null);
+	const mercadoPagoModalRef = useRef(null);
 
 	const paymentMethods = useMemo(() => catalog?.paymentMethods || [], [catalog]);
 
 	const load = () => {
 		API.endpoints.routes.getOne({ id }).then((rs) => {
 			setRoute(rs.data);
+			// Se traen junto con la planilla para poder mostrar cuántos son antes de abrir el modal.
+			if (App.isAdmin() && !rs.data.isStatic) {
+				API.endpoints.routes.getMercadoPagoPayments({ routeId: rs.data.id })
+					.then((payments) => setMercadoPagoPayments(payments.data.items || []));
+			}
 		});
 	};
 
@@ -70,6 +79,11 @@ export const RouteDetails = () => {
 			.finally(() => setLoading(false));
 	};
 
+	const openMercadoPago = () => mercadoPagoModalRef.current?.open({
+		title: `Pagos de Mercado Pago - ${route.dealerName}`,
+		items: mercadoPagoPayments,
+	});
+
 	const openDispatched = () => {
 		setLoading(true);
 		API.endpoints.routes.getDispatched({ routeId: route.id })
@@ -83,7 +97,11 @@ export const RouteDetails = () => {
 		setSaving(true);
 		API.endpoints.routes.updateDispatched({
 			routeId: route.id,
-			products: dispatched.map((item) => ({ type: item.type, quantity: Helpers.numberOrZero(item.quantity) })),
+			products: dispatched.map((item) => ({
+				type: item.type,
+				quantityMorning: Helpers.numberOrZero(item.quantityMorning),
+				quantityAfternoon: Helpers.numberOrZero(item.quantityAfternoon),
+			})),
 		})
 			.then((rs) => {
 				toast.success(rs.message);
@@ -121,9 +139,10 @@ export const RouteDetails = () => {
 
 	return (
 		<>
-			<DispatchedProductsModal ref={dispatchedModalRef} onSave={saveDispatched} loading={saving} />
+			<DispatchedProductsModal ref={dispatchedModalRef} onSave={saveDispatched} loading={saving} readOnly={!App.isAdmin()} />
 			<DispenserPriceModal ref={dispenserModalRef} onSave={saveDispenser} loading={saving} />
 			<TransfersViewModal ref={transfersViewModalRef} />
+			<MercadoPagoPaymentsModal ref={mercadoPagoModalRef} />
 			{App.isAdmin() && <TransferFormModal ref={transferModalRef} onSaved={load} />}
 
 			<PageHeader
@@ -162,24 +181,39 @@ export const RouteDetails = () => {
 					</div>
 				</Card>
 			)}
-			{!route.isStatic && App.isAdmin() && <div className="grid gap-4 xl:grid-cols-[1.2fr_.8fr]">
-				<Card title="Productos vendidos">
+			{!route.isStatic && <div className={`grid gap-4 ${App.isAdmin() ? 'xl:grid-cols-[1.2fr_.8fr]' : ''}`}>
+				<Card
+					title="Productos vendidos"
+					actions={!App.isAdmin() && <Button variant="secondary" loading={loading} onClick={openDispatched}>Productos cargados</Button>}>
 					<DataTable
-						columns={[
-							{ name: 'name', text: 'Producto' },
-							{ name: 'dispatched', text: 'Cargados' },
-							{ name: 'sold', text: 'Vendidos' },
-							{ name: 'returned', text: 'Devueltos' },
-							{ name: 'clientStock', text: 'Stock clientes' },
-							{ name: 'total', text: 'Total', render: Formatters.formatCurrency },
-						]}
+						columns={soldProductColumns(App.isAdmin())}
 						rows={route.soldProducts || []}
 						infinite
 					/>
 				</Card>
-				<Card title="Cobros y gastos">
+				{App.isAdmin() && <Card title="Cobros y gastos">
 					<div className="space-y-2 text-sm">
-						{(route.payments || []).map((payment) => <div key={payment.paymentMethodId} className="flex justify-between"><span>{payment.paymentMethodName}</span><strong>{Formatters.formatCurrency(payment.amount)}</strong></div>)}
+						{(route.payments || []).map((payment) => payment.code === PaymentMethodCode.MercadoPago ? (
+							<button
+								key={payment.code}
+								type="button"
+								onClick={openMercadoPago}
+								disabled={mercadoPagoPayments.length === 0}
+								title={mercadoPagoPayments.length > 0 ? 'Ver detalle de pagos de Mercado Pago' : 'No hay pagos de Mercado Pago'}
+								className="group -mx-1 flex w-full cursor-pointer items-center justify-between rounded-[var(--radius-sm)] px-1 py-1 text-left text-sm transition-colors enabled:hover:bg-bg-tertiary disabled:cursor-default disabled:opacity-100 focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
+							>
+								<span className="flex items-center gap-1.5">
+									<span className={mercadoPagoPayments.length > 0 ? 'text-accent-primary' : ''}>{payment.paymentMethodName}</span>
+									{mercadoPagoPayments.length > 0 && <Badge variant="neutral">{mercadoPagoPayments.length}</Badge>}
+								</span>
+								<span className="flex items-center gap-1">
+									<strong>{Formatters.formatCurrency(payment.amount)}</strong>
+									{mercadoPagoPayments.length > 0 && <ChevronRight size={16} className="text-text-muted transition-transform group-hover:translate-x-0.5" />}
+								</span>
+							</button>
+						) : (
+							<div key={payment.code} className="flex justify-between"><span>{payment.paymentMethodName}</span><strong>{Formatters.formatCurrency(payment.amount)}</strong></div>
+						))}
 						{(() => {
 							const transfers = route.transfers || [];
 							const transfersTotal = transfers.reduce((sum, x) => sum + Number(x.amount || 0), 0);
@@ -206,7 +240,7 @@ export const RouteDetails = () => {
 						<div className="flex justify-between"><span>Dispenser</span><strong>{Formatters.formatCurrency(route.dispenserPrice)}</strong></div>
 						<div className="flex justify-between"><span>Gastos</span><strong>{Formatters.formatCurrency(route.totalExpenses || 0)}</strong></div>
 					</div>
-				</Card>
+				</Card>}
 			</div>}
 			<Card
 				className="mt-4"
