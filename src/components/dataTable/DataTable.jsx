@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button, EmptyState, Loader } from '@components';
+import { Button, EmptyState, Loader, Select } from '@components';
 import { DEFAULT_PAGE_SIZE } from './DataTable.constants';
 
 export const DataTable = ({
@@ -12,12 +12,15 @@ export const DataTable = ({
 	pagination = false,
 	infinite = false,
 	pageSize = DEFAULT_PAGE_SIZE,
+	pageSizeOptions = [],
 	scrollHeight = '24rem',
 }) => {
 	const [page, setPage] = useState(1);
+	const [selectedPageSize, setSelectedPageSize] = useState(pageSize);
 	const [visibleCount, setVisibleCount] = useState(pageSize);
 	const scrollRef = useRef(null);
-	const normalizedPageSize = Math.max(Number(pageSize) || DEFAULT_PAGE_SIZE, 1);
+	const normalizedPageSize = Math.max(Number(selectedPageSize) || DEFAULT_PAGE_SIZE, 1);
+	const canChangePageSize = pagination && pageSizeOptions.length > 1;
 	const isPaginated = pagination && rows.length > normalizedPageSize;
 	const isInfinite = !isPaginated && infinite && rows.length > normalizedPageSize;
 	const totalPages = Math.max(Math.ceil(rows.length / normalizedPageSize), 1);
@@ -28,6 +31,10 @@ export const DataTable = ({
 		if (isInfinite) return rows.slice(0, visibleCount);
 		return rows;
 	}, [isInfinite, isPaginated, pageEnd, pageStart, rows, visibleCount]);
+
+	useEffect(() => {
+		setSelectedPageSize(pageSize);
+	}, [pageSize]);
 
 	useEffect(() => {
 		setPage(1);
@@ -105,9 +112,23 @@ export const DataTable = ({
 					</tbody>
 				</table>
 			</div>
-			{!loading && isPaginated && (
+			{/* La barra sigue visible aunque entre todo en una página: si no, al elegir un tamaño grande
+			    desaparecería el selector y no habría forma de volver a uno chico. */}
+			{!loading && (isPaginated || (canChangePageSize && rows.length > 0)) && (
 				<div className="flex flex-col gap-3 border-t border-border-subtle bg-bg-secondary px-4 py-2.5 text-sm text-text-secondary sm:flex-row sm:items-center sm:justify-between">
-					<span>Mostrando {rangeStart}-{rangeEnd} de {rows.length}</span>
+					<div className="flex items-center gap-2">
+						<span>Mostrando {rangeStart}-{rangeEnd} de {rows.length}</span>
+						{canChangePageSize && (
+							<div className="w-20">
+								<Select
+									size="sm"
+									value={normalizedPageSize}
+									items={pageSizeOptions.map((option) => ({ value: option, label: String(option) }))}
+									onChange={(value) => setSelectedPageSize(value)} />
+							</div>
+						)}
+						{canChangePageSize && <span>por pagina</span>}
+					</div>
 					<div className="flex items-center gap-2">
 						<Button size="sm" variant="secondary" disabled={page === 1} onClick={() => setPage((current) => Math.max(current - 1, 1))}>
 							<ChevronLeft size={14} />Anterior

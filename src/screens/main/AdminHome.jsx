@@ -109,8 +109,9 @@ export const AdminHome = () => {
 							{ name: 'name', text: 'Producto' },
 							{ name: 'dispatched', text: 'Cargados' },
 							{ name: 'sold', text: 'Vendidos' },
-							{ name: 'returned', text: 'Devueltos' },
-							{ name: 'total', text: 'Total', render: Formatters.formatCurrency },
+							{ name: 'returned', text: 'Vacíos' },
+							// Lo que quedó sin bajar: los llenos que tienen que volver en el camión.
+							{ name: 'inTruck', text: 'En el camión', render: (_, row) => Number(row.dispatched || 0) - Number(row.sold || 0) },
 						]}
 						rows={soldProducts}
 						loading={loading}
