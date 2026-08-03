@@ -25,6 +25,7 @@ export const Login = () => {
 				LocalStorage.setUserName(user.name);
 				LocalStorage.setUserEmail(user.email);
 				LocalStorage.setTruckNumber(user.truckNumber);
+				LocalStorage.setCanEditSensitiveData(user.canEditSensitiveData);
 				navigate('/');
 			})
 			.catch((error) => {

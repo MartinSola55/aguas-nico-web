@@ -67,7 +67,7 @@ export const ClientForm = () => {
 						<Input label="Email" type="email" value={client.email} onChange={(value) => update('email', value)} />
 						{App.isAdmin() && <DealerCombo label="Repartidor" clearable dealers={dealers} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />}
 						{App.isAdmin() && <DayCombo label="Dia de reparto" clearable value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />}
-						<Input label="Deuda inicial" type="number" value={client.debt} onChange={(value) => update('debt', value)} />
+						{App.canEditSensitiveData() && <Input label="Deuda inicial" type="number" value={client.debt} onChange={(value) => update('debt', value)} />}
 						<div className="flex flex-col justify-end gap-2">
 							<CheckBox label="Factura" checked={client.hasInvoice} onChange={(value) => update('hasInvoice', value)} />
 							<CheckBox label="Solo abonos" checked={client.onlyAbonos} onChange={(value) => update('onlyAbonos', value)} />

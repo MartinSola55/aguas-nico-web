@@ -4,5 +4,6 @@ export const emptyUser = {
     email: '',
     roleId: '',
     truckNumber: '',
+    canEditSensitiveData: false,
     password: ''
 };

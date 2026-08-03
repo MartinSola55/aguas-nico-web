@@ -35,6 +35,9 @@ export const getSessionExpiration = () => get(StorageKey.SESSION_EXPIRATION);
 export const setTruckNumber = (value) => set(StorageKey.TRUCK_NUMBER, value);
 export const getTruckNumber = () => get(StorageKey.TRUCK_NUMBER);
 
+export const setCanEditSensitiveData = (value) => set(StorageKey.CAN_EDIT_SENSITIVE_DATA, !!value);
+export const getCanEditSensitiveData = () => get(StorageKey.CAN_EDIT_SENSITIVE_DATA);
+
 export const setTheme = (value) => set(StorageKey.THEME, value);
 export const getTheme = () => get(StorageKey.THEME);
 
@@ -49,4 +52,5 @@ export const clearSessionData = () => {
 	remove(StorageKey.USER_EMAIL);
 	remove(StorageKey.SESSION_EXPIRATION);
 	remove(StorageKey.TRUCK_NUMBER);
+	remove(StorageKey.CAN_EDIT_SENSITIVE_DATA);
 };
