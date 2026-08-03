@@ -3,6 +3,7 @@ export const userFormRequest = (form, isDealer) => ({
 	email: (form.email || '').trim(),
 	roleId: form.roleId,
 	truckNumber: isDealer ? Number(form.truckNumber) || 0 : null,
+	canEditSensitiveData: !isDealer && !!form.canEditSensitiveData,
 });
 
 export const validateUserForm = (form, isDealer, isNew) => {

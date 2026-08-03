@@ -152,7 +152,7 @@ export const RouteDetails = () => {
 					<>
 						{route.isStatic && App.isAdmin() && <Button loading={loading} onClick={startRoute}><Play size={16} />Comenzar</Button>}
 						{App.isAdmin() && <Link to="/clientes/nuevo" target="_blank"><Button variant="secondary"><UserPlus size={16} />Nuevo cliente</Button></Link>}
-						{App.isAdmin() && <Link to={`/planillas/${route.id}/editar`}><Button variant="secondary"><Edit size={16} />Editar clientes</Button></Link>}
+						{/* {App.isAdmin() && <Link to={`/planillas/${route.id}/editar`}><Button variant="secondary"><Edit size={16} />Editar clientes</Button></Link>} */}
 						{!route.isStatic && <Link to={`/planillas/${route.id}/manual`}><Button variant="secondary"><Plus size={16} />Fuera de reparto</Button></Link>}
 						{!route.isStatic && App.isAdmin() && <Button onClick={() => transferModalRef.current?.open()}>Nueva transferencia</Button>}
 					</>

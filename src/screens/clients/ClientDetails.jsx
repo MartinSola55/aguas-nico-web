@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { API, Formatters, Helpers } from '@app';
+import { API, App, Formatters, Helpers } from '@app';
 import { Button, Card, CheckBox, ConfirmButton, DataTable, Field, Input, PageHeader } from '@components';
 import { DayCombo, DealerCombo, InvoiceTypeCombo, TaxConditionCombo } from '@screens/shared';
 import { buildClientRequest } from './Clients.helpers.js';
@@ -186,7 +186,9 @@ export const ClientDetails = () => {
 									<Input label="Email" value={client.email} onChange={(value) => update('email', value)} />
 									<DealerCombo label="Repartidor" clearable dealers={dealers} value={client.dealerId} onChange={(value) => update('dealerId', value || '')} />
 									<DayCombo label="Dia" clearable value={client.deliveryDay} onChange={(value) => update('deliveryDay', value)} />
-									<Input label="Deuda" type="number" value={client.debt} onChange={(value) => update('debt', value)} />
+									{App.canEditSensitiveData()
+										? <Input label="Deuda" type="number" value={client.debt} onChange={(value) => update('debt', value)} />
+										: <Field label="Deuda" value={Formatters.debtLabel(client.debt)} />}
 									<CheckBox label="Factura" checked={client.hasInvoice} onChange={(value) => update('hasInvoice', value)} />
 									<CheckBox label="Solo abonos" checked={client.onlyAbonos} onChange={(value) => update('onlyAbonos', value)} />
 									<Input as="textarea" label="Observaciones" value={client.observations} onChange={(value) => update('observations', value)} />

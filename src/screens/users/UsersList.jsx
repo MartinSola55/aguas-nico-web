@@ -63,6 +63,7 @@ export const UsersList = () => {
 						{ name: 'email', text: 'Email' },
 						{ name: 'role', text: 'Rol', render: (value) => <Badge variant={value === Roles.Admin ? 'success' : 'neutral'}>{Helpers.getRoleName(value)}</Badge> },
 						{ name: 'truckNumber', text: 'Camión', render: (value) => value ?? '-' },
+						{ name: 'canEditSensitiveData', text: 'Datos sensibles', render: (value) => <Badge variant={value ? 'success' : 'neutral'}>{value ? 'Puede editar' : 'Solo lectura'}</Badge> },
 						{ name: 'createdAt', text: 'Alta', render: Formatters.formatDate },
 						{
 							name: 'actions', text: 'Acciones', render: (_, row) => (
