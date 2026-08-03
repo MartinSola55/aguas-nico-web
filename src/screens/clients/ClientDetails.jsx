@@ -134,7 +134,9 @@ export const ClientDetails = () => {
 								{ name: 'paymentMethods', text: 'Pago', render: (items = [], row) => row.transferAmount ? Formatters.formatCurrency(row.transferAmount) : items.length ? items.map((m) => `${m.paymentMethodName}: ${Formatters.formatCurrency(m.amount)}`).join(', ') : '-' },
 							]}
 							rows={client.cartsTransfersHistory || []}
-							infinite
+							pagination
+							pageSize={10}
+							pageSizeOptions={[10, 25, 50, 100]}
 						/>
 					</Card>
 					<Card title="Historial de envases">
@@ -146,7 +148,9 @@ export const ClientDetails = () => {
 								{ name: 'date', text: 'Fecha', render: Formatters.formatDate },
 							]}
 							rows={client.productsHistory || []}
-							infinite
+							pagination
+							pageSize={10}
+							pageSizeOptions={[10, 25, 50, 100]}
 						/>
 					</Card>
 					<div className="grid gap-4 lg:grid-cols-2">
