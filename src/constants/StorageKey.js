@@ -4,7 +4,6 @@ export const USER_ROLE = 'aguas_nico_user_role';
 export const USER_NAME = 'aguas_nico_user_name';
 export const USER_EMAIL = 'aguas_nico_user_email';
 export const TRUCK_NUMBER = 'aguas_nico_truck_number';
-export const CAN_EDIT_SENSITIVE_DATA = 'aguas_nico_can_edit_sensitive_data';
 export const SESSION_EXPIRATION = 'aguas_nico_session_expiration';
 export const THEME = 'aguas_nico_theme';
 export const SIDEBAR_EXPANDED = 'aguas_nico_sidebar_expanded';

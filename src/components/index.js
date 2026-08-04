@@ -1,4 +1,5 @@
 export { Badge } from './badge/Badge.jsx';
+export { variants as badgeVariants } from './badge/Badge.constants.js';
 export { Button } from './button/Button.jsx';
 export { Card } from './card/Card.jsx';
 export { CheckBox } from './checkBox/CheckBox.jsx';

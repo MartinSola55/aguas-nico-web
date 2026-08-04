@@ -12,9 +12,10 @@ export const isLoggedIn = () => {
 	return true;
 };
 
-export const isAdmin = () => LocalStorage.getUserRole() === Roles.Admin;
+export const isSuperadmin = () => LocalStorage.getUserRole() === Roles.Superadmin;
+export const isAdmin = () => isSuperadmin() || LocalStorage.getUserRole() === Roles.Admin;
 export const isDealer = () => LocalStorage.getUserRole() === Roles.Dealer;
 
-// Permiso preferencial: habilita editar datos sensibles (deuda del cliente, etc.). El resto de los
+// Datos sensibles (deuda del cliente, etc.): sólo los edita el superadministrador. El resto de los
 // administradores los ve pero no los puede modificar. La validación real vive en el backend.
-export const canEditSensitiveData = () => isAdmin() && LocalStorage.getCanEditSensitiveData() === true;
+export const canEditSensitiveData = () => isSuperadmin();

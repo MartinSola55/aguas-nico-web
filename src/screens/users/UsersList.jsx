@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { API, Formatters, Helpers } from '@app';
+import { API, App, Formatters, Helpers } from '@app';
 import { Roles } from '@constants';
 import { Badge, Button, Card, ConfirmButton, DataTable, PageHeader } from '@components';
 import { UserFormModal } from './UserFormModal.jsx';
@@ -61,16 +61,17 @@ export const UsersList = () => {
 					columns={[
 						{ name: 'name', text: 'Nombre' },
 						{ name: 'email', text: 'Email' },
-						{ name: 'role', text: 'Rol', render: (value) => <Badge variant={value === Roles.Admin ? 'success' : 'neutral'}>{Helpers.getRoleName(value)}</Badge> },
+						{ name: 'role', text: 'Rol', render: (value) => <Badge variant={Helpers.getRoleBadgeVariant(value)}>{Helpers.getRoleName(value)}</Badge> },
 						{ name: 'truckNumber', text: 'Camión', render: (value) => value ?? '-' },
-						{ name: 'canEditSensitiveData', text: 'Datos sensibles', render: (value) => <Badge variant={value ? 'success' : 'neutral'}>{value ? 'Puede editar' : 'Solo lectura'}</Badge> },
 						{ name: 'createdAt', text: 'Alta', render: Formatters.formatDate },
 						{
 							name: 'actions', text: 'Acciones', render: (_, row) => (
-								<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-									<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
-									<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar usuario?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
-								</div>
+								row.role === Roles.Superadmin && !App.isSuperadmin() ? null : (
+									<div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+										<Button size="sm" variant="secondary" onClick={() => formModalRef.current?.open(row)}>Editar</Button>
+										<ConfirmButton size="sm" variant="danger" loading={loading} message="Eliminar usuario?" onConfirm={() => remove(row.id)}>Eliminar</ConfirmButton>
+									</div>
+								)
 							)
 						},
 					]}
