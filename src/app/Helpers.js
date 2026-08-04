@@ -29,8 +29,21 @@ export const numberOrZero = (value) => {
 export const positiveItems = (items = [], quantityKey = 'quantity') =>
 	items.filter((item) => numberOrZero(item[quantityKey]) > 0);
 
+export const getRoleBadgeVariant = (role) => {
+	switch (role) {
+		case Roles.Superadmin:
+			return 'info';
+		case Roles.Admin:
+			return 'success';
+		default:
+			return 'neutral';
+	}
+};
+
 export const getRoleName = (role) => {
 	switch (role) {
+		case Roles.Superadmin:
+			return 'Super Administrador';
 		case Roles.Admin:
 			return 'Administrador';
 		case Roles.Dealer:

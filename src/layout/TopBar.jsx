@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { LogOut, Menu, UserRound } from 'lucide-react';
 import { API, App, Helpers, LocalStorage } from '@app';
-import { Button, ThemeToggle } from '@components';
+import { badgeVariants, Button, ThemeToggle } from '@components';
 import { toast } from 'react-toastify';
 
 export const TopBar = ({ onMobileMenuClick = () => { } }) => {
@@ -14,7 +14,8 @@ export const TopBar = ({ onMobileMenuClick = () => { } }) => {
 	const userEmail = LocalStorage.getUserEmail();
 	const truckNumber = LocalStorage.getTruckNumber();
 	const isDealer = App.isDealer();
-	const roleName = Helpers.getRoleName(LocalStorage.getUserRole());
+	const userRole = LocalStorage.getUserRole();
+	const roleName = Helpers.getRoleName(userRole);
 
 	const logout = () => {
 		toast.dismiss();
@@ -92,7 +93,7 @@ export const TopBar = ({ onMobileMenuClick = () => { } }) => {
 							<div className="min-w-0">
 								<div className="truncate text-sm font-semibold text-text-primary">{userName}</div>
 								{userEmail && <div className="truncate text-xs text-text-muted">{userEmail}</div>}
-								<span className="mt-1.5 inline-block rounded-full bg-accent-primary-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent-primary">
+								<span className={`mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${badgeVariants[Helpers.getRoleBadgeVariant(userRole)]}`}>
 									{roleName}{isDealer && truckNumber ? ` · Camión ${truckNumber}` : ''}
 								</span>
 							</div>

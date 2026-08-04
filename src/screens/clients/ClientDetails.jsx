@@ -32,6 +32,11 @@ export const ClientDetails = () => {
 
 	const update = (key, value) => setClient((current) => ({ ...current, [key]: value }));
 
+	const cancelEdit = (setEditing) => {
+		setEditing(false);
+		load();
+	};
+
 	const saveClient = () => {
 		setLoading(true);
 		API.endpoints.clients.update({ id: client.id, ...buildClientRequest(client) })
@@ -154,7 +159,7 @@ export const ClientDetails = () => {
 						/>
 					</Card>
 					<div className="grid gap-4 lg:grid-cols-2">
-						<Card title="Productos asociados" actions={editingProducts ? <Button size="sm" loading={loading} onClick={saveProducts}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingProducts(true)}>Editar</Button>}>
+						<Card title="Productos asociados" actions={editingProducts ? <><Button size="sm" variant="secondary" onClick={() => cancelEdit(setEditingProducts)}>Cancelar</Button><Button size="sm" loading={loading} onClick={saveProducts}>Guardar</Button></> : <Button size="sm" variant="secondary" onClick={() => setEditingProducts(true)}>Editar</Button>}>
 							<DataTable
 								columns={[
 									{ name: 'productName', text: 'Producto' },
@@ -166,7 +171,7 @@ export const ClientDetails = () => {
 								infinite
 							/>
 						</Card>
-						<Card title="Abonos asociados" actions={editingAbonos ? <Button size="sm" loading={loading} onClick={saveAbonos}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingAbonos(true)}>Editar</Button>}>
+						<Card title="Abonos asociados" actions={editingAbonos ? <><Button size="sm" variant="secondary" onClick={() => cancelEdit(setEditingAbonos)}>Cancelar</Button><Button size="sm" loading={loading} onClick={saveAbonos}>Guardar</Button></> : <Button size="sm" variant="secondary" onClick={() => setEditingAbonos(true)}>Editar</Button>}>
 							<DataTable
 								columns={[
 									{ name: 'abonoName', text: 'Abono' },
@@ -180,7 +185,7 @@ export const ClientDetails = () => {
 					</div>
 				</div>
 				<div className="space-y-4">
-					<Card title="Cliente" actions={editingClient ? <Button size="sm" loading={loading} onClick={saveClient}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingClient(true)}>Editar</Button>}>
+					<Card title="Cliente" actions={editingClient ? <><Button size="sm" variant="secondary" onClick={() => cancelEdit(setEditingClient)}>Cancelar</Button><Button size="sm" loading={loading} onClick={saveClient}>Guardar</Button></> : <Button size="sm" variant="secondary" onClick={() => setEditingClient(true)}>Editar</Button>}>
 						<div className="grid gap-3">
 							{editingClient ? (
 								<>
@@ -216,7 +221,7 @@ export const ClientDetails = () => {
 						</div>
 					</Card>
 					{client.hasInvoice && (
-						<Card title="Datos de facturacion" actions={editingInvoice ? <Button size="sm" loading={loading} onClick={saveInvoice}>Guardar</Button> : <Button size="sm" variant="secondary" onClick={() => setEditingInvoice(true)}>Editar</Button>}>
+						<Card title="Datos de facturacion" actions={editingInvoice ? <><Button size="sm" variant="secondary" onClick={() => cancelEdit(setEditingInvoice)}>Cancelar</Button><Button size="sm" loading={loading} onClick={saveInvoice}>Guardar</Button></> : <Button size="sm" variant="secondary" onClick={() => setEditingInvoice(true)}>Editar</Button>}>
 							<div className="grid gap-3">
 								<InvoiceTypeCombo label="Tipo de factura" disabled={!editingInvoice} value={client.invoiceType} onChange={(value) => update('invoiceType', value)} />
 								<TaxConditionCombo label="Condicion IVA" disabled={!editingInvoice} value={client.taxCondition} onChange={(value) => update('taxCondition', value)} />
