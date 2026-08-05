@@ -39,7 +39,7 @@ export const UserFormModal = ({ roles = [], onSave, loading = false, ref }) => {
 				<Input label="Nombre" required value={form.name} onChange={(value) => setForm((f) => ({ ...f, name: value }))} />
 				<Input label="Email" type="email" required value={form.email} onChange={(value) => setForm((f) => ({ ...f, email: value }))} />
 				<div className="grid gap-3 sm:grid-cols-2">
-					<RoleCombo label="Rol" required roles={selectableRoles} value={form.roleId} onChange={(value) => setForm((f) => ({ ...f, roleId: value }))} />
+					<RoleCombo label="Rol" required autoComplete="new-password" roles={selectableRoles} value={form.roleId} onChange={(value) => setForm((f) => ({ ...f, roleId: value }))} />
 					{isDealer && (
 						<Input label="Número de camión" type="number" min={1} required value={form.truckNumber} onChange={(value) => setForm((f) => ({ ...f, truckNumber: value }))} />
 					)}
@@ -47,6 +47,7 @@ export const UserFormModal = ({ roles = [], onSave, loading = false, ref }) => {
 				<Input
 					label={isNew ? 'Contraseña' : 'Nueva contraseña (opcional)'}
 					type="password"
+					autoComplete="new-password"
 					required={isNew}
 					value={form.password}
 					onChange={(value) => setForm((f) => ({ ...f, password: value }))} />

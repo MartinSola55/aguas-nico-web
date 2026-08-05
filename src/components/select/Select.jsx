@@ -1,4 +1,5 @@
-import ReactSelect from 'react-select';
+import { useMemo } from 'react';
+import ReactSelect, { components as ReactSelectComponents } from 'react-select';
 import { getSelectStyles } from './Select.constants';
 
 export const Select = ({
@@ -11,8 +12,18 @@ export const Select = ({
 	clearable = false,
 	disabled = false,
 	required = false,
+	autoComplete,
 	onChange,
 }) => {
+	// El buscador interno de react-select es un input de texto y el navegador puede autocompletarlo con credenciales guardadas.
+	const selectComponents = useMemo(
+		() =>
+			autoComplete
+				? { Input: (inputProps) => <ReactSelectComponents.Input {...inputProps} autoComplete={autoComplete} /> }
+				: undefined,
+		[autoComplete]
+	);
+
 	const selectedValue = isMulti
 		? items.filter((item) => Array.isArray(value) && value.includes(item.value))
 		: items.find((item) => item.value === value) || null;
@@ -36,6 +47,7 @@ export const Select = ({
 				classNamePrefix="react-select"
 				value={selectedValue}
 				options={items}
+				components={selectComponents}
 				placeholder={placeholder}
 				isMulti={isMulti}
 				isClearable={clearable}
