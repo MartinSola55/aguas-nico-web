@@ -14,6 +14,7 @@ export const Input = ({
 	step,
 	rows = 3,
 	as = 'input',
+	autoComplete,
 	className = '',
 	onChange,
 }) => {
@@ -28,6 +29,7 @@ export const Input = ({
 		min,
 		max,
 		step,
+		autoComplete,
 		onChange: (e) => onChange?.(e.target.value),
 		className: `${CONTROL_CLASS} ${isPassword ? PG_CONTROL_CLASS : ''} ${className}`,
 	};

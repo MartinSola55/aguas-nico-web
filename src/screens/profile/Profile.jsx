@@ -104,8 +104,8 @@ export const Profile = () => {
 				</Card>
 				<Card title="Cambiar contraseña">
 					<div className="grid gap-3">
-						<Input label="Nueva contraseña" type="password" value={password} onChange={setPassword} />
-						<Input label="Confirmar contraseña" type="password" value={confirmPassword} onChange={setConfirmPassword} />
+						<Input label="Nueva contraseña" type="password" autoComplete="new-password" value={password} onChange={setPassword} />
+						<Input label="Confirmar contraseña" type="password" autoComplete="new-password" value={confirmPassword} onChange={setConfirmPassword} />
 						<p className="m-0 text-xs text-text-muted">
 							Mínimo 8 caracteres, con mayúscula, minúscula y número.
 						</p>
